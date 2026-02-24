@@ -32,81 +32,81 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# class User(AbstractBaseUser, PermissionsMixin, BaseModel):
-#     full_name = models.CharField(
-#         max_length=100
-#     )
-#     email = models.EmailField(
-#         unique=True
-#     )
-#     profile_pic = models.ImageField(
-#         upload_to='profiles/',
-#         blank=True,
-#         null=True
-#     )
-#     date_of_birth = models.DateField(
-#         blank=True,
-#         null=True
-#     )
-#     is_email_verified = models.BooleanField(
-#         default=False
-#     )
-#     new_email = models.EmailField(
-#         unique=True,
-#         blank=True,
-#         null=True
-#     )
-#     firebase_uid = models.CharField(
-#         max_length=255,
-#         unique=True,
-#         blank=True,
-#         null=True
-#     )
-#     auth_provider = models.CharField(
-#         max_length=50,
-#         default='email'
-#     )
-#     username = models.CharField(
-#         max_length=150,
-#         unique=True,
-#         blank=True,
-#         null=True
-#     )
+class User(AbstractBaseUser, PermissionsMixin, BaseModel):
+    full_name = models.CharField(
+        max_length=100
+    )
+    email = models.EmailField(
+        unique=True
+    )
+    profile_pic = models.ImageField(
+        upload_to='profiles/',
+        blank=True,
+        null=True
+    )
+    date_of_birth = models.DateField(
+        blank=True,
+        null=True
+    )
+    is_email_verified = models.BooleanField(
+        default=False
+    )
+    new_email = models.EmailField(
+        unique=True,
+        blank=True,
+        null=True
+    )
+    firebase_uid = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True
+    )
+    auth_provider = models.CharField(
+        max_length=50,
+        default='email'
+    )
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        blank=True,
+        null=True
+    )
 
-#     is_staff = models.BooleanField(
-#         default=False
-#     )
-#     is_superuser = models.BooleanField(
-#         default=False
-#     )
+    is_staff = models.BooleanField(
+        default=False
+    )
+    is_superuser = models.BooleanField(
+        default=False
+    )
 
-#     groups = models.ManyToManyField(
-#         'auth.Group',
-#         related_name='custom_user_set',
-#         related_query_name='user',
-#         blank=True,
-#         verbose_name='groups',
-#         help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-#     )
-#     user_permissions = models.ManyToManyField(
-#         'auth.Permission',
-#         related_name='custom_user_set',
-#         related_query_name='user',
-#         blank=True,
-#         verbose_name='user permissions',
-#         help_text='Specific permissions for this user.',
-#     )
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_set',
+        related_query_name='user',
+        blank=True,
+        verbose_name='groups',
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_set',
+        related_query_name='user',
+        blank=True,
+        verbose_name='user permissions',
+        help_text='Specific permissions for this user.',
+    )
 
-#     objects = CustomUserManager()
+    objects = CustomUserManager()
 
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = ['full_name']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['full_name']
 
-#     class Meta:
-#         db_table = 'users'
+    class Meta:
+        db_table = 'users'
 
-#     def __str__(self):
-#         return self.email
+    def __str__(self):
+        return self.email
 
 
 # class OTP(models.Model):
