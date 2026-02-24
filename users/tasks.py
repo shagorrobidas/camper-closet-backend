@@ -20,6 +20,22 @@ def send_otp_email_task(user_id, otp, purpose):
         print(f"Sent OTP email to {user.email} for {purpose} with OTP: {otp}")
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} not found for OTP email.")
+        custom_exception_handler(f"User with id {user_id} not found for OTP email.")
     except Exception as e:
         logger.error(f"Error sending OTP email: {str(e)}")
+        custom_exception_handler(e)
+
+
+def send_verification_email_task(user_id, verification_url):
+    """
+    Synchronously send a verification email.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+        send_verification_email(user, verification_url)
+    except User.DoesNotExist as e:
+        logger.error(f"User with id {user_id} not found for verification email.")
+        custom_exception_handler(e)
+    except Exception as e:
+        logger.error(f"Error sending verification email: {str(e)}")
         custom_exception_handler(e)
