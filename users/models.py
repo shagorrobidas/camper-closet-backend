@@ -109,26 +109,26 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         return self.email
 
 
-# class OTP(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     otp = models.CharField(max_length=6)
-#     purpose = models.CharField(max_length=20, choices=(
-#         ('email_verification', 'Email Verification'),
-#         ('password_reset', 'Password Reset'),
-#         ('login', 'Login'),
-#         ('change_email', 'Change Email'),
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=6)
+    purpose = models.CharField(max_length=20, choices=(
+        ('email_verification', 'Email Verification'),
+        ('password_reset', 'Password Reset'),
+        ('login', 'Login'),
+        ('change_email', 'Change Email'),
 
-#     ))
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     expires_at = models.DateTimeField()
+    ))
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
 
-#     def is_valid(self):
-#         return timezone.now() <= self.expires_at
+    def is_valid(self):
+        return timezone.now() <= self.expires_at
 
-#     class Meta:
-#         indexes = [
-#             models.Index(fields=['user', 'purpose']),
-#         ]
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'purpose']),
+        ]
 
 
 # class EmailVerification(models.Model):
