@@ -1,9 +1,9 @@
 from django.urls import path
 from .views import (
     RegisterView,
-    # LoginView,
-    # RequestOTPView,
-    # VerifyOTPView,
+    VerifyOTPView,
+    RequestOTPView,
+    LoginView,
     # ChangePasswordView,
     # RequestPasswordResetView,
     # VerifyPasswordResetOTPView,
@@ -25,21 +25,21 @@ urlpatterns = [
         RegisterView.as_view(),
         name='signup'
     ),
-    # path(
-    #     'login/',
-    #     LoginView.as_view(),
-    #     name='login'
-    # ),
-    # path(
-    #     'request-otp/',
-    #     RequestOTPView.as_view(),
-    #     name='request_otp'
-    # ),
-    # path(
-    #     'verify-otp/',
-    #     VerifyOTPView.as_view(),
-    #     name='verify_otp'
-    # ),
+    path(
+        'verify-otp/',
+        VerifyOTPView.as_view(),
+        name='verify_otp'
+    ),
+    path(
+        'request-otp/',
+        RequestOTPView.as_view(),
+        name='request_otp'
+    ),
+    path(
+        'login/',
+        LoginView.as_view(),
+        name='login'
+    ),
     # path(
     #     'change-password/',
     #     ChangePasswordView.as_view(),
