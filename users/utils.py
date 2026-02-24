@@ -69,3 +69,16 @@ def create_otp(user, purpose, expiry_minutes=10):
 
     return otp_obj
 
+
+def verify_otp(user, otp_code, purpose):
+    print("call verify otp")
+    try:
+        otp_obj = OTP.objects.get(user=user, purpose=purpose, otp=otp_code)
+        print(f"Verified OTP for {user.email}: {otp_code}")
+        if otp_obj.is_valid():
+            otp_obj.delete()  # OTP can only be used once
+            return True
+        return False
+    except OTP.DoesNotExist:
+        return False
+    
