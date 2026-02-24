@@ -131,17 +131,17 @@ class OTP(models.Model):
         ]
 
 
-# class EmailVerification(models.Model):
-#     user = models.ForeignKey(
-#         User,
-#         on_delete=models.CASCADE
-#     )
-#     token = models.UUIDField(
-#         default=uuid.uuid4,
-#         unique=True
-#     )
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     expires_at = models.DateTimeField()
+class EmailVerification(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
 
-#     def is_valid(self):
-#         return timezone.now() <= self.expires_at
+    def is_valid(self):
+        return timezone.now() <= self.expires_at
