@@ -48,3 +48,24 @@ def send_otp_email(user, otp, purpose):
 
     email.content_subtype = 'html'
     email.send()
+
+
+def create_otp(user, purpose, expiry_minutes=10):
+    print("call create otp")
+    # Delete any existing OTPs for this user and purpose
+    OTP.objects.filter(user=user, purpose=purpose).delete()
+
+    # Create new OTP
+    otp = generate_otp()
+    expires_at = timezone.now() + timedelta(minutes=expiry_minutes)
+
+    otp_obj = OTP.objects.create(
+        user=user,
+        otp=otp,
+        purpose=purpose,
+        expires_at=expires_at
+    )
+    print(f"Generated OTP for {user.email}: {otp}")
+
+    return otp_obj
+
