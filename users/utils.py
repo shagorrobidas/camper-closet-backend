@@ -28,7 +28,7 @@ def send_otp_email(user, otp, purpose):
 
     # Make sure that when purpose is "change_email", we send to the new email
     if purpose == "change_email":
-        print(f"Sending OTP email to {user.new_email} for {purpose} with OTP: {otp}")  
+        print(f"Sending OTP email to {user.new_email} for {purpose} with OTP: {otp}")  # noqa
         message = render_to_string('emails/email_change_email.html', context)
         email = EmailMessage(
             subject=subject,
@@ -37,7 +37,9 @@ def send_otp_email(user, otp, purpose):
             to=[user.new_email]  # Use the new email field here
         )
     else:
-        print(f"Sending OTP email to {user.email} for {purpose} with OTP: {otp}")  # For other purposes
+        print(
+            f"Sending OTP email to {user.email} for {purpose} with OTP: {otp}"
+        )  # For other purposes
         message = render_to_string('emails/otp_email.html', context)
         email = EmailMessage(
             subject=subject,
@@ -81,4 +83,23 @@ def verify_otp(user, otp_code, purpose):
         return False
     except OTP.DoesNotExist:
         return False
-    
+
+
+def send_verification_email(user, verification_url):
+    print("call send verification email")
+    subject = "Verify Your Email Address"
+    context = {
+        'user': user,
+        'verification_url': verification_url,
+    }
+
+    message = render_to_string('emails/verification_email.html', context)
+
+    email = EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user.email]
+    )
+    email.content_subtype = 'html'
+    email.send()
