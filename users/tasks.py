@@ -39,3 +39,40 @@ def send_verification_email_task(user_id, verification_url):
     except Exception as e:
         logger.error(f"Error sending verification email: {str(e)}")
         custom_exception_handler(e)
+
+
+def send_welcome_email(user_id):
+    """
+    Synchronously send a welcome email.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+
+        html_message = render_to_string(
+            'emails/welcome_email.html', {'user': user}
+        )
+        # fallback for clients that can't render HTML (optional)
+        # plain_message = strip_tags(html_message)
+
+        subject = 'Welcome to Comper Closet App!'
+
+        msg = EmailMessage(
+            subject,
+            html_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email]
+        )
+        msg.content_subtype = "html"
+        msg.send(fail_silently=False)
+
+        print(f"Sent welcome email to {user.email}")
+        
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist for welcome email.")
+        custom_exception_handler(f"User with id {user_id} does not exist for welcome email.")
+    except TemplateDoesNotExist as e:
+        logger.error(f"Email template not found: {str(e)}")
+        custom_exception_handler(e)
+    except Exception as e:
+        logger.error(f"Error sending welcome email: {str(e)}")
+        custom_exception_handler(e)
