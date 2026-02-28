@@ -11,7 +11,8 @@ from .views import (
     RequestPasswordView,
     VerifyPasswordResetOTPView,
     SetNewPasswordView,
-    CheckPasswordResetStatusView
+    CheckPasswordResetStatusView,
+    ChangePasswordView
 )
 
 urlpatterns = [
@@ -42,11 +43,11 @@ urlpatterns = [
         LoginView.as_view(),
         name='login'
     ),
-    # path(
-    #     'change-password/',
-    #     ChangePasswordView.as_view(),
-    #     name='change_password'
-    # ),
+    path(
+        'change-password/',
+        ChangePasswordView.as_view(),
+        name='change_password'
+    ),
     path(
         'request-password-reset/',
         RequestPasswordView.as_view(),
