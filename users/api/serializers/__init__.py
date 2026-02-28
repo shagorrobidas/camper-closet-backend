@@ -8,6 +8,11 @@ from .otp import (
 )
 from .users import UserSerializer
 from .login import LoginSerializer
+from .reset_password import (
+    ResetPasswordSerializer,
+    VerifyPasswordResetOTPSerializer,
+    SetNewPasswordSerializer
+)
 
 
 __all__ = [
@@ -18,4 +23,7 @@ __all__ = [
     'OTPVerificationSerializer',
     'UserSerializer',
     'LoginSerializer',
+    'ResetPasswordSerializer',
+    'VerifyPasswordResetOTPSerializer',
+    'SetNewPasswordSerializer'
 ]
