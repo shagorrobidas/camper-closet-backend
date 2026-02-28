@@ -1,30 +1,28 @@
 from django.urls import path
 from .views import (
-    RegisterView,
+    RegisterParentView,
+    RegisterChildView,
     VerifyOTPView,
     RequestOTPView,
     LoginView,
-    # ChangePasswordView,
-    # RequestPasswordResetView,
-    # VerifyPasswordResetOTPView,
-    # SetNewPasswordView,
-    # CheckPasswordResetStatusView,
-    # LogoutView,
-    # UserProfileView,
-    # UserProfileUpdateView,
-    # UserProfileDeleteView,
-    # RequestEmailChangeView,
-    # VerifyEmailChangeView,
-    # GoogleSocialAuthView,
-    # AppleSocialAuthView
+    UserProfileView,
+    UpdateUserProfileView,
+    DeleteUserProfileView,
 )
 
 urlpatterns = [
+    # ── Registration ─────────────────────────────────────────────────────────
     path(
-        'signup/',
-        RegisterView.as_view(),
-        name='signup'
+        'signup/parent/',
+        RegisterParentView.as_view(),
+        name='signup_parent',
     ),
+    path(
+        'signup/child/',
+        RegisterChildView.as_view(),
+        name='signup_child',
+    ),
+
     path(
         'verify-otp/',
         VerifyOTPView.as_view(),
@@ -66,35 +64,40 @@ urlpatterns = [
     #     name='check_reset_status'
     # ),
 
-    # path(
-    #     'profile/',
-    #     UserProfileView.as_view(),
-    #     name='profile'
-    # ),
-    # path(
-    #     'profile/update/',
-    #     UserProfileUpdateView.as_view(),
-    #     name='profile_update'
-    # ),
-    # path(
-    #     'profile/delete/',
-    #     UserProfileDeleteView.as_view(),
-    #     name='profile_delete'
-    # ),
+    path(
+        'profile/',
+        UserProfileView.as_view(),
+        name='profile'
+    ),
+    path(
+        'profile/<uuid:pk>/',
+        UserProfileView.as_view(),
+        name='profile_detail'
+    ),
+    path(
+        'profile/update/',
+        UpdateUserProfileView.as_view(),
+        name='profile_update'
+    ),
+    path(
+        'profile/update/<uuid:pk>/',
+        UpdateUserProfileView.as_view(),
+        name='profile_update_detail'
+    ),
+    path(
+        'profile/delete/',
+        DeleteUserProfileView.as_view(),
+        name='profile_delete'
+    ),
+    path(
+        'profile/delete/<uuid:pk>/',
+        DeleteUserProfileView.as_view(),
+        name='profile_delete_detail'
+    ),
     # path(
     #     'logout/',
     #     LogoutView.as_view(),
     #     name='logout'
-    # ),
-    # path(
-    #     'change-email/request/',
-    #     RequestEmailChangeView.as_view(),
-    #     name='request_email_change'
-    # ),
-    # path(
-    #     'change-email/verify/',
-    #     VerifyEmailChangeView.as_view(),
-    #     name='verify_email_change'
     # ),
     # path(
     #     'social-auth/google/',
