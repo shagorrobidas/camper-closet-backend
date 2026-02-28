@@ -35,12 +35,12 @@ def custom_exception_handler(exc: Exception, context: Dict[str, Any]):
             custom_code = error_data.get("code")
 
             if custom_message:
-                if isinstance(custom_message, list) and len(custom_message) > 0:
+                if isinstance(custom_message, list) and custom_message:
                     message = str(custom_message[0])
                 else:
                     message = str(custom_message)
             elif custom_error:
-                if isinstance(custom_error, list) and len(custom_error) > 0:
+                if isinstance(custom_error, list) and custom_error:
                     message = str(custom_error[0])
                 else:
                     message = str(custom_error)
@@ -48,14 +48,25 @@ def custom_exception_handler(exc: Exception, context: Dict[str, Any]):
                 message = str(detail)
 
             if custom_code:
-                if isinstance(custom_code, list) and len(custom_code) > 0:
+                if isinstance(custom_code, list) and custom_code:
                     code = custom_code[0]
                 else:
                     code = custom_code
-           
-            # Extract actual validation errors if present, excluding our extracted fields
-            errors = {k: v for k, v in error_data.items() if k not in ["detail", "error", "code"]}
-            if not errors:
+
+            # Extract actual validation errors if present
+            raw_errors = {
+                k: v for k, v in error_data.items()
+                if k not in ["detail", "error", "code", "message"]
+            }
+            if raw_errors:
+                error_msgs = []
+                for k, v in raw_errors.items():
+                    if isinstance(v, list):
+                        error_msgs.extend([str(item) for item in v])
+                    else:
+                        error_msgs.append(str(v))
+                errors = {"message": " ".join(error_msgs)}
+            else:
                 errors = None
         elif isinstance(error_data, list):
             errors = error_data
