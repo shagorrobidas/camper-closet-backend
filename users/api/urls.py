@@ -8,6 +8,8 @@ from .views import (
     UserProfileView,
     UpdateUserProfileView,
     DeleteUserProfileView,
+    RequestPasswordView,
+    VerifyPasswordResetOTPView
 )
 
 urlpatterns = [
@@ -43,16 +45,16 @@ urlpatterns = [
     #     ChangePasswordView.as_view(),
     #     name='change_password'
     # ),
-    # path(
-    #     'request-password-reset/',
-    #     RequestPasswordResetView.as_view(),
-    #     name='request_password-reset'
-    # ),
-    # path(
-    #     'verify-password-reset-otp/',
-    #     VerifyPasswordResetOTPView.as_view(),
-    #     name='verify_password_reset_otp'
-    # ),
+    path(
+        'request-password-reset/',
+        RequestPasswordView.as_view(),
+        name='request_password-reset'
+    ),
+    path(
+        'verify-password-reset-otp/',
+        VerifyPasswordResetOTPView.as_view(),
+        name='verify_password_reset_otp'
+    ),
     # path(
     #     'set-new-password/',
     #     SetNewPasswordView.as_view(),
