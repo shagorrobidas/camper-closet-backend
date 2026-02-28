@@ -9,7 +9,8 @@ from .views import (
     UpdateUserProfileView,
     DeleteUserProfileView,
     RequestPasswordView,
-    VerifyPasswordResetOTPView
+    VerifyPasswordResetOTPView,
+    SetNewPasswordView
 )
 
 urlpatterns = [
@@ -55,11 +56,11 @@ urlpatterns = [
         VerifyPasswordResetOTPView.as_view(),
         name='verify_password_reset_otp'
     ),
-    # path(
-    #     'set-new-password/',
-    #     SetNewPasswordView.as_view(),
-    #     name='set_new_password'
-    # ),
+    path(
+        'set-new-password/',
+        SetNewPasswordView.as_view(),
+        name='set_new_password'
+    ),
     # path(
     #     'check-reset-status/',
     #     CheckPasswordResetStatusView.as_view(),
