@@ -16,6 +16,7 @@ from users.utils import (
     generate_reset_token
 )
 from django.core.cache import cache
+from datetime import timedelta
 from django.utils import timezone
 from users.utils import CustomResponse, custom_exception_handler
 
@@ -150,14 +151,15 @@ class CheckPasswordResetStatusView(GenericAPIView):
             if not email:
                 return CustomResponse.error(
                     message="Email is required",
-                    status_code = status.HTTP_400_BAD_REQUEST
+                    status_code=status.HTTP_400_BAD_REQUEST
                 )
             try:
                 user = User.objects.get(email=email)
                 reset_request_time = cache.get(
                     f"password_reset_request_{user.id}"
                 )
-                if  reset_request_time:
+
+                if reset_request_time:
                     time_diff = timezone.now() - reset_request_time
                     if time_diff > timedelta(hours=1):
                         data ={
