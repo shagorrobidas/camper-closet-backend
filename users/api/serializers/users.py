@@ -10,9 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'email',
+            'role',
             'full_name',
             'profile_pic',
             'date_of_birth',
+            'parent',
             'is_email_verified',
             'created_at'
         )
