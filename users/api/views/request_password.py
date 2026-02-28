@@ -18,7 +18,7 @@ from users.utils import (
 from django.core.cache import cache
 from datetime import timedelta
 from django.utils import timezone
-from users.utils import CustomResponse, custom_exception_handler
+from core.utils import CustomResponse, custom_exception_handler
 
 
 class RequestPasswordView(GenericAPIView):

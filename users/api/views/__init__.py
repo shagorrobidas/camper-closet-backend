@@ -10,7 +10,8 @@ from .user_profile import (
 from .request_password import (
     RequestPasswordView,
     VerifyPasswordResetOTPView,
-    SetNewPasswordView
+    SetNewPasswordView,
+    CheckPasswordResetStatusView
 )
 
 
@@ -25,5 +26,6 @@ __all__ = [
     'DeleteUserProfileView',
     'RequestPasswordView',
     'VerifyPasswordResetOTPView',
-    'SetNewPasswordView'
+    'SetNewPasswordView',
+    'CheckPasswordResetStatusView'
 ]
