@@ -1,4 +1,7 @@
-from .signup import RegisterSerializer
+from .signup import (
+    RegisterParentSerializer,
+    RegisterChildSerializer,
+)
 from .otp import (
     OTPSerializer,
     OTPVerificationSerializer
@@ -9,8 +12,10 @@ from .login import LoginSerializer
 
 __all__ = [
     'RegisterSerializer',
+    'RegisterParentSerializer',
+    'RegisterChildSerializer',
     'OTPSerializer',
     'OTPVerificationSerializer',
     'UserSerializer',
-    'LoginSerializer'
+    'LoginSerializer',
 ]

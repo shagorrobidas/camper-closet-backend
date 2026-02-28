@@ -1,12 +1,21 @@
-from .signup import RegisterView
+from .signup import RegisterParentView, RegisterChildView
 from .verify_otp import VerifyOTPView
 from .request_otp import RequestOTPView
 from .login import LoginView
+from .user_profile import (
+    UserProfileView,
+    UpdateUserProfileView,
+    DeleteUserProfileView,
+)
 
 
 __all__ = [
-    'RegisterView',
+    'RegisterParentView',
+    'RegisterChildView',
     'VerifyOTPView',
     'RequestOTPView',
-    'LoginView'
+    'LoginView',
+    'UserProfileView',
+    'UpdateUserProfileView',
+    'DeleteUserProfileView',
 ]
