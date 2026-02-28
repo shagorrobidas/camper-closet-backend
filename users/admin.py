@@ -5,7 +5,7 @@ from users.models import User, OTP, EmailVerification
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'email', 'full_name',
+        'pk', 'email', 'role', 'full_name',
         'is_email_verified',
         'is_active', 'is_superuser'
     )
