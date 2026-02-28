@@ -53,10 +53,7 @@ class LoginView(generics.GenericAPIView):
 
         except serializers.ValidationError as e:
             logger.error(f"Failed to login: {str(e)}")
-            return CustomResponse.error(
-                message=e.detail,
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
+            return custom_exception_handler(e, request)
 
         except Exception as e:
             logger.error(f"Failed to login: {str(e)}")
