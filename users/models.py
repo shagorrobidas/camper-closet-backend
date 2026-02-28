@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import(
+from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin
@@ -19,6 +19,15 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create_parent(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("role", "parent")
+        return self.create_user(email, password, **extra_fields)
+
+    def create_child(self, email, parent, password=None, **extra_fields):
+        extra_fields.setdefault("role", "child")
+        extra_fields.setdefault("parent", parent)
+        return self.create_user(email, password, **extra_fields)
+
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -33,6 +42,23 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
+
+    ROLE_CHOICES = (
+        ('parent', 'Parent'),
+        ('child', 'Child'),
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+    )
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
     full_name = models.CharField(
         max_length=100
     )
@@ -50,11 +76,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     )
     is_email_verified = models.BooleanField(
         default=False
-    )
-    new_email = models.EmailField(
-        unique=True,
-        blank=True,
-        null=True
     )
     firebase_uid = models.CharField(
         max_length=255,
@@ -86,7 +107,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         related_query_name='user',
         blank=True,
         verbose_name='groups',
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', # noqa
     )
     user_permissions = models.ManyToManyField(
         'auth.Permission',
@@ -97,16 +118,19 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         help_text='Specific permissions for this user.',
     )
 
-    objects = CustomUserManager()
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name']
 
+    objects = CustomUserManager()
+
     class Meta:
-        db_table = 'users'
+        indexes = [
+            models.Index(fields=["email"]),
+            models.Index(fields=["role"]),
+        ]
 
     def __str__(self):
-        return self.email
+        return f"{self.full_name} ({self.role})"
 
 
 class OTP(models.Model):
