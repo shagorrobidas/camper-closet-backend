@@ -20,7 +20,9 @@ def send_otp_email_task(user_id, otp, purpose):
         print(f"Sent OTP email to {user.email} for {purpose} with OTP: {otp}")
     except User.DoesNotExist:
         logger.error(f"User with id {user_id} not found for OTP email.")
-        custom_exception_handler(f"User with id {user_id} not found for OTP email.")
+        custom_exception_handler(
+            f"User with id {user_id} not found for OTP email."
+        )
     except Exception as e:
         logger.error(f"Error sending OTP email: {str(e)}")
         custom_exception_handler(e)
@@ -34,11 +36,13 @@ def send_verification_email_task(user_id, verification_url):
         user = User.objects.get(id=user_id)
         send_verification_email(user, verification_url)
     except User.DoesNotExist as e:
-        logger.error(f"User with id {user_id} not found for verification email.")
-        custom_exception_handler(e)
+        logger.error(
+            f"User with id {user_id} not found for verification email."
+        )
+        return custom_exception_handler(e)
     except Exception as e:
         logger.error(f"Error sending verification email: {str(e)}")
-        custom_exception_handler(e)
+        return custom_exception_handler(e)
 
 
 def send_welcome_email(user_id):
@@ -66,10 +70,18 @@ def send_welcome_email(user_id):
         msg.send(fail_silently=False)
 
         print(f"Sent welcome email to {user.email}")
-        
-    except User.DoesNotExist:
-        logger.error(f"User with id {user_id} does not exist for welcome email.")
-        custom_exception_handler(f"User with id {user_id} does not exist for welcome email.")
+
+    except User.DoesNotExist as e:
+        logger.error(
+            f"User with id {user_id} does not exist for welcome email."
+        )
+        return custom_exception_handler(e)
+    except TemplateDoesNotExist as e:
+        logger.error(f"Email template not found: {str(e)}")
+        return custom_exception_handler(e)
+    except Exception as e:
+        logger.error(f"Error sending welcome email: {str(e)}")
+        return custom_exception_handler(e)
     except TemplateDoesNotExist as e:
         logger.error(f"Email template not found: {str(e)}")
         custom_exception_handler(e)
@@ -105,10 +117,12 @@ def send_child_credentials_email_task(user_id, raw_password):
         msg.send(fail_silently=False)
 
         print(f"Sent child credentials email to {user.email}")
-        
-    except User.DoesNotExist:
-        logger.error(f"User with id {user_id} does not exist for child credentials email.")
-        return custom_exception_handler(f"User with id {user_id} does not exist for child credentials email.")
+
+    except User.DoesNotExist as e:
+        logger.error(
+            f"User with id {user_id} does not exist for child credentials email."   # noqa: E501
+        )
+        return custom_exception_handler(e)
     except TemplateDoesNotExist as e:
         logger.error(f"Email template not found: {str(e)}")
         return custom_exception_handler(e)
