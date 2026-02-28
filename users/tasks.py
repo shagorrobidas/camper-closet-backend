@@ -76,3 +76,42 @@ def send_welcome_email(user_id):
     except Exception as e:
         logger.error(f"Error sending welcome email: {str(e)}")
         custom_exception_handler(e)
+
+
+def send_child_credentials_email_task(user_id, raw_password):
+    """
+    Synchronously send an email to the child with their login credentials.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+
+        html_message = render_to_string(
+            'emails/child_credentials_email.html',
+            {
+                'user': user,
+                'password': raw_password
+            }
+        )
+
+        subject = 'Your Comper Closet Account Details'
+
+        msg = EmailMessage(
+            subject,
+            html_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email]
+        )
+        msg.content_subtype = "html"
+        msg.send(fail_silently=False)
+
+        print(f"Sent child credentials email to {user.email}")
+        
+    except User.DoesNotExist:
+        logger.error(f"User with id {user_id} does not exist for child credentials email.")
+        return custom_exception_handler(f"User with id {user_id} does not exist for child credentials email.")
+    except TemplateDoesNotExist as e:
+        logger.error(f"Email template not found: {str(e)}")
+        return custom_exception_handler(e)
+    except Exception as e:
+        logger.error(f"Error sending child credentials email: {str(e)}")
+        return custom_exception_handler(e)
