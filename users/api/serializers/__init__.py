@@ -13,6 +13,7 @@ from .reset_password import (
     VerifyPasswordResetOTPSerializer,
     SetNewPasswordSerializer
 )
+from .change_password import ChangePasswordSerializer
 
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     'LoginSerializer',
     'ResetPasswordSerializer',
     'VerifyPasswordResetOTPSerializer',
-    'SetNewPasswordSerializer'
+    'SetNewPasswordSerializer',
+    'ChangePasswordSerializer'
 ]
