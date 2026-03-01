@@ -35,3 +35,34 @@ class UserSerializer(serializers.ModelSerializer):
             else:
                 ret['profile_pic'] = instance.profile_pic.url
         return ret
+
+
+class ChildSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='full_name')
+    profile_pic = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'name',
+            'email',
+            'role',
+            'profile_pic',
+            'date_of_birth',
+            'parent',
+            'is_email_verified',
+            'created_at'
+        )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.profile_pic:
+            request = self.context.get('request')
+            if request:
+                ret['profile_pic'] = request.build_absolute_uri(
+                    instance.profile_pic.url
+                )
+            else:
+                ret['profile_pic'] = instance.profile_pic.url
+        return ret

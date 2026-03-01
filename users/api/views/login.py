@@ -5,6 +5,7 @@ from django.utils import timezone
 from users.api.serializers import (
     UserSerializer,
     LoginSerializer,
+    ChildSerializer,
 )
 from core.utils.response import CustomResponse
 from core.utils.exceptions import custom_exception_handler
@@ -44,6 +45,13 @@ class LoginView(generics.GenericAPIView):
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }
+
+            if getattr(user, 'role', None) == 'parent':
+                children = user.children.all()
+                # Providing the child data as a list using ChildSerializer
+                data['child'] = ChildSerializer(
+                    children, many=True, context={'request': request}
+                ).data
 
             return CustomResponse.success(
                 message='Login successful',
