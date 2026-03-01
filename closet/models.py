@@ -15,8 +15,6 @@ class ItemCategory(BaseModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
         related_name='categories'
     )
     name = models.CharField(
