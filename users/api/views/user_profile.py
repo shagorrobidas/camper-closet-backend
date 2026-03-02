@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from users.models import User
 from users.permission import ProfileAccessMixin
-from users.api.serializers import UserSerializer
+from users.api.serializers import UserSerializer, ChildSerializer
 from core.utils.response import CustomResponse
 from core.utils.exceptions import custom_exception_handler
 
@@ -20,8 +20,22 @@ class UserProfileView(ProfileAccessMixin, generics.RetrieveAPIView):
         try:
             user = self.get_object()
             serializer = self.get_serializer(user)
+            data = serializer.data
+
+            if user.role == 'parent':
+                data['child'] = ChildSerializer(
+                    user.children.all(),
+                    many=True,
+                    context={'request': request},
+                ).data
+            elif user.role == 'child' and user.parent:
+                data['parent'] = UserSerializer(
+                    user.parent,
+                    context={'request': request},
+                ).data
+
             return CustomResponse.success(
-                data=serializer.data,
+                data=data,
                 message="User profile retrieved successfully.",
                 status_code=status.HTTP_200_OK,
             )
