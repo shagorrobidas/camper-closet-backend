@@ -7,6 +7,7 @@ from .otp import (
     OTPVerificationSerializer
 )
 from .users import UserSerializer
+from .child import ChildSerializer
 from .login import LoginSerializer
 from .reset_password import (
     ResetPasswordSerializer,
@@ -24,6 +25,7 @@ __all__ = [
     'OTPSerializer',
     'OTPVerificationSerializer',
     'UserSerializer',
+    'ChildSerializer',
     'LoginSerializer',
     'ResetPasswordSerializer',
     'VerifyPasswordResetOTPSerializer',
