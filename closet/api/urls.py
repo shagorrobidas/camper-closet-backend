@@ -5,7 +5,8 @@ from closet.api.views import (
     ItemCategoryCreateView,
     ClosetItemListView,
     ClosetItemCreateView,
-    ClosetItemUpdateView
+    ClosetItemUpdateView,
+    ClosetItemDeleteView,
 )
 
 urlpatterns = [
@@ -38,5 +39,10 @@ urlpatterns = [
         'items/update/<uuid:pk>/',
         ClosetItemUpdateView.as_view(),
         name='closet_items_update'
+    ),
+    path(
+        'items/delete/<uuid:pk>/',
+        ClosetItemDeleteView.as_view(),
+        name='closet_items_delete'
     ),
 ]

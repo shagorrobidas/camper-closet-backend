@@ -1,9 +1,9 @@
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
-    UpdateAPIView
+    UpdateAPIView,
+    DestroyAPIView
 )
-from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from closet.models import ClosetItem
 from closet.api.serializers import ClosetItemSerializer
@@ -71,9 +71,9 @@ class ClosetItemUpdateView(ProfileAccessMixin, UpdateAPIView):
 
             # Check ownership: item must belong to resolved user
             if item.user != user:
-                raise PermissionDenied(
-                    "You do not have permission to "
-                    "update this item."
+                return CustomResponse.error(
+                    message="You do not have permission to update this item.",
+                    status_code=403
                 )
 
             partial = kwargs.pop('partial', False)
@@ -89,3 +89,33 @@ class ClosetItemUpdateView(ProfileAccessMixin, UpdateAPIView):
             )
         except Exception as e:
             return custom_exception_handler(e, request)
+
+
+class ClosetItemDeleteView(ProfileAccessMixin, DestroyAPIView):
+    queryset = ClosetItem.objects.all()
+    serializer_class = ClosetItemSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            # Resolve user via ProfileAccessMixin (self or child)
+            item_pk = self.kwargs.pop('pk', None)
+            user = self.get_object()
+
+            # Look up the ClosetItem by pk
+            item = get_object_or_404(ClosetItem, pk=item_pk)
+
+            # Check ownership: item must belong to resolved user
+            if item.user != user:
+                return CustomResponse.error(
+                    message="You do not have permission to delete this item.",
+                    status_code=403
+                )
+
+            item.delete()
+            return CustomResponse.success(
+                message="Closet item deleted successfully",
+                status_code=200
+            )
+        except Exception as e:
+            return custom_exception_handler(e, request)
+

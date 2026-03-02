@@ -9,6 +9,7 @@ from .item import (
     ClosetItemListView,
     ClosetItemCreateView,
     ClosetItemUpdateView,
+    ClosetItemDeleteView,
 )
 
 
@@ -19,4 +20,5 @@ __all__ = [
     'ClosetItemListView',
     'ClosetItemCreateView',
     'ClosetItemUpdateView',
+    'ClosetItemDeleteView',
 ]
