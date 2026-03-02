@@ -3,10 +3,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from users.api.serializers import LogoutSerializer
-from core.utils.response import (
-    CustomResponse,
-    custom_exception_handler
-)
+from core.utils import CustomResponse
 
 
 class LogoutView(APIView):
@@ -21,7 +18,7 @@ class LogoutView(APIView):
         serializer.is_valid(raise_exception=True)
 
         refresh_token = serializer.validated_data['refresh']
-        
+
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
@@ -30,5 +27,8 @@ class LogoutView(APIView):
                 message="Successfully logged out",
                 status_code=status.HTTP_200_OK
             )
-        except TokenError as e:
-            return custom_exception_handler(e, request)
+        except TokenError:
+            return CustomResponse.error(
+                message="Token is invalid or expired.",
+                status_code=status.HTTP_401_UNAUTHORIZED
+            )
