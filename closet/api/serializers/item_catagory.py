@@ -3,6 +3,7 @@ from closet.models import ItemCategory
 
 
 class ItemCategorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ItemCategory
         fields = [
@@ -20,10 +21,12 @@ class ItemCategorySerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
-    # def validate(self, attrs):
-    #     user = self.context['request'].user
-    #     name = attrs.get('name')
-    #     type = attrs.get('type')
-    #     if ItemCategory.objects.filter(user=user, name=name, type=type).exists():
-    #         raise serializers.ValidationError("Item category already exists")
-    #     return attrs
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.type:
+            ret['type'] = {
+                'id': str(instance.type.id),
+                'name': instance.type.name,
+                'code': instance.type.code,
+            }
+        return ret
