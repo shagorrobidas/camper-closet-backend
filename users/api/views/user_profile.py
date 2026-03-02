@@ -40,10 +40,14 @@ class UpdateUserProfileView(ProfileAccessMixin, generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             user = self.get_object()
-            
+
             # Use partial=True natively or through standard DRF kwargs
             partial = kwargs.pop('partial', False)
-            serializer = self.get_serializer(user, data=request.data, partial=partial)
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=partial
+            )
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
 
