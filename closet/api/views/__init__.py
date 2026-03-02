@@ -8,6 +8,7 @@ from .brand_catagory import (
 from .item import (
     ClosetItemListView,
     ClosetItemCreateView,
+    ClosetItemUpdateView,
 )
 
 
@@ -17,4 +18,5 @@ __all__ = [
     'BrandCategoryTypeListView',
     'ClosetItemListView',
     'ClosetItemCreateView',
+    'ClosetItemUpdateView',
 ]
