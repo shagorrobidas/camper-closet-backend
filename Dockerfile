@@ -21,6 +21,12 @@ RUN pip install -r requirements.txt
 # Copy project
 COPY . .
 
+RUN mkdir -p /app/staticfiles /app/media && \
+    chmod -R 777 /app/staticfiles /app/media
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
 # Expose port
 EXPOSE 8000
 
