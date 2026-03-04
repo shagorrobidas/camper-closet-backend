@@ -27,7 +27,7 @@ echo "  ✔ Migrations complete."
 
 # ─── Collect Static Files ─────────────────────────────────────────────────────
 echo "[3/4] Collecting static files..."
-python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
 echo "  ✔ Static files collected."
 
 # ─── Start Gunicorn ──────────────────────────────────────────────────────────
