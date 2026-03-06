@@ -1,16 +1,370 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comper Closet | Home</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
-</head>
-<body>
-  
-khal;skd
-    <h1>Welcome to the Comper Closet App</h1>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home | Comper Closet</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="shortcut icon" href="./favicon.png" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="page-hero-wrap">
+      <img class="hero-bg-img" src="heroBg.png" alt="" />
+      <!-- Header -->
+      <header class="header">
+        <a href="/" class="logo">
+          <img class="logo-img" src="logo.png" alt="Comper Closet Logo" />
+        </a>
+        <nav class="nav">
+          <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+      </header>
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <!-- Left content -->
+        <div class="hero-left">
+          <h1 class="hero-title">
+            Stress-free packing<br />
+            <span class="hero-title-blue">for the whole family.</span>
+          </h1>
+          <p class="hero-desc">
+            Organize camp gear, travel essentials, and closet<br />
+            inventory with invisible AI. Built for busy parents<br />
+            who need simplicity, not another complex tool.
+          </p>
+          <div class="hero-actions">
+            <a href="#" class="store-btn store-apple">
+              <i class="fab fa-apple"></i>
+              <div class="store-text">
+                <span class="store-sub">Download on the</span>
+                <span class="store-main">App Store</span>
+              </div>
+            </a>
+            <a href="#" class="store-btn store-google">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="28"
+                height="28"
+                aria-hidden="true"
+                class="gplay-svg"
+              >
+                <path
+                  d="M3.18 23.54c.37.22.8.34 1.26.34.72 0 1.42-.25 2.05-.64L19.23 15.6l-3.96-3.74z"
+                  fill="#EA4335"
+                />
+                <path
+                  d="M22.46 10.48l-3.23-1.85L15.27 12l3.96 3.74 3.23-1.85C24.36 12.88 24.36 11.49 22.46 10.48z"
+                  fill="#FBBC04"
+                />
+                <path
+                  d="M2.92 1.14C2.38 1.52 2 2.29 2 3.26v17.49c0 .97.38 1.74.92 2.12L15.27 12z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M3.18.46L15.27 12l3.96-3.74L6.49 1.1C5.86.7 5.16.46 4.44.46c-.46 0-.89.12-1.26.34z"
+                  fill="#34A853"
+                />
+              </svg>
+              <div class="store-text">
+                <span class="store-sub">GET IT ON</span>
+                <span class="store-main">Google Play</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right content -->
+        <div class="hero-right">
+          <div class="hero-desktop-wrap">
+            <img
+              class="hero-desktop-img"
+              src="heroDesktopbg.png"
+              alt="App Screenshot"
+            />
+            <div class="hero-desktop-shadow"></div>
+          </div>
+          <!-- Mobile only frame -->
+          <img class="hero-frame-img" src="heroFrame.png" alt="App on mobile" />
+        </div>
+      </section>
+    </div>
+    <!-- /.page-hero-wrap -->
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="container">
+        <h2 class="features-title">Features</h2>
+        <div class="features-divider"></div>
+
+        <!-- Feature 1 – Smart Closet Scanner -->
+        <div class="feature-row feature-row-reverse">
+          <div class="feature-media">
+            <img
+              src="https://img.freepik.com/free-vector/augmented-reality-phone-screen_23-2148563095.jpg"
+              alt="Smart Closet Scanner"
+              class="feature-img"
+            />
+          </div>
+          <div class="feature-text">
+            <p class="feature-dot-title">
+              <span class="feature-dot"></span> Smart Closet Scanner
+            </p>
+            <p class="feature-desc">
+              Snap a photo of any item. Our AI automatically detects the type,
+              size, and brand to build your inventory in seconds.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 2 – Family Accounts -->
+        <div class="feature-row">
+          <div class="feature-text feature-text-center">
+            <p class="feature-dot-title feature-dot-right">
+              Family Accounts <span class="feature-dot"></span>
+            </p>
+            <p class="feature-desc feature-desc-center">
+              Seamlessly switch between children's profiles. Track<br />
+              what's in the closet for Leo and what's ready for Ava<br />
+              in one tap.
+            </p>
+          </div>
+          <div class="feature-media feature-media-multi">
+            <img
+              src="familyAccount.png"
+              alt="Family Accounts"
+              class="feature-img"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dynamic Packing Lists Section -->
+    <section class="packing-section">
+      <div class="container">
+        <h2 class="packing-title">Dynamic Packing Lists</h2>
+        <div class="packing-divider"></div>
+        <p class="packing-desc">
+          Smart lists that update based on weather, location. Never forget a<br />
+          toothbrush (or a rain coat) again.
+        </p>
+        <div class="packing-img-wrap">
+          <img
+            src="packageList.png"
+            alt="Dynamic Packing List"
+            class="packing-img"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number">+200M</span>
+            <span class="stat-label"
+              ><i class="fas fa-download stat-icon"></i> Download</span
+            >
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">+480M</span>
+            <span class="stat-label"
+              ><i class="fas fa-users stat-icon"></i> Members</span
+            >
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number">+18K</span>
+            <span class="stat-label"
+              ><i class="fas fa-paw stat-icon"></i> Communities</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+      <div class="container">
+        <h2 class="testimonials-title">Loved by customer and<br />family</h2>
+        <p class="testimonials-sub">
+          Join hundreds of transportation companies who've transformed their
+          operations
+        </p>
+
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="quote-mark">&ldquo;&rdquo;</div>
+            <p class="testimonial-text">
+              "All Packed transformed our operation. We went from manual
+              spreadsheets to a beautiful, automated system. Our drivers love
+              the app, and we've reduced no-shows by 75%. Best decision we ever
+              made."
+            </p>
+            <div class="testimonial-author">
+              <img
+                src="https://randomuser.me/api/portraits/women/44.jpg"
+                alt="Sarah Martinez"
+                class="author-avatar"
+              />
+              <div>
+                <p class="author-name">Sarah Martinez</p>
+                <p class="author-role">Owner, CareTransport Services</p>
+                <p class="author-location">Boston, MA</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="stars">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i><i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="quote-mark">&ldquo;&rdquo;</div>
+            <p class="testimonial-text">
+              "The AI dispatching is incredible. It assigns the right driver
+              every time and our fuel costs dropped 40%. The real-time map gives
+              us complete visibility. It's like having a superpower."
+            </p>
+            <div class="testimonial-author">
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Michael Chen"
+                class="author-avatar"
+              />
+              <div>
+                <p class="author-name">Michael Chen</p>
+                <p class="author-role">Operations Director</p>
+                <p class="author-location">MediRide Chicago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        
+    <!-- CTA Download Section -->
+    <section class="cta-section">
+      <div class="container">
+        <h2 class="cta-title">What are you waiting for? Download Now!</h2>
+        <div class="cta-actions">
+          <a href="#" class="store-btn store-apple">
+            <i class="fab fa-apple"></i>
+            <div class="store-text">
+              <span class="store-sub">Download on the</span>
+              <span class="store-main">App Store</span>
+            </div>
+          </a>
+          <a href="#" class="store-btn store-google">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="28"
+              height="28"
+              aria-hidden="true"
+              class="gplay-svg"
+            >
+              <path
+                d="M3.18 23.54c.37.22.8.34 1.26.34.72 0 1.42-.25 2.05-.64L19.23 15.6l-3.96-3.74z"
+                fill="#EA4335"
+              />
+              <path
+                d="M22.46 10.48l-3.23-1.85L15.27 12l3.96 3.74 3.23-1.85C24.36 12.88 24.36 11.49 22.46 10.48z"
+                fill="#FBBC04"
+              />
+              <path
+                d="M2.92 1.14C2.38 1.52 2 2.29 2 3.26v17.49c0 .97.38 1.74.92 2.12L15.27 12z"
+                fill="#4285F4"
+              />
+              <path
+                d="M3.18.46L15.27 12l3.96-3.74L6.49 1.1C5.86.7 5.16.46 4.44.46c-.46 0-.89.12-1.26.34z"
+                fill="#34A853"
+              />
+            </svg>
+            <div class="store-text">
+              <span class="store-sub">GET IT ON</span>
+              <span class="store-main">Google Play</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+      <img class="footer-decor footer-decor1" src="footerDecor1.png" alt="" />
+      <img class="footer-decor footer-decor2" src="footerDecor2.png" alt="" />
+
+      <div class="container footer-inner">
+        <div class="footer-content">
+          <!-- Left - Logo and Description -->
+          <div class="footer-left">
+            <div class="footer-logo">
+              <img
+                class="footer-logo-img"
+                src="logo.png"
+                alt="All Packed Logo"
+              />
+            </div>
+            <p class="footer-description">
+              Nam posuere accumsan porta.<br />
+              Integer id orci sed ante tincidunt<br />
+              tincidunt sit amet sed libero.
+            </p>
+            <p class="copyright">© All Packed 2021</p>
+          </div>
+
+          <!-- Center - Company Links -->
+          <div class="footer-center">
+            <h3 class="footer-heading">COMPANY</h3>
+            <ul class="footer-links">
+              <li><a href="#">About</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- Right - Social and Language -->
+          <div class="footer-right">
+            <div class="social-icons">
+              <a href="#" class="social-icon"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="social-icon"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+              <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-icon"
+                ><i class="fas fa-envelope"></i
+              ></a>
+            </div>
+            <div class="language-selector">
+              <span class="globe-icon">🌐</span>
+              <select name="language" id="language">
+                <option value="en">English - En</option>
+                <option value="es">Spanish - Es</option>
+                <option value="fr">French - Fr</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <div class="footer-bottom-bar"></div>
+  </body>
 </html>
