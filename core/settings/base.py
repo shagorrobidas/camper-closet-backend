@@ -34,6 +34,7 @@ LOCAL_APPS = [
     'api',
     'users',
     'closet',
+    'landing_page',
 ]
 
 # Application definition
