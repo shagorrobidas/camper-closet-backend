@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterParentView,
     RegisterChildView,
@@ -12,7 +13,8 @@ from .views import (
     VerifyPasswordResetOTPView,
     SetNewPasswordView,
     CheckPasswordResetStatusView,
-    ChangePasswordView
+    ChangePasswordView,
+    LogoutView
 )
 
 urlpatterns = [
@@ -99,11 +101,16 @@ urlpatterns = [
         DeleteUserProfileView.as_view(),
         name='profile_delete_detail'
     ),
-    # path(
-    #     'logout/',
-    #     LogoutView.as_view(),
-    #     name='logout'
-    # ),
+    path(
+        'logout/',
+        LogoutView.as_view(),
+        name='logout'
+    ),
+    path(
+        'token/refresh/',
+        TokenRefreshView.as_view(),
+        name='token_refresh'
+    ),
     # path(
     #     'social-auth/google/',
     #     GoogleSocialAuthView.as_view(),

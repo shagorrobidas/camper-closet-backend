@@ -14,6 +14,7 @@ from .request_password import (
     CheckPasswordResetStatusView
 )
 from .change_password import ChangePasswordView
+from .logout import LogoutView
 
 
 __all__ = [
@@ -29,5 +30,6 @@ __all__ = [
     'VerifyPasswordResetOTPView',
     'SetNewPasswordView',
     'CheckPasswordResetStatusView',
-    'ChangePasswordView'
+    'ChangePasswordView',
+    'LogoutView'
 ]

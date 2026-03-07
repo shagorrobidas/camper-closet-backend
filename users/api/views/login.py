@@ -4,6 +4,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from django.utils import timezone
 from users.api.serializers import (
     UserSerializer,
+    ChildSerializer,
     LoginSerializer,
 )
 from core.utils.response import CustomResponse
@@ -41,8 +42,13 @@ class LoginView(generics.GenericAPIView):
                 'user': UserSerializer(
                     user, context={'request': request}
                 ).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'children': ChildSerializer(
+                    user.children.all(),
+                    many=True,
+                    context={'request': request}
+                ).data if user.role == 'parent' else [],
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
             }
 
             return CustomResponse.success(

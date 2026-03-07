@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+
+  # ───────────── PostgreSQL ─────────────
+  db:
+    image: postgres:16-alpine
+    container_name: comper_closet_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+
+  # ───────────── Django + Gunicorn ─────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comper_closet_web
+    restart: unless-stopped
+    entrypoint: ["/app/entrypoint.sh"]
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+
+
+  # ───────────── Nginx ─────────────
+  nginx:
+    image: nginx:alpine
+    container_name: comper_closet_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - web
+    networks:
+      - backend
+
+
+# ───────────── Volumes ─────────────
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+
+# ───────────── Custom Network ─────────────
+networks:
+  backend:
+    driver: bridge
