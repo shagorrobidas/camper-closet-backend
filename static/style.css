@@ -770,7 +770,8 @@ body {
   background-color: #f8f9fb;
   border-style: solid;
   border-color: #424549;
-  border-width: 2px 2px 8px 2px; /* Top, Right, Bottom, Left */
+  border-width: 2px 2px 8px 2px;
+  /* Top, Right, Bottom, Left */
 
   border-radius: 15px;
   padding: 32px;
@@ -850,6 +851,78 @@ body {
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-icon {
+  font-size: 48px;
+  color: #10b981;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.modal-text {
+  font-size: 16px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.modal-close-btn {
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-close-btn:hover {
+  background-color: #2563eb;
 }
 
 /* =====================

@@ -36,7 +36,42 @@
           </div>
           <div class="contact-divider"></div>
 
-          <form class="contact-form">
+          <form class="contact-form" method="POST" action="{% url 'contact' %}">
+            {% csrf_token %}
+
+            {% if messages %}
+            <div id="successModal" class="modal-overlay">
+              <div class="modal-content">
+                <i class="fas fa-check-circle modal-icon"></i>
+                <h3 class="modal-title">Success!</h3>
+                {% for message in messages %}
+                <p class="modal-text">{{ message }}</p>
+                {% endfor %}
+                <button type="button" class="modal-close-btn" onclick="closeModal()">Close</button>
+              </div>
+            </div>
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const modal = document.getElementById("successModal");
+                if (modal) {
+                  // Small delay to allow CSS transition
+                  modal.style.display = 'flex';
+                  setTimeout(() => {
+                    modal.classList.add("active");
+                  }, 10);
+                }
+              });
+
+              function closeModal() {
+                const modal = document.getElementById("successModal");
+                modal.classList.remove("active");
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 300);
+              }
+            </script>
+            {% endif %}
+
             <div class="form-group">
               <label for="name">Name</label>
               <input type="text" id="name" name="name" placeholder="Name" />
@@ -96,10 +131,10 @@
         <!-- Right - Social and Language -->
         <div class="footer-right">
           <div class="social-icons">
-            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon"><i class="fas fa-envelope"></i></a>
+            <a href="{{ site_config.facebook_url }}" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="{{ site_config.linkedin_url }}" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+            <a href="{{ site_config.twitter_url }}" class="social-icon"><i class="fab fa-twitter"></i></a>
+            <a href="mailto:{{ site_config.email_address }}" class="social-icon"><i class="fas fa-envelope"></i></a>
           </div>
           <!-- <div class="language-selector">
             <span class="globe-icon">🌐</span>

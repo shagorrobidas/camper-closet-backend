@@ -23,11 +23,13 @@ from django.conf.urls.static import static
 urlpatterns = [
     path(
         '',
-        home
+        home,
+        name='home'
     ),
     path(
         'contact/',
-        contact
+        contact,
+        name='contact'
     ),
     path(
         'admin/',
