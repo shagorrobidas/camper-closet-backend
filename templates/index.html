@@ -163,54 +163,72 @@
         operations
       </p>
 
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <div class="quote-mark">&ldquo;&rdquo;</div>
-          <p class="testimonial-text">
-            "All Packed transformed our operation. We went from manual
-            spreadsheets to a beautiful, automated system. Our drivers love
-            the app, and we've reduced no-shows by 75%. Best decision we ever
-            made."
-          </p>
-          <div class="testimonial-author">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Martinez" class="author-avatar" />
-            <div>
-              <p class="author-name">Sarah Martinez</p>
-              <p class="author-role">Owner, CareTransport Services</p>
-              <p class="author-location">Boston, MA</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="stars">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-            <i class="fas fa-star"></i><i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-          <div class="quote-mark">&ldquo;&rdquo;</div>
-          <p class="testimonial-text">
-            "The AI dispatching is incredible. It assigns the right driver
-            every time and our fuel costs dropped 40%. The real-time map gives
-            us complete visibility. It's like having a superpower."
-          </p>
-          <div class="testimonial-author">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Chen" class="author-avatar" />
-            <div>
-              <p class="author-name">Michael Chen</p>
-              <p class="author-role">Operations Director</p>
-              <p class="author-location">MediRide Chicago</p>
-            </div>
-          </div>
-        </div>
+      <div class="testimonials-grid" id="dynamic-testimonials">
+        <!-- JS will populate cards here via AJAX -->
       </div>
     </div>
   </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch('/api/testimonials/')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('dynamic-testimonials');
+          container.innerHTML = '';
+
+          if (data.testimonials && data.testimonials.length > 0) {
+            data.testimonials.forEach(t => {
+              let stars = '';
+              for (let i = 0; i < t.rating; i++) stars += '<i class="fas fa-star"></i>';
+
+              const avatar = t.avatar ?
+                `<img src="${t.avatar}" alt="${t.author_name}" class="author-avatar" />` :
+                `<div class="author-avatar" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#64748b;"><i class="fas fa-user"></i></div>`;
+
+              const card = `
+                <div class="testimonial-card">
+                  <div class="stars">${stars}</div>
+                  <div class="quote-mark">&ldquo;&rdquo;</div>
+                  <p class="testimonial-text">"${t.text}"</p>
+                  <div class="testimonial-author">
+                    ${avatar}
+                    <div>
+                      <p class="author-name">${t.author_name}</p>
+                      <p class="author-role">${t.author_role}</p>
+                      <p class="author-location">${t.author_location}</p>
+                    </div>
+                  </div>
+                </div>
+              `;
+              container.innerHTML += card;
+            });
+
+            // Auto slide functionality
+            if (data.testimonials.length > 1) {
+              let scrollAmount = 0;
+              setInterval(() => {
+                const maxScroll = container.scrollWidth - container.clientWidth;
+                if (maxScroll <= 0) return; // Cannot scroll
+
+                if (scrollAmount >= maxScroll - 10) {
+                  scrollAmount = 0;
+                } else {
+                  const cardWidth = container.children[0].offsetWidth;
+                  scrollAmount += cardWidth + 32; // card width + gap
+                }
+                container.scrollTo({
+                  top: 0,
+                  left: scrollAmount,
+                  behavior: 'smooth'
+                });
+              }, 4000); // 4 seconds interval
+            }
+          }
+        })
+        .catch(err => console.error("Error fetching testimonials:", err));
+    });
+  </script>
 
 
   <!-- Footer -->

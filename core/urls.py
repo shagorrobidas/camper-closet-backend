@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from landing_page.views import home, contact
+from landing_page.views import home, contact, get_testimonials
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -30,6 +30,11 @@ urlpatterns = [
         'contact/',
         contact,
         name='contact'
+    ),
+    path(
+        'api/testimonials/',
+        get_testimonials,
+        name='api_testimonials'
     ),
     path(
         'admin/',

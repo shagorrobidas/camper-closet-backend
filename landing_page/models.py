@@ -37,3 +37,19 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message from {self.name} ({self.email})"
+
+
+class Testimonial(models.Model):
+    author_name = models.CharField(max_length=100)
+    author_role = models.CharField(max_length=100)
+    author_location = models.CharField(max_length=100)
+    text = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5)
+    avatar = models.ImageField(
+        upload_to='testimonials/', blank=True, null=True
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.author_name} - {self.author_role}"

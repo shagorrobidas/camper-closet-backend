@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import ContactMessage, SiteConfiguration
+from django.http import JsonResponse
+from .models import ContactMessage, SiteConfiguration, Testimonial
 
 
 def home(request):
@@ -48,3 +49,20 @@ def contact(request):
             messages.error(request, 'Please fill out all required fields.')
 
     return render(request, 'contact.html')
+
+
+def get_testimonials(request):
+    testimonials = Testimonial.objects.filter(
+        is_active=True
+    ).order_by('-created_at')
+    data = []
+    for t in testimonials:
+        data.append({
+            'author_name': t.author_name,
+            'author_role': t.author_role,
+            'author_location': t.author_location,
+            'text': t.text,
+            'rating': t.rating,
+            'avatar': t.avatar.url if t.avatar else None
+        })
+    return JsonResponse({'testimonials': data})

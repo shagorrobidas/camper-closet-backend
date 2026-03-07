@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SiteConfiguration, ContactMessage
+from .models import SiteConfiguration, ContactMessage, Testimonial
 
 
 @admin.register(SiteConfiguration)
@@ -21,3 +21,12 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = (
+        'author_name', 'author_role', 'rating', 'is_active', 'created_at'
+    )
+    list_filter = ('is_active', 'rating')
+    search_fields = ('author_name', 'text')

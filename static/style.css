@@ -763,7 +763,30 @@ body {
 .testimonials-grid {
   display: flex;
   gap: 32px;
-  justify-content: center;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0 20px;
+  /* added bottom padding for scrollbar */
+}
+
+/* Custom Scrollbar for Testimonials */
+.testimonials-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.testimonials-grid::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.testimonials-grid::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.testimonials-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .testimonial-card {
@@ -775,8 +798,10 @@ body {
 
   border-radius: 15px;
   padding: 32px;
-  flex: 1;
+  flex: 0 0 auto;
+  width: 90%;
   max-width: 460px;
+  scroll-snap-align: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
