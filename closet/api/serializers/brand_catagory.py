@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from closet.models import BrandCategoryType
+from closet.models import ItemCategoryType
 
 
-class BrandCategoryTypeSerializer(serializers.ModelSerializer):
+class ItemCategoryTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BrandCategoryType
+        model = ItemCategoryType
         fields = [
             'id',
             'name',

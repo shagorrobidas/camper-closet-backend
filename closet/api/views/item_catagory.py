@@ -10,8 +10,7 @@ class ItemCategoryListView(ProfileAccessMixin, ListAPIView):
     serializer_class = ItemCategorySerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.get_object()
-        queryset = self.queryset.filter(user=user)
+        queryset = self.queryset.all()
         serializer = self.get_serializer(queryset, many=True)
         return CustomResponse.success(
             data=serializer.data,
@@ -28,7 +27,8 @@ class ItemCategoryCreateView(ProfileAccessMixin, CreateAPIView):
         user = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
+        instance = serializer.save()
+        instance.users.add(user)
         return CustomResponse.success(
             data=serializer.data,
             message="Item category created successfully",

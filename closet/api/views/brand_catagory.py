@@ -1,12 +1,12 @@
 from rest_framework.generics import ListAPIView
-from closet.models import BrandCategoryType
-from closet.api.serializers import BrandCategoryTypeSerializer
+from closet.models import ItemCategoryType
+from closet.api.serializers import ItemCategoryTypeSerializer
 from core.utils import CustomResponse
 
 
-class BrandCategoryTypeListView(ListAPIView):
-    queryset = BrandCategoryType.objects.all()
-    serializer_class = BrandCategoryTypeSerializer
+class ItemCategoryTypeListView(ListAPIView):
+    queryset = ItemCategoryType.objects.all()
+    serializer_class = ItemCategoryTypeSerializer
 
     def get(self, request, *args, **kwargs):
         queryset = self.queryset.all()

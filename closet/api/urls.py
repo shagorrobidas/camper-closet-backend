@@ -1,6 +1,6 @@
 from django.urls import path
 from closet.api.views import (
-    BrandCategoryTypeListView,
+    ItemCategoryTypeListView,
     ItemCategoryListView,
     ItemCategoryCreateView,
     ClosetItemListView,
@@ -12,7 +12,7 @@ from closet.api.views import (
 urlpatterns = [
     path(
         'brand-category-types/',
-        BrandCategoryTypeListView.as_view(),
+        ItemCategoryTypeListView.as_view(),
         name='brand_category_types'
     ),
     path(

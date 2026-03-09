@@ -3,7 +3,7 @@ from .item_catagory import (
     ItemCategoryCreateView,
 )
 from .brand_catagory import (
-    BrandCategoryTypeListView,
+    ItemCategoryTypeListView,
 )
 from .item import (
     ClosetItemListView,
@@ -16,7 +16,7 @@ from .item import (
 __all__ = [
     'ItemCategoryListView',
     'ItemCategoryCreateView',
-    'BrandCategoryTypeListView',
+    'ItemCategoryTypeListView',
     'ClosetItemListView',
     'ClosetItemCreateView',
     'ClosetItemUpdateView',
