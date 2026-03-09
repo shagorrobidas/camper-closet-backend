@@ -56,7 +56,6 @@ class Trip(BaseModel):
         on_delete=models.SET_NULL,
         null=True
     )
-    
 
     status = models.ForeignKey(
         TripStatus,
