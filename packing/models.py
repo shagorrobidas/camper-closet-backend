@@ -136,6 +136,8 @@ class PackingTemplate(BaseModel):
 
     sort_order = models.IntegerField(default=0)
 
+    is_system = models.BooleanField(default=True)
+
     def __str__(self):
         return self.title
 
