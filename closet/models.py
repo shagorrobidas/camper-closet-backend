@@ -3,7 +3,7 @@ from core.models import BaseModel
 from django.conf import settings
 
 
-class BrandCategoryType(BaseModel):
+class ItemCategoryType(BaseModel):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=5)
 
@@ -12,18 +12,16 @@ class BrandCategoryType(BaseModel):
 
 
 class ItemCategory(BaseModel):
-    user = models.ForeignKey(
+    users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
         related_name='categories',
-        null=True,
         blank=True
     )
     name = models.CharField(
         max_length=100
     )
     type = models.ForeignKey(
-        BrandCategoryType,
+        ItemCategoryType,
         on_delete=models.CASCADE,
         related_name='categories'
     )
@@ -32,9 +30,8 @@ class ItemCategory(BaseModel):
     )
 
     class Meta:
-        unique_together = ("user", "name")
+        unique_together = ("name", "type")
         indexes = [
-            models.Index(fields=["user"]),
             models.Index(fields=["type"]),
         ]
 

@@ -1,11 +1,11 @@
 from django.contrib import admin
-from closet.models import BrandCategoryType, ItemCategory, ClosetItem
+from closet.models import ItemCategoryType, ItemCategory, ClosetItem
 
 
 class ItemCategoryInline(admin.TabularInline):
     model = ItemCategory
     extra = 1
-    autocomplete_fields = ("user", "type")
+    autocomplete_fields = ("type",)
 
 
 class ClosetItemInline(admin.TabularInline):
@@ -14,8 +14,8 @@ class ClosetItemInline(admin.TabularInline):
     autocomplete_fields = ("user", "category")
 
 
-@admin.register(BrandCategoryType)
-class BrandCategoryTypeAdmin(admin.ModelAdmin):
+@admin.register(ItemCategoryType)
+class ItemCategoryTypeAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
@@ -33,7 +33,6 @@ class ItemCategoryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
-        "user",
         "type",
         "is_custom",
         "created_at",
@@ -45,10 +44,9 @@ class ItemCategoryAdmin(admin.ModelAdmin):
     )
     search_fields = (
         "name",
-        "user__email",
-        "user__full_name",
+
     )
-    autocomplete_fields = ("user", "type")
+    autocomplete_fields = ("type",)
     ordering = ("-created_at",)
     inlines = [ClosetItemInline]
 
