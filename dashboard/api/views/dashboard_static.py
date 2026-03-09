@@ -1,7 +1,7 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count
-from closet.models import ClosetItem, BrandCategoryType
+from closet.models import ClosetItem, ItemCategoryType
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
 
@@ -17,7 +17,7 @@ class DashboardStatsView(ProfileAccessMixin, GenericAPIView):
                 user=user
             ).count()
 
-            brand_types = BrandCategoryType.objects.annotate(
+            brand_types = ItemCategoryType.objects.annotate(
                 item_count=Count(
                     'categories__closet_items',
                     filter=__import__(
