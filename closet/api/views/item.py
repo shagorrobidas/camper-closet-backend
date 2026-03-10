@@ -19,7 +19,7 @@ class ClosetItemListView(ProfileAccessMixin, ListAPIView):
     serializer_class = ClosetItemSerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = self.get_profile_user()
         queryset = self.queryset.filter(user=user, is_active=True)
 
         # Filter by main_category
@@ -69,7 +69,7 @@ class ClosetItemDetailView(ProfileAccessMixin, RetrieveAPIView):
             item_pk = self.kwargs.get('pk')
             # ProfileAccessMixin's get_object() tries to find a User using `pk` from kwargs.
             # In this view, `pk` is the Item ID, so we must use request.user explicitly.
-            user = request.user
+            user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk, user=user)
             serializer = self.get_serializer(item)
             return CustomResponse.success(
@@ -87,12 +87,10 @@ class ClosetItemCreateView(ProfileAccessMixin, CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # We use request.user directly because get_object() in ProfileAccessMixin
-            # expects a user pk in the URL, which is absent for item creation.
-            user = request.user
+            user = self.get_profile_user()
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            serializer.save(user=user)
+            serializer.save(user=user, is_active=True, is_favorite=False)
             return CustomResponse.success(
                 data=serializer.data,
                 message="Closet item created successfully",
@@ -109,7 +107,7 @@ class ClosetItemUpdateView(ProfileAccessMixin, UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             item_pk = self.kwargs.pop('pk', None)
-            user = request.user
+            user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk)
 
             if item.user != user:
@@ -140,7 +138,7 @@ class ClosetItemDeleteView(ProfileAccessMixin, DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         try:
             item_pk = self.kwargs.pop('pk', None)
-            user = request.user
+            user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk)
 
             if item.user != user:
@@ -164,7 +162,7 @@ class ClosetItemToggleFavoriteView(ProfileAccessMixin, APIView):
     def patch(self, request, *args, **kwargs):
         try:
             item_pk = self.kwargs.get('pk')
-            user = request.user
+            user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk, user=user)
             item.is_favorite = not item.is_favorite
             item.save(update_fields=['is_favorite'])
