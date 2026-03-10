@@ -40,7 +40,7 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('item_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             packing_item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
 
@@ -92,7 +92,7 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('item_pk')
             selection_pk = self.kwargs.get('selection_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             packing_item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
             selection = get_object_or_404(
@@ -115,7 +115,7 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('item_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             packing_item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
 
@@ -150,7 +150,7 @@ class TripEventListView(ProfileAccessMixin, ListAPIView):
     def get(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             events = trip.events.all().order_by('date')
             serializer = self.get_serializer(events, many=True)
@@ -169,7 +169,7 @@ class TripEventCreateView(ProfileAccessMixin, CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -189,7 +189,7 @@ class TripEventDeleteView(ProfileAccessMixin, DestroyAPIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             event_pk = self.kwargs.get('pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             event = get_object_or_404(
                 TripEvent, pk=event_pk, trip=trip, event_type='custom'
