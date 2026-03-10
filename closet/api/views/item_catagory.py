@@ -11,7 +11,7 @@ class ItemCategoryListView(ProfileAccessMixin, ListAPIView):
     serializer_class = ItemCategorySerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = self.get_profile_user()
         # Return system categories + this user's custom categories
         queryset = ItemCategory.objects.filter(
             Q(is_system=True) | Q(user=user)
@@ -39,8 +39,8 @@ class ItemCategoryCreateView(ProfileAccessMixin, CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # We use request.user directly because get_object() expects a user pk
-            user = request.user
+            # We use get_profile_user to support ?child= for parent/child accounts
+            user = self.get_profile_user()
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=user, is_custom=True, is_system=False)
