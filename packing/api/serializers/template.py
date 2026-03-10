@@ -4,16 +4,27 @@ from django.db.models import Sum
 
 
 class PackingTemplateItemSerializer(serializers.ModelSerializer):
+    main_category_name = serializers.CharField(
+        source='main_category.name', read_only=True
+    )
+    sub_category_name = serializers.CharField(
+        source='sub_category.name', read_only=True
+    )
+
     class Meta:
         model = PackingTemplateItem
         fields = [
             'id',
             'template',
             'main_category',
+            'main_category_name',
             'sub_category',
+            'sub_category_name',
+            'title',
             'quantity',
             'is_required',
             'note',
+            'sort_order',
             'created_at',
             'updated_at',
         ]
@@ -23,23 +34,12 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        if instance.main_category:
-            ret['main_category'] = {
-                'id': instance.main_category.id,
-                'name': instance.main_category.name,
-            }
-        if instance.sub_category:
-            ret['sub_category'] = {
-                'id': instance.sub_category.id,
-                'name': instance.sub_category.name,
-            }
-        return ret
-
 
 class PackingTemplateSerializer(serializers.ModelSerializer):
     total_items = serializers.SerializerMethodField()
+    trip_type_name = serializers.CharField(
+        source='trip_type.name', read_only=True
+    )
 
     class Meta:
         model = PackingTemplate
@@ -47,16 +47,20 @@ class PackingTemplateSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'trip_type',
+            'trip_type_name',
             'season',
             'description',
             'image',
             'is_system',
+            'is_active',
+            'sort_order',
             'total_items',
             'created_at',
             'updated_at',
         ]
         read_only_fields = [
             'id',
+            'is_system',
             'created_at',
             'updated_at',
         ]
