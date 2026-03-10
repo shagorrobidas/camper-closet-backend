@@ -137,60 +137,37 @@ class PackingTemplateItem(BaseModel):
     note = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.template.title
+        return self.template.title + " - " + self.sub_category.name
 
 
-class PackingList(BaseModel):
-    PACKING_LIST_STATUS_CHOICES = [
+class PackingClosetItem(BaseModel):
+    PACKING_STATUS_CHOICES = [
         ('active', 'Active'),
         ('complete', 'Complete'),
         ('archived', 'Archived'),
     ]
 
-    trip = models.OneToOneField(
+    trip = models.ForeignKey(
         Trip,
         on_delete=models.CASCADE,
-        related_name='packing_list'
+        related_name='packing_items'
     )
-
-    title = models.CharField(max_length=255)
 
     status = models.CharField(
         max_length=20,
-        choices=PACKING_LIST_STATUS_CHOICES,
+        choices=PACKING_STATUS_CHOICES,
         default='active'
     )
-
-    def __str__(self):
-        return self.title
-
-
-class PackingListItem(BaseModel):
-
-    packing_list = models.ForeignKey(
-        PackingList,
-        on_delete=models.CASCADE,
-        related_name='items'
-    )
-
+    
     template_item = models.ForeignKey(
         PackingTemplateItem,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
-
-    closet_item = models.ForeignKey(
+    
+    closet_item = models.ManyToManyField(
         ClosetItem,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    category = models.ForeignKey(
-        ItemCategory,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True
     )
 
@@ -206,4 +183,4 @@ class PackingListItem(BaseModel):
     note = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.category.name if self.category else "Uncategorized Item"
+        return self.template_item.sub_category.name if self.template_item and self.template_item.sub_category else "Uncategorized Item"
