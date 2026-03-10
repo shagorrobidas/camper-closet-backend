@@ -16,7 +16,7 @@ class ProfileAccessMixin:
         2. The authenticated user is a parent, and the
            requested ID belongs to their child.
     """
-    def get_object(self):
+    def get_profile_user(self):
         # 1. Try URL kwarg first (for update / delete routes)
         pk = self.kwargs.get('pk')
 
