@@ -7,9 +7,11 @@ from .brand_catagory import (
 )
 from .item import (
     ClosetItemListView,
+    ClosetItemDetailView,
     ClosetItemCreateView,
     ClosetItemUpdateView,
     ClosetItemDeleteView,
+    ClosetItemToggleFavoriteView,
 )
 
 
@@ -18,7 +20,9 @@ __all__ = [
     'ItemCategoryCreateView',
     'ItemCategoryTypeListView',
     'ClosetItemListView',
+    'ClosetItemDetailView',
     'ClosetItemCreateView',
     'ClosetItemUpdateView',
     'ClosetItemDeleteView',
+    'ClosetItemToggleFavoriteView',
 ]

@@ -4,24 +4,26 @@ from closet.api.views import (
     ItemCategoryListView,
     ItemCategoryCreateView,
     ClosetItemListView,
+    ClosetItemDetailView,
     ClosetItemCreateView,
     ClosetItemUpdateView,
     ClosetItemDeleteView,
+    ClosetItemToggleFavoriteView,
 )
 
 urlpatterns = [
     path(
-        'brand-category-types/',
+        'category-types/',
         ItemCategoryTypeListView.as_view(),
-        name='brand_category_types'
+        name='category_types'
     ),
     path(
-        'item-categories/',
+        'categories/',
         ItemCategoryListView.as_view(),
         name='item_categories'
     ),
     path(
-        'item-categories/create/',
+        'categories/create/',
         ItemCategoryCreateView.as_view(),
         name='item_categories_create'
     ),
@@ -36,13 +38,23 @@ urlpatterns = [
         name='closet_items_create'
     ),
     path(
-        'items/update/<uuid:pk>/',
+        'items/<uuid:pk>/',
+        ClosetItemDetailView.as_view(),
+        name='closet_items_detail'
+    ),
+    path(
+        'items/<uuid:pk>/update/',
         ClosetItemUpdateView.as_view(),
         name='closet_items_update'
     ),
     path(
-        'items/delete/<uuid:pk>/',
+        'items/<uuid:pk>/delete/',
         ClosetItemDeleteView.as_view(),
         name='closet_items_delete'
+    ),
+    path(
+        'items/<uuid:pk>/toggle-favorite/',
+        ClosetItemToggleFavoriteView.as_view(),
+        name='closet_items_toggle_favorite'
     ),
 ]
