@@ -1,12 +1,16 @@
 from .template import (
     PackingTemplateSerializer,
     PackingTemplateItemSerializer,
-    PackingTemplateDetailSerializer
+    PackingTemplateDetailSerializer,
 )
 from .trip import (
     TripSerializer,
-    TripDetailSerializer
+    TripDetailSerializer,
+    TripPackingItemSerializer,
+    TripPackingItemCreateSerializer,
+    TripPackingItemSelectionSerializer,
 )
+from .events import TripEventSerializer
 
 
 __all__ = [
@@ -15,5 +19,8 @@ __all__ = [
     'PackingTemplateDetailSerializer',
     'TripSerializer',
     'TripDetailSerializer',
+    'TripPackingItemSerializer',
+    'TripPackingItemCreateSerializer',
+    'TripPackingItemSelectionSerializer',
+    'TripEventSerializer',
 ]
-
