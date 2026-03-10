@@ -2,7 +2,7 @@ from django.contrib import admin
 from packing.models import (
     TripType, Trip,
     PackingTemplate, PackingTemplateItem,
-    PackingClosetItem
+    TripPackingItem, TripPackingItemSelection, TripEvent
 )
 
 
@@ -15,9 +15,9 @@ class TripTypeAdmin(admin.ModelAdmin):
 @admin.register(PackingTemplate)
 class PackingTemplateAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'trip_type', 'season', 'sort_order', 'created_at'
+        'title', 'trip_type', 'season', 'is_system', 'is_active', 'sort_order', 'created_at'
     )
-    list_filter = ('trip_type', 'season')
+    list_filter = ('trip_type', 'season', 'is_system', 'is_active')
     search_fields = ('title', 'description')
 
 
@@ -30,13 +30,13 @@ class PackingTemplateItemInline(admin.TabularInline):
 class PackingTemplateItemAdmin(admin.ModelAdmin):
     list_display = (
         'template', 'main_category', 'sub_category',
-        'quantity', 'is_required'
+        'title', 'quantity', 'is_required', 'sort_order'
     )
     list_filter = (
         'template', 'main_category', 'sub_category', 'is_required'
     )
     search_fields = (
-        'template__title', 'note',
+        'template__title', 'title', 'note',
         'main_category__name', 'sub_category__name'
     )
 
@@ -44,17 +44,26 @@ class PackingTemplateItemAdmin(admin.ModelAdmin):
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'user', 'trip_type', 'status', 'start_date', 'end_date'
+        'name', 'user', 'trip_type', 'status', 'is_template_applied', 'start_date', 'end_date'
     )
-    list_filter = ('trip_type', 'status', 'start_date')
+    list_filter = ('trip_type', 'status', 'is_template_applied', 'start_date')
     search_fields = ('name', 'location', 'user__email')
 
 
-@admin.register(PackingClosetItem)
-class PackingClosetItemAdmin(admin.ModelAdmin):
+@admin.register(TripPackingItem)
+class TripPackingItemAdmin(admin.ModelAdmin):
     list_display = (
-        '__str__', 'trip', 'status', 'quantity', 'picked_quantity', 'is_packed'
+        '__str__', 'trip', 'status', 'main_category', 'sub_category', 'title', 'quantity', 'picked_quantity', 'is_packed'
     )
-    list_filter = ('status', 'is_packed', 'is_custom_item')
-    search_fields = ('trip__name', 'note', 'template_item__sub_category__name')
-    filter_horizontal = ('closet_item',)
+    list_filter = ('status', 'main_category', 'sub_category', 'is_packed', 'is_custom_item')
+    search_fields = ('trip__name', 'title', 'note', 'sub_category__name')
+
+
+@admin.register(TripPackingItemSelection)
+class TripPackingItemSelectionAdmin(admin.ModelAdmin):
+    list_display = ('packing_item', 'closet_item', 'quantity')
+
+
+@admin.register(TripEvent)
+class TripEventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'trip', 'event_type', 'date')
