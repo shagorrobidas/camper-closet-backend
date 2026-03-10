@@ -1,14 +1,44 @@
 from .template import (
     PackingTemplateListView,
-    PackingTemplateDetailView
+    PackingTemplateDetailView,
 )
 from .trip import (
-    TripCreateView
+    TripListView,
+    TripDetailView,
+    TripCreateView,
+    TripUpdateView,
+    TripDeleteView,
+    TripPackingItemListView,
+    TripPackingItemCreateView,
+    TripPackingItemUpdateView,
+    TripPackingItemDeleteView,
+)
+from .packing import (
+    PackingItemSelectClosetView,
+    PackingItemRemoveClosetView,
+    ClosetMatchSuggestionView,
+    TripEventListView,
+    TripEventCreateView,
+    TripEventDeleteView,
 )
 
 
 __all__ = [
     'PackingTemplateListView',
     'PackingTemplateDetailView',
+    'TripListView',
+    'TripDetailView',
     'TripCreateView',
+    'TripUpdateView',
+    'TripDeleteView',
+    'TripPackingItemListView',
+    'TripPackingItemCreateView',
+    'TripPackingItemUpdateView',
+    'TripPackingItemDeleteView',
+    'PackingItemSelectClosetView',
+    'PackingItemRemoveClosetView',
+    'ClosetMatchSuggestionView',
+    'TripEventListView',
+    'TripEventCreateView',
+    'TripEventDeleteView',
 ]
