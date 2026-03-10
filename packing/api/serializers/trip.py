@@ -3,7 +3,10 @@ from packing.models import Trip, PackingClosetItem
 
 
 class PackingClosetItemSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='template_item.sub_category.name', read_only=True)
+    category_name = serializers.CharField(
+        source='template_item.sub_category.name',
+        read_only=True
+    )
     closet_item_names = serializers.SerializerMethodField()
 
     class Meta:

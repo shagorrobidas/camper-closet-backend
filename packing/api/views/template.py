@@ -12,7 +12,7 @@ class PackingTemplateListView(ListAPIView):
     serializer_class = PackingTemplateSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(is_system=True)
         trip_type = self.request.query_params.get('trip_type')
         season = self.request.query_params.get('season')
 
