@@ -11,7 +11,7 @@ class ItemCategoryInline(admin.TabularInline):
 class ClosetItemInline(admin.TabularInline):
     model = ClosetItem
     extra = 1
-    autocomplete_fields = ("user", "category")
+    autocomplete_fields = ("user", "main_category", "sub_category")
 
 
 @admin.register(ItemCategoryType)
@@ -33,20 +33,23 @@ class ItemCategoryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
+        "user",
         "type",
         "is_custom",
+        "is_system",
         "created_at",
     )
     list_filter = (
         "type",
         "is_custom",
+        "is_system",
         "created_at",
     )
     search_fields = (
         "name",
-
+        "user__email",
     )
-    autocomplete_fields = ("type",)
+    autocomplete_fields = ("type", "user")
     ordering = ("-created_at",)
     inlines = [ClosetItemInline]
 
@@ -57,17 +60,19 @@ class ClosetItemAdmin(admin.ModelAdmin):
         "id",
         "name",
         "user",
-        "category",
+        "main_category",
+        "sub_category",
         "brand",
-        "color",
-        "size",
         "quantity",
-        "ai_detected",
+        "is_scanned",
+        "is_favorite",
         "created_at",
     )
     list_filter = (
-        "category",
-        "ai_detected",
+        "main_category",
+        "sub_category",
+        "is_scanned",
+        "is_favorite",
         "created_at",
     )
     search_fields = (
@@ -77,5 +82,5 @@ class ClosetItemAdmin(admin.ModelAdmin):
         "user__email",
         "user__full_name",
     )
-    autocomplete_fields = ("user", "category")
+    autocomplete_fields = ("user", "main_category", "sub_category")
     ordering = ("-created_at",)
