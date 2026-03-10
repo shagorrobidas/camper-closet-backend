@@ -1,8 +1,7 @@
 from rest_framework.generics import CreateAPIView
 from django.db import transaction
 from packing.models import (
-    Trip,
-    PackingTemplate, PackingList, PackingListItem, PackingTemplateItem
+    Trip, PackingTemplate, PackingClosetItem, PackingTemplateItem
 )
 from closet.models import ClosetItem
 from packing.api.serializers import TripSerializer
@@ -37,19 +36,12 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
             trip = serializer.save()
 
             if template:
-                # 1. Create PackingList
-                packing_list = PackingList.objects.create(
-                    trip=trip,
-                    title=f"Packing List for {trip.name}",
-                    status='active'
-                )
-
-                # 2. Get Template Items
+                # Get Template Items
                 template_items = PackingTemplateItem.objects.filter(
                     template=template
                 )
 
-                # 3. Process each template item to auto-populate PackingList
+                # Process each template item to auto-populate PackingClosetItem
                 for t_item in template_items:
                     required_qty = t_item.quantity
 
@@ -70,27 +62,27 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                         pick_qty = min(remaining_qty, c_item.quantity)
 
                         if pick_qty > 0:
-                            PackingListItem.objects.create(
-                                packing_list=packing_list,
+                            p_item = PackingClosetItem.objects.create(
+                                trip=trip,
+                                status='active',
                                 template_item=t_item,
-                                closet_item=c_item,
-                                category=t_item.sub_category,
                                 quantity=pick_qty,
                                 picked_quantity=0,
                                 is_packed=False,
                                 is_custom_item=False,
                                 note=t_item.note
                             )
+                            # Link to the closet item (ManyToMany)
+                            p_item.closet_item.add(c_item)
                             remaining_qty -= pick_qty
 
                     # If some quantity is still required but no closet items found,
-                    # create a placeholder item for the remaining quantity
+                    # create a placeholder
                     if remaining_qty > 0:
-                        PackingListItem.objects.create(
-                            packing_list=packing_list,
+                        PackingClosetItem.objects.create(
+                            trip=trip,
+                            status='active',
                             template_item=t_item,
-                            closet_item=None,
-                            category=t_item.sub_category,
                             quantity=remaining_qty,
                             picked_quantity=0,
                             is_packed=False,
@@ -100,6 +92,6 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
 
         return CustomResponse.success(
             data=serializer.data,
-            message="Trip and automated packing list created successfully",
+            message="Trip and automated packing items created successfully",
             status_code=201
         )
