@@ -1,8 +1,8 @@
 from django.contrib import admin
 from packing.models import (
     TripType, Trip,
-    PackingTemplate,         PackingTemplateItem,
-    PackingList, PackingListItem
+    PackingTemplate, PackingTemplateItem,
+    PackingClosetItem
 )
 
 
@@ -10,7 +10,6 @@ from packing.models import (
 class TripTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'code', 'created_at')
     search_fields = ('name', 'code')
-
 
 
 @admin.register(PackingTemplate)
@@ -42,18 +41,6 @@ class PackingTemplateItemAdmin(admin.ModelAdmin):
     )
 
 
-class PackingListItemInline(admin.TabularInline):
-    model = PackingListItem
-    extra = 1
-
-
-@admin.register(PackingList)
-class PackingListAdmin(admin.ModelAdmin):
-    list_display = ('title', 'trip', 'status', 'created_at')
-    list_filter = ('status',)
-    search_fields = ('title', 'trip__name')
-
-
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
     list_display = (
@@ -63,9 +50,11 @@ class TripAdmin(admin.ModelAdmin):
     search_fields = ('name', 'location', 'user__email')
 
 
-
-@admin.register(PackingListItem)
-class PackingListItemAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'quantity', 'is_packed', 'is_custom_item')
-    list_filter = ('is_packed', 'is_custom_item')
-    search_fields = ('name', 'closet_item__name', 'note')
+@admin.register(PackingClosetItem)
+class PackingClosetItemAdmin(admin.ModelAdmin):
+    list_display = (
+        '__str__', 'trip', 'status', 'quantity', 'picked_quantity', 'is_packed'
+    )
+    list_filter = ('status', 'is_packed', 'is_custom_item')
+    search_fields = ('trip__name', 'note', 'template_item__sub_category__name')
+    filter_horizontal = ('closet_item',)
