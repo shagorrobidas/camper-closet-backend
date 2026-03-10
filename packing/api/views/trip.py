@@ -56,7 +56,7 @@ class TripListView(ProfileAccessMixin, ListAPIView):
     serializer_class = TripSerializer
 
     def get(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = self.get_profile_user()
         queryset = Trip.objects.filter(user=user).order_by('-created_at')
 
         status_filter = request.query_params.get('status')
@@ -81,7 +81,7 @@ class TripDetailView(ProfileAccessMixin, RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             serializer = self.get_serializer(trip)
             return CustomResponse.success(
@@ -98,7 +98,7 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
     serializer_class = TripSerializer
 
     def create(self, request, *args, **kwargs):
-        user = self.get_object()
+        user = self.get_profile_user()
         data = request.data.copy()
         data['user'] = user.id
         data['status'] = 'Active'
@@ -197,7 +197,7 @@ class TripUpdateView(ProfileAccessMixin, UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.pop('pk', None)
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
 
             partial = kwargs.pop('partial', False)
@@ -218,7 +218,7 @@ class TripDeleteView(ProfileAccessMixin, DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.pop('pk', None)
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             trip.delete()
             return CustomResponse.success(
@@ -237,7 +237,7 @@ class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
     def get(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             queryset = trip.packing_items.filter(status='active').order_by('sort_order')
 
@@ -269,7 +269,7 @@ class TripPackingItemCreateView(ProfileAccessMixin, CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
 
             serializer = self.get_serializer(data=request.data)
@@ -296,7 +296,7 @@ class TripPackingItemUpdateView(ProfileAccessMixin, UpdateAPIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
 
@@ -319,7 +319,7 @@ class TripPackingItemDeleteView(ProfileAccessMixin, DestroyAPIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('pk')
-            user = self.get_object()
+            user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             item = get_object_or_404(
                 TripPackingItem, pk=item_pk, trip=trip, is_custom_item=True
