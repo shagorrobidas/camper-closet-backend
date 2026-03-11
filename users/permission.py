@@ -16,20 +16,26 @@ class ProfileAccessMixin:
         2. The authenticated user is a parent, and the
            requested ID belongs to their child.
     """
-    def get_profile_user(self):
-        # 1. Try URL kwarg first (for update / delete routes)
-        pk = self.kwargs.get('pk')
+    def get_profile_user(self, follow_kwarg_pk=True):
+        """
+        Retrieves the user whose profile is being accessed.
+        - Prioritizes ?child=<uuid> query parameter.
+        - Optionally falls back to URL kwarg 'pk' if follow_kwarg_pk is True.
+        - Defaults to authenticated user.
+        """
+        # 1. Try ?child= query param first as it's explicit for child access
+        child_param = self.request.query_params.get('child')
+        pk = None
 
-        # 2. Fall back to ?child= query param
-        if not pk:
-            child_param = self.request.query_params.get('child')
-            if child_param:
-                try:
-                    pk = UUID(child_param)
-                except (ValueError, AttributeError):
-                    raise ValidationError(
-                        "Invalid child ID format."
-                    )
+        if child_param:
+            try:
+                pk = UUID(child_param)
+            except (ValueError, AttributeError):
+                raise ValidationError("Invalid child ID format.")
+
+        # 2. Try URL kwarg if allowed and no child param provided
+        if not pk and follow_kwarg_pk:
+            pk = self.kwargs.get('pk')
 
         # Operate on self if no specific ID requested
         if not pk:
@@ -49,6 +55,5 @@ class ProfileAccessMixin:
             return user
 
         raise PermissionDenied(
-            "You do not have permission to "
-            "access this profile."
+            "You do not have permission to access this profile."
         )
