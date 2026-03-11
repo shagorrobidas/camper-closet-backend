@@ -25,9 +25,13 @@ class Trip(BaseModel):
         ('Active', 'Active'),
         ('Complete', 'Complete'),
         ('Past', 'Past'),
+        ('Cancelled', 'Cancelled'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
 
     template = models.ForeignKey(
         "PackingTemplate",
@@ -47,6 +51,8 @@ class Trip(BaseModel):
         choices=TRIP_STATUS_CHOICES,
         default='Active'
     )
+
+    is_template_applied = models.BooleanField(default=False)
 
     name = models.CharField(max_length=255)
 
@@ -130,72 +136,68 @@ class PackingTemplateItem(BaseModel):
         on_delete=models.CASCADE
     )
 
+    title = models.CharField(max_length=255, blank=True, null=True)
+
     quantity = models.IntegerField(default=1)
 
     is_required = models.BooleanField(default=True)
 
     note = models.TextField(blank=True, null=True)
 
+    sort_order = models.IntegerField(default=0)
+
     def __str__(self):
-        return self.template.title
+        if self.title:
+            return self.template.title + " - " + self.title
+        return self.template.title + " - " + self.sub_category.name
 
 
-class PackingList(BaseModel):
-    PACKING_LIST_STATUS_CHOICES = [
+class TripPackingItem(BaseModel):
+    PACKING_STATUS_CHOICES = [
         ('active', 'Active'),
         ('complete', 'Complete'),
         ('archived', 'Archived'),
     ]
 
-    trip = models.OneToOneField(
+    trip = models.ForeignKey(
         Trip,
         on_delete=models.CASCADE,
-        related_name='packing_list'
+        related_name='packing_items'
     )
 
-    title = models.CharField(max_length=255)
-
-    status = models.CharField(
-        max_length=20,
-        choices=PACKING_LIST_STATUS_CHOICES,
-        default='active'
-    )
-
-    def __str__(self):
-        return self.title
-
-
-class PackingListItem(BaseModel):
-
-    packing_list = models.ForeignKey(
-        PackingList,
-        on_delete=models.CASCADE,
-        related_name='items'
-    )
-
-    template_item = models.ForeignKey(
-        PackingTemplateItem,
+    main_category = models.ForeignKey(
+        ItemCategoryType,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    closet_item = models.ForeignKey(
-        ClosetItem,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    category = models.ForeignKey(
+    sub_category = models.ForeignKey(
         ItemCategory,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
+    title = models.CharField(max_length=255, blank=True, null=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=PACKING_STATUS_CHOICES,
+        default='active'
+    )
+    
+    template_item = models.ForeignKey(
+        PackingTemplateItem,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    
     quantity = models.IntegerField(default=1)
     picked_quantity = models.IntegerField(default=0)
+
+    is_required = models.BooleanField(default=True)
 
     is_packed = models.BooleanField(default=False)
 
@@ -205,5 +207,53 @@ class PackingListItem(BaseModel):
 
     note = models.TextField(blank=True, null=True)
 
+    sort_order = models.IntegerField(default=0)
+
     def __str__(self):
-        return self.category.name if self.category else "Uncategorized Item"
+        if self.title:
+            return self.title
+        return self.sub_category.name if self.sub_category else "Uncategorized Item"
+
+
+class TripPackingItemSelection(BaseModel):
+    packing_item = models.ForeignKey(
+        TripPackingItem,
+        on_delete=models.CASCADE,
+        related_name='selections'
+    )
+    closet_item = models.ForeignKey(
+        ClosetItem,
+        on_delete=models.CASCADE,
+        related_name='packing_selections'
+    )
+    quantity = models.IntegerField(default=1)
+    note = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.closet_item.name}"
+
+
+class TripEvent(BaseModel):
+    EVENT_TYPE_CHOICES = [
+        ('deadline', 'Deadline'),
+        ('trip_start', 'Trip Start'),
+        ('trip_end', 'Trip End'),
+        ('custom', 'Custom'),
+    ]
+
+    trip = models.ForeignKey(
+        Trip,
+        on_delete=models.CASCADE,
+        related_name='events'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    event_type = models.CharField(
+        max_length=20,
+        choices=EVENT_TYPE_CHOICES,
+        default='custom'
+    )
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.title} - {self.trip.name}"

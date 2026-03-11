@@ -18,7 +18,7 @@ class UserProfileView(ProfileAccessMixin, generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            user = self.get_object()
+            user = self.get_profile_user()
             serializer = self.get_serializer(user)
             data = serializer.data
 
@@ -53,7 +53,7 @@ class UpdateUserProfileView(ProfileAccessMixin, generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            user = self.get_object()
+            user = self.get_profile_user()
 
             # Use partial=True natively or through standard DRF kwargs
             partial = kwargs.pop('partial', False)
@@ -84,7 +84,7 @@ class DeleteUserProfileView(ProfileAccessMixin, generics.DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         try:
-            user = self.get_object()
+            user = self.get_profile_user()
             user.delete()
             return CustomResponse.success(
                 message="User profile deleted successfully.",

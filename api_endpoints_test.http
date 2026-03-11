@@ -1,0 +1,295 @@
+# Camper Closet App - Complete API Documentation & Testing File
+# This file is used to test the Camper Closet App API endpoints.
+# You can use the REST Client extension for VS Code or IntelliJ HTTP Client to execute these requests.
+
+@baseUrl = http://localhost:8000/api/v1
+@host = localhost:8000
+
+# To run these tests, first login and replace the token value below
+# with the 'access' token from the login response.
+@token = your_access_token_here
+
+### -------------------------------------------------------------------------
+### USER AUTHENTICATION
+### -------------------------------------------------------------------------
+
+### Login (Get Token)
+# @name login
+POST {{baseUrl}}/user/login/
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "yourpassword123"
+}
+
+### -------------------------------------------------------------------------
+### CLOSET & CATEGORY SYSTEM
+### -------------------------------------------------------------------------
+
+### 1. Get Main Categories (Category Types)
+GET {{baseUrl}}/closet/category-types/
+Authorization: Bearer {{token}}
+
+### 2. Get Sub Categories (System + User Custom)
+# Optional query params:
+# - type: Filter by Main Category ID
+# - search: Search by name
+GET {{baseUrl}}/closet/categories/
+Authorization: Bearer {{token}}
+# GET {{baseUrl}}/closet/categories/?type=<uuid>&search=shirt
+
+### 3. Create Custom Sub Category
+POST {{baseUrl}}/closet/categories/create/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "type": "uuid-of-main-category",
+    "name": "My Custom Subcategory"
+}
+
+### -------------------------------------------------------------------------
+### CLOSET MANAGEMENT (ITEMS)
+### -------------------------------------------------------------------------
+
+### 4. Create Closet Item
+# This shows all possible fields
+POST {{baseUrl}}/closet/items/create/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Blue Nike Running Shoes",
+    "main_category": "uuid-of-clothes-category",
+    "sub_category": "uuid-of-shoes-category",
+    "brand": "Nike",
+    "color": "Blue",
+    "size": "10",
+    "quantity": 1,
+    "notes": "Good for trail running",
+    "is_favorite": true
+}
+
+### 5. List Closet Items
+# Supported Query Params:
+# - main_category: uuid
+# - sub_category: uuid
+# - is_favorite: true/false
+# - search: text (searches name and brand)
+# - sort_by: name, -name, created_at, -created_at, quantity, -quantity
+GET {{baseUrl}}/closet/items/
+Authorization: Bearer {{token}}
+# GET {{baseUrl}}/closet/items/?search=Blue&is_favorite=true&sort_by=-created_at
+
+### 6. Get Single Closet Item Detail
+@itemId = uuid-of-closet-item
+GET {{baseUrl}}/closet/items/{{itemId}}/
+Authorization: Bearer {{token}}
+
+### 7. Update Closet Item (Partial Update)
+PATCH {{baseUrl}}/closet/items/{{itemId}}/update/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "notes": "Updated notes about these shoes",
+    "quantity": 2
+}
+
+### 8. Toggle Favorite Status
+PATCH {{baseUrl}}/closet/items/{{itemId}}/toggle-favorite/
+Authorization: Bearer {{token}}
+
+### 9. Delete Closet Item
+DELETE {{baseUrl}}/closet/items/{{itemId}}/delete/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### PACKING TEMPLATES
+### -------------------------------------------------------------------------
+
+### 10. List Packing Templates
+# Supported Query Params:
+# - trip_type: uuid
+# - season: string
+GET {{baseUrl}}/packing/templates/
+Authorization: Bearer {{token}}
+# GET {{baseUrl}}/packing/templates/?season=summer&trip_type=<uuid>
+
+### 11. Get Template Details (Includes all items)
+@templateId = uuid-of-template
+GET {{baseUrl}}/packing/templates/{{templateId}}/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### TRIP MANAGEMENT
+### -------------------------------------------------------------------------
+
+### 12. List User Trips
+# Supported Query Params:
+# - status: string (e.g. Active, Completed, Cancelled)
+# - search: string (searches name)
+GET {{baseUrl}}/packing/trips/
+Authorization: Bearer {{token}}
+
+### 13. Create a New Trip (with Template)
+# Using a template auto-creates packing items and smart-matches closet items!
+POST {{baseUrl}}/packing/trips/create/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Summer Yosemite Trip",
+    "location": "Yosemite National Park",
+    "start_date": "2024-07-15",
+    "end_date": "2024-07-20",
+    "packing_deadline": "2024-07-10",
+    "template": "uuid-of-template" 
+    # ^ Optional: leave out to start empty
+}
+
+### 14. Get Trip Details (Includes full packing list & progress summary)
+@tripId = uuid-of-trip
+GET {{baseUrl}}/packing/trips/{{tripId}}/
+Authorization: Bearer {{token}}
+
+### 15. Update Trip
+PATCH {{baseUrl}}/packing/trips/{{tripId}}/update/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "status": "Completed"
+}
+
+### 16. Delete Trip
+DELETE {{baseUrl}}/packing/trips/{{tripId}}/delete/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### TRIP PACKING ITEMS (Individual Checklist Items)
+### -------------------------------------------------------------------------
+
+### 17. List Packing Items for a Trip
+# Supported Query Params:
+# - main_category: uuid
+# - sub_category: uuid
+# - is_packed: true/false
+GET {{baseUrl}}/packing/trips/{{tripId}}/packing-items/
+Authorization: Bearer {{token}}
+
+### 18. Add Custom Packing Item to Trip
+POST {{baseUrl}}/packing/trips/{{tripId}}/packing-items/create/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "main_category": "uuid-of-main-cat",
+    "sub_category": "uuid-of-sub-cat",
+    "title": "Extra Batteries for Headlamp",
+    "quantity": 4,
+    "is_required": true,
+    "note": "Don't forget AA!"
+}
+
+### 19. Update Packing Item details
+@packingItemId = uuid-of-packing-item
+PATCH {{baseUrl}}/packing/trips/{{tripId}}/packing-items/{{packingItemId}}/update/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "quantity": 5,
+    "note": "Actually, bring 5 AA batteries."
+}
+
+### 20. Delete Custom Packing Item (Only works for custom items)
+DELETE {{baseUrl}}/packing/trips/{{tripId}}/packing-items/{{packingItemId}}/delete/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### CLOSET MATCHING & CHOOSE ITEMS (Selection Flow)
+### -------------------------------------------------------------------------
+
+### 21. Get Smart Suggestions for a Packing Item
+# Returns items from your closet that match this packing item's category
+GET {{baseUrl}}/packing/trips/{{tripId}}/packing-items/{{packingItemId}}/suggest-closet/
+Authorization: Bearer {{token}}
+
+### 22. Select/Assign a Closet Item to a Packing Item
+# Automatically updates picked_quantity and is_packed on the packing item
+POST {{baseUrl}}/packing/trips/{{tripId}}/packing-items/{{packingItemId}}/select-closet/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "closet_item": "uuid-of-your-closet-item",
+    "quantity": 1
+}
+
+### 23. Remove a Closet Item Selection
+# Automatically recalculates picked_quantity and reverses is_packed if needed
+@selectionId = uuid-of-selection-record
+DELETE {{baseUrl}}/packing/trips/{{tripId}}/packing-items/{{packingItemId}}/selections/{{selectionId}}/remove/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### TRIP EVENTS / TIMELINE CALENDAR
+### -------------------------------------------------------------------------
+
+### 24. List All Events for a Trip (Timeline)
+# Note: Deadline, Start, and End are auto-created when trip is made
+GET {{baseUrl}}/packing/trips/{{tripId}}/events/
+Authorization: Bearer {{token}}
+
+### 25. Add Custom Timeline Event
+POST {{baseUrl}}/packing/trips/{{tripId}}/events/create/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "title": "Buy Trail Mix",
+    "event_type": "custom",
+    "date": "2024-07-05T12:00:00Z"
+}
+
+### 26. Delete Custom Timeline Event
+@eventId = uuid-of-event
+DELETE {{baseUrl}}/packing/trips/{{tripId}}/events/{{eventId}}/delete/
+Authorization: Bearer {{token}}
+
+### -------------------------------------------------------------------------
+### NOTIFICATIONS SYSTEM
+### -------------------------------------------------------------------------
+
+### 27. List My Notifications (Paginated)
+# Query Params:
+# - is_read: true/false
+# - page: number
+GET {{baseUrl}}/user/notifications/
+Authorization: Bearer {{token}}
+# GET {{baseUrl}}/user/notifications/?is_read=false
+
+### 28. Mark Single Notification as Read
+@notificationId = uuid-of-notification
+PATCH {{baseUrl}}/user/notifications/{{notificationId}}/mark-read/
+Authorization: Bearer {{token}}
+
+### 29. Mark ALL Unread Notifications as Read
+PATCH {{baseUrl}}/user/notifications/mark-read/
+Authorization: Bearer {{token}}
+
+### 30. Get Notification Settings
+GET {{baseUrl}}/user/notifications/settings/
+Authorization: Bearer {{token}}
+
+### 31. Update Notification Settings
+PATCH {{baseUrl}}/user/notifications/settings/
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "packing_reminders": false,
+    "weekly_summaries": true
+}

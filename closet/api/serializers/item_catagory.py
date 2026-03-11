@@ -8,15 +8,19 @@ class ItemCategorySerializer(serializers.ModelSerializer):
         model = ItemCategory
         fields = [
             'id',
-            'users',
+            'user',
             'name',
             'type',
+            'is_custom',
+            'is_system',
             'created_at',
             'updated_at',
         ]
         read_only_fields = [
             'id',
-            'users',
+            'user',
+            'is_custom',
+            'is_system',
             'created_at',
             'updated_at',
         ]
