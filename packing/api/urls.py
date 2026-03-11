@@ -9,14 +9,15 @@ from packing.api.views import (
     TripDeleteView,
     TripPackingItemListView,
     TripPackingItemCreateView,
-    TripPackingItemUpdateView,
     TripPackingItemDeleteView,
     PackingItemSelectClosetView,
     PackingItemRemoveClosetView,
     ClosetMatchSuggestionView,
+    TripBulkPackingView,
     TripEventListView,
     TripEventCreateView,
     TripEventDeleteView,
+    TripPackingItemUpdateView
 )
 
 urlpatterns = [
@@ -57,6 +58,11 @@ urlpatterns = [
         'trips/<uuid:pk>/delete/',
         TripDeleteView.as_view(),
         name='trip-delete'
+    ),
+    path(
+        'trips/<uuid:trip_pk>/bulk-select-closet/',
+        TripBulkPackingView.as_view(),
+        name='trip-bulk-select-closet'
     ),
 
     # Trip Packing Items
