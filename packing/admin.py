@@ -12,6 +12,12 @@ class TripTypeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'code')
 
 
+class PackingTemplateItemInline(admin.TabularInline):
+    model = PackingTemplateItem
+    extra = 1
+    raw_id_fields = ('main_category', 'sub_category')
+
+
 @admin.register(PackingTemplate)
 class PackingTemplateAdmin(admin.ModelAdmin):
     list_display = (
@@ -19,11 +25,7 @@ class PackingTemplateAdmin(admin.ModelAdmin):
     )
     list_filter = ('trip_type', 'season', 'is_system', 'is_active')
     search_fields = ('title', 'description')
-
-
-class PackingTemplateItemInline(admin.TabularInline):
-    model = PackingTemplateItem
-    extra = 1
+    inlines = [PackingTemplateItemInline]
 
 
 @admin.register(PackingTemplateItem)
@@ -41,6 +43,17 @@ class PackingTemplateItemAdmin(admin.ModelAdmin):
     )
 
 
+class TripPackingItemInline(admin.TabularInline):
+    model = TripPackingItem
+    extra = 1
+    raw_id_fields = ('main_category', 'sub_category', 'template_item')
+
+
+class TripEventInline(admin.TabularInline):
+    model = TripEvent
+    extra = 1
+
+
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
     list_display = (
@@ -48,6 +61,13 @@ class TripAdmin(admin.ModelAdmin):
     )
     list_filter = ('trip_type', 'status', 'is_template_applied', 'start_date')
     search_fields = ('name', 'location', 'user__email')
+    inlines = [TripPackingItemInline, TripEventInline]
+
+
+class TripPackingItemSelectionInline(admin.TabularInline):
+    model = TripPackingItemSelection
+    extra = 1
+    raw_id_fields = ('closet_item',)
 
 
 @admin.register(TripPackingItem)
@@ -57,11 +77,14 @@ class TripPackingItemAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', 'main_category', 'sub_category', 'is_packed', 'is_custom_item')
     search_fields = ('trip__name', 'title', 'note', 'sub_category__name')
+    inlines = [TripPackingItemSelectionInline]
+    raw_id_fields = ('trip', 'main_category', 'sub_category', 'template_item')
 
 
 @admin.register(TripPackingItemSelection)
 class TripPackingItemSelectionAdmin(admin.ModelAdmin):
     list_display = ('packing_item', 'closet_item', 'quantity')
+    raw_id_fields = ('packing_item', 'closet_item')
 
 
 @admin.register(TripEvent)

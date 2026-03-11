@@ -233,8 +233,6 @@ class TripDeleteView(ProfileAccessMixin, DestroyAPIView):
             return custom_exception_handler(e, request)
 
 
-# ── Packing Items ───────────────────────────────────────────────────────────────
-
 class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
     serializer_class = TripPackingItemSerializer
 
