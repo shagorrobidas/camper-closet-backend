@@ -1,6 +1,6 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Count
+from django.db.models import Count, Q
 from closet.models import ClosetItem, ItemCategoryType
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
@@ -19,12 +19,15 @@ class DashboardStatsView(ProfileAccessMixin, GenericAPIView):
 
             brand_types = ItemCategoryType.objects.annotate(
                 item_count=Count(
-                    'categories__closet_items',
-                    filter=__import__(
-                        'django.db.models', fromlist=['Q']
-                    ).Q(categories__closet_items__user=user)
+                    'closet_items_main',
+                    filter=Q(closet_items_main__user=user)
                 )
-            ).values('id', 'name', 'code', 'item_count')
+            ).values(
+                'id',
+                'name',
+                'code',
+                'item_count'
+            )
 
             data = {
                 'total_items': total_items,
@@ -36,5 +39,6 @@ class DashboardStatsView(ProfileAccessMixin, GenericAPIView):
                 message="Dashboard stats retrieved successfully",
                 status_code=200,
             )
+
         except Exception as e:
             return custom_exception_handler(e, request)
