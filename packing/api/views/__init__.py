@@ -39,10 +39,7 @@ __all__ = [
     'PackingItemSelectClosetView',
     'PackingItemRemoveClosetView',
     'ClosetMatchSuggestionView',
-<<<<<<< HEAD
     'TripBulkPackingView',
-=======
->>>>>>> f8c5e95 (Configure URLs and export new packing views)
     'TripEventListView',
     'TripEventCreateView',
     'TripEventDeleteView',
