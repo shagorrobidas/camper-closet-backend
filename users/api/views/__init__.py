@@ -15,6 +15,11 @@ from .request_password import (
 )
 from .change_password import ChangePasswordView
 from .logout import LogoutView
+from .notification import (
+    NotificationListView,
+    NotificationMarkReadView,
+    NotificationSettingView,
+)
 
 
 __all__ = [
@@ -31,5 +36,8 @@ __all__ = [
     'SetNewPasswordView',
     'CheckPasswordResetStatusView',
     'ChangePasswordView',
-    'LogoutView'
+    'LogoutView',
+    'NotificationListView',
+    'NotificationMarkReadView',
+    'NotificationSettingView',
 ]

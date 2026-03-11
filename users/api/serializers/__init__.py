@@ -16,6 +16,7 @@ from .reset_password import (
 )
 from .change_password import ChangePasswordSerializer
 from .logout import LogoutSerializer
+from .notification import NotificationSerializer, NotificationSettingSerializer
 
 
 __all__ = [
@@ -31,5 +32,7 @@ __all__ = [
     'VerifyPasswordResetOTPSerializer',
     'SetNewPasswordSerializer',
     'ChangePasswordSerializer',
-    'LogoutSerializer'
+    'LogoutSerializer',
+    'NotificationSerializer',
+    'NotificationSettingSerializer',
 ]

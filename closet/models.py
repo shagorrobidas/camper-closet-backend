@@ -12,9 +12,11 @@ class ItemCategoryType(BaseModel):
 
 
 class ItemCategory(BaseModel):
-    users = models.ManyToManyField(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name='categories',
+        null=True,
         blank=True
     )
     name = models.CharField(
@@ -28,9 +30,12 @@ class ItemCategory(BaseModel):
     is_custom = models.BooleanField(
         default=False
     )
+    is_system = models.BooleanField(
+        default=False
+    )
 
     class Meta:
-        unique_together = ("name", "type")
+        unique_together = ("user", "name", "type")
         indexes = [
             models.Index(fields=["type"]),
         ]
@@ -45,7 +50,14 @@ class ClosetItem(BaseModel):
         on_delete=models.CASCADE,
         related_name='closet_items'
     )
-    category = models.ForeignKey(
+    main_category = models.ForeignKey(
+        ItemCategoryType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='closet_items_main'
+    )
+    sub_category = models.ForeignKey(
         ItemCategory,
         on_delete=models.SET_NULL,
         null=True,
@@ -73,11 +85,14 @@ class ClosetItem(BaseModel):
     quantity = models.IntegerField(
         default=1
     )
-    note = models.TextField(
+    notes = models.TextField(
         blank=True,
         null=True
     )
-    ai_detected = models.BooleanField(
+    is_scanned = models.BooleanField(
+        default=False
+    )
+    is_favorite = models.BooleanField(
         default=False
     )
 
@@ -85,7 +100,7 @@ class ClosetItem(BaseModel):
         unique_together = ("user", "name")
         indexes = [
             models.Index(fields=["user"]),
-            models.Index(fields=["category"]),
+            models.Index(fields=["sub_category"]),
         ]
 
     def __str__(self):

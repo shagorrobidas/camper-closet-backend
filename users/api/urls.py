@@ -14,7 +14,10 @@ from .views import (
     SetNewPasswordView,
     CheckPasswordResetStatusView,
     ChangePasswordView,
-    LogoutView
+    LogoutView,
+    NotificationListView,
+    NotificationMarkReadView,
+    NotificationSettingView,
 )
 
 urlpatterns = [
@@ -122,4 +125,25 @@ urlpatterns = [
     #     name='apple_social_auth'
     # ),
 
+    # ── Notifications ─────────────────────────────────────────────────────────
+    path(
+        'notifications/',
+        NotificationListView.as_view(),
+        name='notification-list'
+    ),
+    path(
+        'notifications/mark-read/',
+        NotificationMarkReadView.as_view(),
+        name='notification-mark-all-read'
+    ),
+    path(
+        'notifications/<uuid:pk>/mark-read/',
+        NotificationMarkReadView.as_view(),
+        name='notification-mark-read'
+    ),
+    path(
+        'notifications/settings/',
+        NotificationSettingView.as_view(),
+        name='notification-settings'
+    ),
 ]
