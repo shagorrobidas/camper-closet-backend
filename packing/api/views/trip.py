@@ -59,7 +59,6 @@ class TripListView(ProfileAccessMixin, ListAPIView):
     def get(self, request, *args, **kwargs):
         user = self.get_profile_user()
         queryset = Trip.objects.filter(user=user).order_by('-created_at')
-
         status_filter = request.query_params.get('status')
         if status_filter:
             queryset = queryset.filter(status=status_filter)
@@ -81,8 +80,8 @@ class TripDetailView(ProfileAccessMixin, RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_profile_user()
+            trip_pk = self.kwargs.get('pk')
+            user = self.get_profile_user(follow_kwarg_pk=False)
             logger.info(f"trip_pk: {trip_pk}")
             logger.info(f"user: {user}")
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
@@ -130,11 +129,10 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                 template_items = PackingTemplateItem.objects.filter(
                     template=template
                 ).order_by('sort_order')
-
                 for t_item in template_items:
                     required_qty = t_item.quantity
 
-                    p_item = TripPackingItem.objects.create(
+                    TripPackingItem.objects.create(
                         trip=trip,
                         status='active',
                         main_category=t_item.main_category,
@@ -153,39 +151,39 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                     )
 
                     # Smart closet matching by sub_category
-                    closet_items = ClosetItem.objects.filter(
-                        user=user,
-                        sub_category=t_item.sub_category,
-                        is_active=True
-                    ).order_by('-quantity')
+                #     closet_items = ClosetItem.objects.filter(
+                #         user=user,
+                #         sub_category=t_item.sub_category,
+                #         is_active=True
+                #     ).order_by('-quantity')
 
-                    remaining_qty = required_qty
-                    picked_qty_total = 0
+                #     remaining_qty = required_qty
+                #     picked_qty_total = 0
 
-                    for c_item in closet_items:
-                        if remaining_qty <= 0:
-                            break
-                        pick_qty = min(remaining_qty, c_item.quantity)
-                        if pick_qty > 0:
-                            TripPackingItemSelection.objects.create(
-                                packing_item=p_item,
-                                closet_item=c_item,
-                                quantity=pick_qty
-                            )
-                            remaining_qty -= pick_qty
-                            picked_qty_total += pick_qty
+                #     for c_item in closet_items:
+                #         if remaining_qty <= 0:
+                #             break
+                #         pick_qty = min(remaining_qty, c_item.quantity)
+                #         if pick_qty > 0:
+                #             TripPackingItemSelection.objects.create(
+                #                 packing_item=p_item,
+                #                 closet_item=c_item,
+                #                 quantity=pick_qty
+                #             )
+                #             remaining_qty -= pick_qty
+                #             picked_qty_total += pick_qty
 
-                    if picked_qty_total > 0:
-                        p_item.picked_quantity = picked_qty_total
-                        if picked_qty_total >= required_qty:
-                            p_item.is_packed = True
-                            p_item.packed_at = timezone.now()
-                        p_item.save(
-                            update_fields=['picked_quantity', 'is_packed', 'packed_at']
-                        )
+                #     if picked_qty_total > 0:
+                #         p_item.picked_quantity = picked_qty_total
+                #         if picked_qty_total >= required_qty:
+                #             p_item.is_packed = True
+                #             p_item.packed_at = timezone.now()
+                #         p_item.save(
+                #             update_fields=['picked_quantity', 'is_packed', 'packed_at']
+                #         )
 
-                trip.is_template_applied = True
-                trip.save(update_fields=['is_template_applied'])
+                # trip.is_template_applied = True
+                # trip.save(update_fields=['is_template_applied'])
 
         detail_serializer = TripDetailSerializer(trip, context={'request': request})
         return CustomResponse.success(
@@ -200,8 +198,8 @@ class TripUpdateView(ProfileAccessMixin, UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            trip_pk = self.kwargs.pop('pk', None)
-            user = self.get_profile_user()
+            trip_pk = self.kwargs.get('pk')
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
 
             partial = kwargs.pop('partial', False)
@@ -221,8 +219,8 @@ class TripDeleteView(ProfileAccessMixin, DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         try:
-            trip_pk = self.kwargs.pop('pk', None)
-            user = self.get_profile_user()
+            trip_pk = self.kwargs.get('pk')
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             trip.delete()
             return CustomResponse.success(
@@ -239,7 +237,7 @@ class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
     def get(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_profile_user()
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             queryset = trip.packing_items.filter(status='active').order_by('sort_order')
 
@@ -271,7 +269,7 @@ class TripPackingItemCreateView(ProfileAccessMixin, CreateAPIView):
     def create(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            user = self.get_profile_user()
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
 
             serializer = self.get_serializer(data=request.data)
@@ -298,7 +296,7 @@ class TripPackingItemUpdateView(ProfileAccessMixin, UpdateAPIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('pk')
-            user = self.get_profile_user()
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
 
@@ -321,7 +319,7 @@ class TripPackingItemDeleteView(ProfileAccessMixin, DestroyAPIView):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('pk')
-            user = self.get_profile_user()
+            user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             item = get_object_or_404(
                 TripPackingItem, pk=item_pk, trip=trip, is_custom_item=True
