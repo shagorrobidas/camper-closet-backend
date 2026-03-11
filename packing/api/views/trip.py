@@ -1,3 +1,4 @@
+import logging
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -5,8 +6,6 @@ from rest_framework.generics import (
     UpdateAPIView,
     DestroyAPIView,
 )
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
@@ -21,6 +20,8 @@ from packing.api.serializers import (
 )
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
+
+logger = logging.getLogger(__name__)
 
 
 def _create_trip_events(trip):
@@ -80,9 +81,12 @@ class TripDetailView(ProfileAccessMixin, RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            trip_pk = self.kwargs.get('pk')
+            trip_pk = self.kwargs.get('trip_pk')
             user = self.get_profile_user()
+            logger.info(f"trip_pk: {trip_pk}")
+            logger.info(f"user: {user}")
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
+            logger.info(f"trip: {trip}")
             serializer = self.get_serializer(trip)
             return CustomResponse.success(
                 data=serializer.data,
