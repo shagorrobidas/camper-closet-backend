@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum
+from django.utils import timezone
 from core.models import BaseModel
 from users.models import User
 from closet.models import ItemCategory, ClosetItem, ItemCategoryType
@@ -214,6 +216,38 @@ class TripPackingItem(BaseModel):
             return self.title
         return self.sub_category.name if self.sub_category else "Uncategorized Item"
 
+    def save(self, *args, **kwargs):
+        # We need to refresh status if quantity changes to ensure is_packed is correct
+        is_new = self._state.adding
+        super().save(*args, **kwargs)
+        if not is_new:
+            # If not new, quantity might have changed, so refresh status
+            # refresh_status also saves, but only update_fields
+            self.refresh_status()
+
+    @property
+    def remaining_quantity(self):
+        return max(0, self.quantity - self.picked_quantity)
+
+    def refresh_status(self):
+        """Recalculate picked_quantity and packed status from selections."""
+        result = self.selections.aggregate(total=Sum('quantity'))
+        total_picked = result['total'] or 0
+        
+        self.picked_quantity = total_picked
+        if total_picked >= self.quantity:
+            self.is_packed = True
+            self.is_required = False  # As requested: when quantity == picked_quantity, is_required false
+            if not self.packed_at:
+                self.packed_at = timezone.now()
+        else:
+            self.is_packed = False
+            self.is_required = True  # Revert if it's no longer fully picked
+            self.packed_at = None
+        self.save(
+            update_fields=['picked_quantity', 'is_packed', 'is_required', 'packed_at']
+        )
+
 
 class TripPackingItemSelection(BaseModel):
     packing_item = models.ForeignKey(
@@ -231,6 +265,15 @@ class TripPackingItemSelection(BaseModel):
 
     def __str__(self):
         return f"{self.quantity} x {self.closet_item.name}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.packing_item.refresh_status()
+
+    def delete(self, *args, **kwargs):
+        packing_item = self.packing_item
+        super().delete(*args, **kwargs)
+        packing_item.refresh_status()
 
 
 class TripEvent(BaseModel):
