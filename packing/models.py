@@ -219,6 +219,16 @@ class TripPackingItem(BaseModel):
     def save(self, *args, **kwargs):
         # We need to refresh status if quantity changes to ensure is_packed is correct
         is_new = self._state.adding
+        
+        # Avoid recursion: if we are only updating status fields, just save.
+        update_fields = kwargs.get('update_fields')
+        if update_fields:
+            status_fields = {'picked_quantity', 'is_packed', 'is_required', 'packed_at'}
+            # If all updated fields are status fields, don't refresh again.
+            if all(f in status_fields for f in update_fields):
+                super().save(*args, **kwargs)
+                return
+
         super().save(*args, **kwargs)
         if not is_new:
             # If not new, quantity might have changed, so refresh status
