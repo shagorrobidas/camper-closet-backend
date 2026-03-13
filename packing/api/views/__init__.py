@@ -18,6 +18,7 @@ from .packing import (
     PackingItemRemoveClosetView,
     ClosetMatchSuggestionView,
     TripBulkPackingView,
+    UpcomingTripEventListView,
     TripEventListView,
     TripEventCreateView,
     TripEventDeleteView,
