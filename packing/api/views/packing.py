@@ -9,8 +9,11 @@ from packing.models import (
 )
 from closet.models import ClosetItem
 from packing.api.serializers import (
-    TripPackingItemSelectionSerializer, TripEventSerializer, TripPackingItemSerializer
+    TripPackingItemSelectionSerializer,
+    TripEventSerializer,
+    TripPackingItemSerializer
 )
+from closet.api.serializers import ClosetItemSerializer
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
 from django.utils import timezone
@@ -45,10 +48,20 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
                         ClosetItem, pk=closet_item_id
                     )
 
-                    # Enforce same-user ownership
-                    if closet_item.user != user:
+                    # Enforce family-wide ownership
+                    family_ids = {user.id}
+                    if user.parent:
+                        family_ids.add(user.parent_id)
+                        family_ids.update(user.parent.children.values_list('id', flat=True))
+                    elif user.role == 'parent':
+                        family_ids.update(user.children.values_list('id', flat=True))
+
+                    # Also include the authenticated user in case they are performing the action
+                    family_ids.add(self.request.user.id)
+
+                    if closet_item.user_id not in family_ids:
                         raise PermissionDenied(
-                            f"Closet item {closet_item_id} does not belong to you." # noqa
+                            f"Closet item {closet_item_id} does not belong to your family." # noqa
                         )
 
                     if quantity < 1:
@@ -137,9 +150,20 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
                         pk=closet_item_id
                     )
 
-                    if closet_item.user != user:
+                    # Enforce family-wide ownership
+                    family_ids = {user.id}
+                    if user.parent:
+                        family_ids.add(user.parent_id)
+                        family_ids.update(user.parent.children.values_list('id', flat=True))
+                    elif user.role == 'parent':
+                        family_ids.update(user.children.values_list('id', flat=True))
+                    
+                    # Also include the authenticated user in case they are performing the action
+                    family_ids.add(self.request.user.id)
+
+                    if closet_item.user_id not in family_ids:
                         raise PermissionDenied(
-                            f"Closet item {closet_item_id} does not belong to you." # noqa
+                            f"Closet item {closet_item_id} does not belong to your family." # noqa
                         )
 
                     if quantity < 1:
@@ -244,7 +268,7 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
 
 
 class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
-    """GET smart closet item suggestions for a packing item based on sub_category.""" # noqa
+    """GET smart closet item suggestions for a packing item based on sub_category name.""" # noqa
 
     def get(self, request, *args, **kwargs):
         try:
@@ -262,13 +286,32 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
                 'closet_item_id', flat=True
             )
 
-            suggestions = ClosetItem.objects.filter(
-                user=user,
-                sub_category=packing_item.sub_category,
-                is_active=True
-            ).exclude(id__in=already_selected_ids).order_by('-quantity')
+            # Define family user IDs: self, parent, and all siblings/children
+            family_ids = {user.id}
+            if user.parent:
+                family_ids.add(user.parent_id)
+                family_ids.update(user.parent.children.values_list('id', flat=True))
+            elif user.role == 'parent':
+                family_ids.update(user.children.values_list('id', flat=True))
 
-            from closet.api.serializers import ClosetItemSerializer
+            # Query closet items from any family member
+            queryset = ClosetItem.objects.filter(
+                user_id__in=family_ids,
+                is_active=True
+            ).exclude(id__in=already_selected_ids)
+
+            # Match by Name to account for duplicate category records across users
+            if packing_item.sub_category:
+                queryset = queryset.filter(
+                    sub_category__name__iexact=packing_item.sub_category.name
+                )
+            elif packing_item.main_category:
+                queryset = queryset.filter(
+                    main_category__name__iexact=packing_item.main_category.name
+                )
+            
+            suggestions = queryset.order_by('-quantity')
+
             serializer = ClosetItemSerializer(
                 suggestions, many=True, context={'request': request}
             )
