@@ -17,7 +17,8 @@ from packing.api.views import (
     TripEventListView,
     TripEventCreateView,
     TripEventDeleteView,
-    TripPackingItemUpdateView
+    TripPackingItemUpdateView,
+    UpcomingTripEventListView,
 )
 
 urlpatterns = [
@@ -99,7 +100,7 @@ urlpatterns = [
         name='packing-item-suggest-closet'
     ),
     path(
-        'trips/<uuid:trip_pk>/packing-items/<uuid:item_pk>/selections/<uuid:selection_pk>/remove/',
+        'trips/<uuid:trip_pk>/packing-items/<uuid:item_pk>/selections/<uuid:selection_pk>/remove/', # noqa
         PackingItemRemoveClosetView.as_view(),
         name='packing-item-remove-selection'
     ),
@@ -119,5 +120,12 @@ urlpatterns = [
         'trips/<uuid:trip_pk>/events/<uuid:pk>/delete/',
         TripEventDeleteView.as_view(),
         name='trip-event-delete'
+    ),
+
+    # Upcoming Events (Global)
+    path(
+        'trips/upcoming-events/',
+        UpcomingTripEventListView.as_view(),
+        name='upcoming-trip-events'
     ),
 ]
