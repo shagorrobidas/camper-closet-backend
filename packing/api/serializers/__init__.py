@@ -9,6 +9,7 @@ from .trip import (
     TripPackingItemSerializer,
     TripPackingItemCreateSerializer,
     TripPackingItemSelectionSerializer,
+    TripTypeSerializer
 )
 from .events import TripEventSerializer
 
@@ -23,4 +24,5 @@ __all__ = [
     'TripPackingItemCreateSerializer',
     'TripPackingItemSelectionSerializer',
     'TripEventSerializer',
+    'TripTypeSerializer',
 ]
