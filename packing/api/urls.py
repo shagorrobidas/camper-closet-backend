@@ -19,6 +19,8 @@ from packing.api.views import (
     TripEventDeleteView,
     TripPackingItemUpdateView,
     UpcomingTripEventListView,
+    MenualTripCreateView,
+    TripTypeListView
 )
 
 urlpatterns = [
@@ -86,6 +88,17 @@ urlpatterns = [
         'trips/<uuid:trip_pk>/packing-items/<uuid:pk>/delete/',
         TripPackingItemDeleteView.as_view(),
         name='trip-packing-item-delete'
+    ),
+
+    path(
+        'trips/menual-create/',
+        MenualTripCreateView.as_view(),
+        name='menual-trip-create'
+    ),
+    path(
+        'trips/types/',
+        TripTypeListView.as_view(),
+        name='trip-type-list'
     ),
 
     # Closet Selection / Matching
