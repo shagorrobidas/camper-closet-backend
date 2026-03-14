@@ -85,6 +85,7 @@ class PackingTemplate(BaseModel):
         ('Autumn', 'Autumn'),
         ('Late Autumn', 'Late Autumn'),
         ('Spring', 'Spring'),
+        ('None', 'None'),
     ]
     title = models.CharField(
         max_length=255
@@ -135,7 +136,9 @@ class PackingTemplateItem(BaseModel):
 
     sub_category = models.ForeignKey(
         ItemCategory,
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )
 
     title = models.CharField(max_length=255, blank=True, null=True)
