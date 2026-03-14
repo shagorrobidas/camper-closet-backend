@@ -1,4 +1,5 @@
 import logging
+import traceback
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -10,13 +11,23 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
 from packing.models import (
-    Trip, PackingTemplate, TripPackingItem, PackingTemplateItem,
-    TripPackingItemSelection, TripEvent
+    Trip,
+    PackingTemplate,
+    TripPackingItem,
+    PackingTemplateItem,
+    TripPackingItemSelection,
+    TripEvent,
+    TripType
 )
-from closet.models import ClosetItem
+from closet.models import (
+    ClosetItem,
+    ItemCategory,
+    ItemCategoryType
+)
 from packing.api.serializers import (
     TripSerializer, TripDetailSerializer, TripPackingItemSerializer,
-    TripPackingItemCreateSerializer
+    TripPackingItemCreateSerializer,
+    TripTypeSerializer
 )
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
@@ -32,7 +43,10 @@ def _create_trip_events(trip):
             title='Packing Deadline',
             event_type='deadline',
             date=timezone.make_aware(
-                timezone.datetime.combine(trip.packing_deadline, timezone.datetime.min.time())
+                timezone.datetime.combine(
+                    trip.packing_deadline,
+                    timezone.datetime.min.time()
+                )
             )
         )
     TripEvent.objects.create(
@@ -40,7 +54,10 @@ def _create_trip_events(trip):
         title='Trip Starts',
         event_type='trip_start',
         date=timezone.make_aware(
-            timezone.datetime.combine(trip.start_date, timezone.datetime.min.time())
+            timezone.datetime.combine(
+                trip.start_date,
+                timezone.datetime.min.time()
+            )
         )
     )
     TripEvent.objects.create(
@@ -48,7 +65,10 @@ def _create_trip_events(trip):
         title='Trip Ends',
         event_type='trip_end',
         date=timezone.make_aware(
-            timezone.datetime.combine(trip.end_date, timezone.datetime.min.time())
+            timezone.datetime.combine(
+                trip.end_date,
+                timezone.datetime.min.time()
+            )
         )
     )
 
@@ -138,7 +158,7 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                         main_category=t_item.main_category,
                         sub_category=t_item.sub_category,
                         title=t_item.title or (
-                            t_item.sub_category.name if t_item.sub_category else ''
+                            t_item.sub_category.name if t_item.sub_category else ''  # noqa
                         ),
                         template_item=t_item,
                         quantity=required_qty,
@@ -179,13 +199,20 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                 #             p_item.is_packed = True
                 #             p_item.packed_at = timezone.now()
                 #         p_item.save(
-                #             update_fields=['picked_quantity', 'is_packed', 'packed_at']
+                #             update_fields=[
+                #                 'picked_quantity',
+                #                 'is_packed',
+                #                 'packed_at'
+                #             ]
                 #         )
 
                 # trip.is_template_applied = True
                 # trip.save(update_fields=['is_template_applied'])
 
-        detail_serializer = TripDetailSerializer(trip, context={'request': request})
+        detail_serializer = TripDetailSerializer(
+            trip,
+            context={'request': request}
+        )
         return CustomResponse.success(
             data=detail_serializer.data,
             message="Trip created successfully",
@@ -203,7 +230,11 @@ class TripUpdateView(ProfileAccessMixin, UpdateAPIView):
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
 
             partial = kwargs.pop('partial', False)
-            serializer = self.get_serializer(trip, data=request.data, partial=partial)
+            serializer = self.get_serializer(
+                trip,
+                data=request.data,
+                partial=partial
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return CustomResponse.success(
@@ -239,7 +270,9 @@ class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
             trip_pk = self.kwargs.get('trip_pk')
             user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
-            queryset = trip.packing_items.filter(status='active').order_by('sort_order')
+            queryset = trip.packing_items.filter(
+                status='active'
+            ).order_by('sort_order')
 
             main_category = request.query_params.get('main_category')
             if main_category:
@@ -251,7 +284,9 @@ class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
 
             is_packed = request.query_params.get('is_packed')
             if is_packed is not None:
-                queryset = queryset.filter(is_packed=is_packed.lower() == 'true')
+                queryset = queryset.filter(
+                    is_packed=is_packed.lower() == 'true'
+                )
 
             serializer = self.get_serializer(queryset, many=True)
             return CustomResponse.success(
@@ -301,7 +336,11 @@ class TripPackingItemUpdateView(ProfileAccessMixin, UpdateAPIView):
             item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)
 
             partial = kwargs.pop('partial', False)
-            serializer = self.get_serializer(item, data=request.data, partial=partial)
+            serializer = self.get_serializer(
+                item,
+                data=request.data,
+                partial=partial
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return CustomResponse.success(
@@ -327,6 +366,95 @@ class TripPackingItemDeleteView(ProfileAccessMixin, DestroyAPIView):
             item.delete()
             return CustomResponse.success(
                 message="Custom item removed successfully",
+                status_code=200
+            )
+        except Exception as e:
+            return custom_exception_handler(e, request)
+
+
+class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
+    serializer_class = TripSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            user = self.get_profile_user(follow_kwarg_pk=False)
+            data = request.data.copy()
+            data['user'] = user.id
+
+            serializer = self.get_serializer(data=data)
+            if not serializer.is_valid():
+                print("Serializer errors in MenualTripCreateView:")
+                print(serializer.errors)
+            serializer.is_valid(raise_exception=True)
+
+            with transaction.atomic():
+                trip_type_id = data.get('trip_type')
+                trip_type = TripType.objects.get(id=trip_type_id)
+
+                # 1. Create PackingTemplate first
+                template = PackingTemplate.objects.create(
+                    title=data.get('name'),
+                    trip_type=trip_type,
+                    season='None',
+                    is_system=False
+                )
+
+                # 2. Create Trip
+                trip = serializer.save(
+                    user=user,
+                    is_template_applied=False,
+                    status='active',
+                    trip_type=trip_type,
+                    template=template
+                )
+
+                # Auto-generate trip events
+                _create_trip_events(trip)
+
+                # 3. Create PackingTemplateItems
+                cat_types = ItemCategoryType.objects.all()
+                for cat_type in cat_types:
+                    PackingTemplateItem.objects.create(
+                        template=template,
+                        main_category=cat_type,
+                        title=trip.name,
+                        is_required=False,
+                        quantity=1
+                    )
+
+                    # # 4. Create TripPackingItems
+                    # TripPackingItem.objects.create(
+                    #     trip=trip,
+                    #     main_category=cat_type,
+                    #     title=trip.name,
+                    #     status='active',
+                    #     template_item=t_item,
+                    #     quantity=1,
+                    #     is_required=False,
+                    #     is_packed=False,
+                    #     is_custom_item=False
+                    # )
+
+            out = TripDetailSerializer(trip, context={'request': request})
+            return CustomResponse.success(
+                data=out.data,
+                message="Trip created successfully",
+                status_code=201
+            )
+        except Exception as e:
+            return custom_exception_handler(e, request)
+
+
+class TripTypeListView(ProfileAccessMixin, ListAPIView):
+    serializer_class = TripTypeSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            queryset = TripType.objects.all()
+            serializer = self.get_serializer(queryset, many=True)
+            return CustomResponse.success(
+                data=serializer.data,
+                message="Trip types retrieved successfully",
                 status_code=200
             )
         except Exception as e:
