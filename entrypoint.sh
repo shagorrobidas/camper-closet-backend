@@ -20,6 +20,13 @@ until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -q;
 done
 echo "  ✔ PostgreSQL is ready."
 
+# ─── Run makemigrations ────────────────────────────────────────────────────────
+echo "[2/4] Running database migrations..."
+python manage.py makemigrations --noinput
+echo "  ✔ Migrations complete."
+
+
+
 # ─── Run Migrations ──────────────────────────────────────────────────────────
 echo "[2/4] Running database migrations..."
 python manage.py migrate --noinput
