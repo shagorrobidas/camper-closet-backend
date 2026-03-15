@@ -36,6 +36,8 @@ LOCAL_APPS = [
     'closet',
     'landing_page',
     'packing',
+    'dashboard',
+    'trips',
 ]
 
 # Application definition
