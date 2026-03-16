@@ -116,10 +116,24 @@ class SetNewPasswordView(GenericAPIView):
             try:
                 user = User.objects.get(email=email)
                 reset_token = request.data.get('reset_token')
-                cached_token = cache.get(f"password_reset_token_{user.id}")
-                if reset_token and cached_token != reset_token:
+                
+                if not reset_token:
                     return CustomResponse.error(
-                        message="Invalid or expired reset token",
+                        message="Reset token is required",
+                        status_code=status.HTTP_400_BAD_REQUEST
+                    )
+
+                cached_token = cache.get(f"password_reset_token_{user.id}")
+                
+                if not cached_token:
+                    return CustomResponse.error(
+                        message="Password reset token has expired or not found",
+                        status_code=status.HTTP_400_BAD_REQUEST
+                    )
+
+                if cached_token != reset_token:
+                    return CustomResponse.error(
+                        message="Invalid reset token",
                         status_code=status.HTTP_400_BAD_REQUEST
                     )
                 user.set_password(new_password)

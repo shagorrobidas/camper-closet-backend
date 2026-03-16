@@ -1,8 +1,9 @@
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 import logging
 import traceback
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from datetime import timezone as dt_timezone
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
@@ -11,12 +12,19 @@ from rest_framework import status
 logger = logging.getLogger(__name__)
 
 
-def custom_exception_handler(exc: Exception, context: Dict[str, Any]):
+def custom_exception_handler(exc: Exception, context: Optional[Any] = None):
     """Custom exception handler that normalizes error responses.
 
     Uses the same response shape as `CustomResponse.error` so clients
     receive consistent payloads for all API errors.
     """
+    # Ensure context is a dictionary for DRF's exception_handler
+    if context is None:
+        context = {}
+    elif not isinstance(context, dict):
+        # If context is a request object (as seen in some calls), wrap it
+        context = {'request': context}
+
     # Call REST framework's default exception handler first
     response = exception_handler(exc, context)
 
@@ -90,7 +98,20 @@ def custom_exception_handler(exc: Exception, context: Dict[str, Any]):
         response.data = custom_response
     else:
         # Handle exceptions that DRF's default handler doesn't catch
-        # (e.g., 500 Internal Server Error)
+        # (e.g., Django's ObjectDoesNotExist or other 500s)
+        
+        if isinstance(exc, ObjectDoesNotExist):
+            custom_response = {
+                "success": False,
+                "status_code": status.HTTP_404_NOT_FOUND,
+                "code": 404,
+                "message": str(exc),
+                "timestamp": timezone.now().astimezone(dt_timezone.utc).isoformat(),
+                "data": None,
+                "errors": {"detail": str(exc)},
+            }
+            return Response(custom_response, status=status.HTTP_404_NOT_FOUND)
+
         logger.error(f"Unhandled Exception: {str(exc)}")
         logger.error(traceback.format_exc())
 
