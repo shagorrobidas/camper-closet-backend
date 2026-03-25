@@ -12,11 +12,13 @@ from closet.models import ClosetItem
 from closet.api.serializers import ClosetItemSerializer
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
+from api.pagination import CustomPagination
 
 
 class ClosetItemListView(ProfileAccessMixin, ListAPIView):
     queryset = ClosetItem.objects.all()
     serializer_class = ClosetItemSerializer
+    pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
         user = self.get_profile_user()
@@ -51,6 +53,11 @@ class ClosetItemListView(ProfileAccessMixin, ListAPIView):
         ]
         if sort_by in allowed_sorts:
             queryset = queryset.order_by(sort_by)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
         return CustomResponse.success(
