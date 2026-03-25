@@ -76,8 +76,10 @@ class ClosetItem(BaseModel):
         blank=True,
         null=True
     )
-    color = models.CharField(
-        max_length=100
+    color = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Store multiple color codes or names as a JSON array"
     )
     size = models.CharField(
         max_length=100
