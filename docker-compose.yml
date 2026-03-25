@@ -44,9 +44,71 @@ services:
       DJANGO_SETTINGS_MODULE: core.settings
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
+      CELERY_BROKER_URL: redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - backend
+
+
+  # ───────────── Redis ─────────────
+  redis:
+    image: redis:alpine
+    container_name: comper_closet_redis
+    restart: unless-stopped
+    expose:
+      - "6379"
+    networks:
+      - backend
+
+
+  # ───────────── Celery Worker ─────────────
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comper_closet_celery_worker
+    restart: unless-stopped
+    command: celery -A core worker -l info
+    volumes:
+      - media_volume:/app/media
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - backend
+
+
+  # ───────────── Celery Beat ─────────────
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comper_closet_celery_beat
+    restart: unless-stopped
+    command: celery -A core beat -l info
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_MODULE: core.settings
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - backend
 
