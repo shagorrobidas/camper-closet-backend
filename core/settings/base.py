@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 # Load environment variables in specific settings files (development.py, production.py)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -205,10 +206,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-from celery.schedules import crontab
+
 CELERY_BEAT_SCHEDULE = {
     'check-packing-deadlines-daily': {
         'task': 'packing.tasks.check_packing_deadlines_task',
         'schedule': crontab(hour=0, minute=0),
     },
 }
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
