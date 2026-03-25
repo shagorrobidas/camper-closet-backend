@@ -17,9 +17,18 @@ class ItemCategoryListView(ProfileAccessMixin, ListAPIView):
             Q(is_system=True) | Q(user=user)
         ).select_related('type')
 
-        type_id = request.query_params.get('type')
-        if type_id:
-            queryset = queryset.filter(type_id=type_id)
+        type_param = request.query_params.get('type')
+        if type_param:
+            import uuid
+            try:
+                # Filter by exact ID if it's a valid UUID
+                uuid.UUID(type_param)
+                queryset = queryset.filter(type_id=type_param)
+            except ValueError:
+                # Otherwise filter by the ItemCategoryType's name or code
+                queryset = queryset.filter(
+                    Q(type__name__iexact=type_param) | Q(type__code__iexact=type_param)
+                )
 
         search = request.query_params.get('search')
         if search:
