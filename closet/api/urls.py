@@ -9,6 +9,7 @@ from closet.api.views import (
     ClosetItemUpdateView,
     ClosetItemDeleteView,
     ClosetItemToggleFavoriteView,
+    ScanItemView,
 )
 
 urlpatterns = [
@@ -56,5 +57,10 @@ urlpatterns = [
         'items/<uuid:pk>/toggle-favorite/',
         ClosetItemToggleFavoriteView.as_view(),
         name='closet_items_toggle_favorite'
+    ),
+    path(
+        'items/scan/',
+        ScanItemView.as_view(),
+        name='closet_items_scan'
     ),
 ]

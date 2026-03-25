@@ -13,6 +13,7 @@ from .item import (
     ClosetItemDeleteView,
     ClosetItemToggleFavoriteView,
 )
+from .scanning_item import ScanItemView
 
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     'ClosetItemUpdateView',
     'ClosetItemDeleteView',
     'ClosetItemToggleFavoriteView',
+    'ScanItemView',
 ]
