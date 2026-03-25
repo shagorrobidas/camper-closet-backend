@@ -3,7 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from users.models import User
 from users.permission import ProfileAccessMixin
-from users.api.serializers import UserSerializer, ChildSerializer
+from users.api.serializers import (
+    UserSerializer,
+    ChildSerializer,
+    ManageAccountSerializer
+)
 from core.utils.response import CustomResponse
 from core.utils.exceptions import custom_exception_handler
 
@@ -89,6 +93,29 @@ class DeleteUserProfileView(ProfileAccessMixin, generics.DestroyAPIView):
             return CustomResponse.success(
                 message="User profile deleted successfully.",
                 status_code=status.HTTP_204_NO_CONTENT,
+            )
+        except Exception as e:
+            return custom_exception_handler(e, request)
+
+
+class ManageAccountView(ProfileAccessMixin, generics.RetrieveAPIView):
+    """
+    Retrieve user profile.
+    """
+    queryset = User.objects.all()
+    serializer_class = ManageAccountSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user = self.get_profile_user()
+            serializer = self.get_serializer(user)
+            data = serializer.data
+
+            return CustomResponse.success(
+                data=data,
+                message="Manage account retrieved successfully.",
+                status_code=status.HTTP_200_OK,
             )
         except Exception as e:
             return custom_exception_handler(e, request)

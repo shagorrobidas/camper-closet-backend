@@ -6,6 +6,7 @@ from .user_profile import (
     UserProfileView,
     UpdateUserProfileView,
     DeleteUserProfileView,
+    ManageAccountView
 )
 from .request_password import (
     RequestPasswordView,
@@ -40,4 +41,5 @@ __all__ = [
     'NotificationListView',
     'NotificationMarkReadView',
     'NotificationSettingView',
+    'ManageAccountView',
 ]

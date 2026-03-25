@@ -18,6 +18,7 @@ from .views import (
     NotificationListView,
     NotificationMarkReadView,
     NotificationSettingView,
+    ManageAccountView
 )
 
 urlpatterns = [
@@ -103,6 +104,11 @@ urlpatterns = [
         'profile/delete/<uuid:pk>/',
         DeleteUserProfileView.as_view(),
         name='profile_delete_detail'
+    ),
+    path(
+        'profile/manage-account/',
+        ManageAccountView.as_view(),
+        name='manage_account'
     ),
     path(
         'logout/',
