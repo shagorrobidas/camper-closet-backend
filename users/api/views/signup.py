@@ -108,6 +108,7 @@ class RegisterChildView(generics.CreateAPIView):
             return CustomResponse.success(
                 message="Child account created successfully.",
                 status_code=status.HTTP_201_CREATED,
+                data=serializer.data,
             )
         except Exception as e:
             return custom_exception_handler(e, request)

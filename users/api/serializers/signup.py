@@ -78,6 +78,7 @@ class RegisterChildSerializer(_PasswordMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
+            'id',
             'email',
             'password',
             'password_confirm',
