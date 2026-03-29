@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from celery.schedules import crontab
+from core.jazzmin import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
 # Load environment variables in specific settings files (development.py, production.py)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -17,6 +18,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 
 DJANGO_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
