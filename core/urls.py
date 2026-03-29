@@ -20,6 +20,11 @@ from landing_page.views import home, contact, get_testimonials
 from django.conf import settings
 from django.conf.urls.static import static
 
+admin.site.site_header = "Comper Closet Admin"
+admin.site.site_title = "Comper Closet Admin Portal"
+admin.site.index_title = "Welcome to your Comper Closet Admin Portal"
+
+
 urlpatterns = [
     path(
         '',
