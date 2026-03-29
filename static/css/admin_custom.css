@@ -1,0 +1,26 @@
+/* User avatar in navbar */
+.navbar .user-menu img,
+.navbar .user-image,
+.navbar .img-circle {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+/* Sidebar avatar */
+.main-sidebar .user-panel img,
+.main-sidebar .user-panel .image img,
+.user-panel.d-flex .image img,
+[class*="sidebar-"] .user-panel img {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    margin-top: 0 !important;
+}
+
+/* Ensure the container doesn't force a larger size */
+.main-sidebar .user-panel .image {
+    padding-left: 0 !important;
+}
