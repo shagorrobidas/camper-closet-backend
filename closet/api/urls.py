@@ -39,22 +39,22 @@ urlpatterns = [
         name='closet_items_create'
     ),
     path(
-        'items/<uuid:pk>/',
+        'items/<uuid:item_pk>/',
         ClosetItemDetailView.as_view(),
         name='closet_items_detail'
     ),
     path(
-        'items/<uuid:pk>/update/',
+        'items/<uuid:item_pk>/update/',
         ClosetItemUpdateView.as_view(),
         name='closet_items_update'
     ),
     path(
-        'items/<uuid:pk>/delete/',
+        'items/<uuid:item_pk>/delete/',
         ClosetItemDeleteView.as_view(),
         name='closet_items_delete'
     ),
     path(
-        'items/<uuid:pk>/toggle-favorite/',
+        'items/<uuid:item_pk>/toggle-favorite/',
         ClosetItemToggleFavoriteView.as_view(),
         name='closet_items_toggle_favorite'
     ),

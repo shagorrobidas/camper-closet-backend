@@ -37,19 +37,31 @@ class ClosetItemListView(ProfileAccessMixin, ListAPIView):
         # Filter favorites
         is_favorite = request.query_params.get('is_favorite')
         if is_favorite is not None:
-            queryset = queryset.filter(is_favorite=is_favorite.lower() == 'true')
+            queryset = queryset.filter(
+                is_favorite=is_favorite.lower() == 'true'
+            )
 
         # Search by name or brand
         search = request.query_params.get('search')
         if search:
-            queryset = queryset.filter(name__icontains=search) | queryset.filter(
+            queryset = queryset.filter(
+                name__icontains=search
+            ) | queryset.filter(
                 brand__icontains=search
             )
 
         # Sorting
-        sort_by = request.query_params.get('sort_by', '-created_at')
+        sort_by = request.query_params.get(
+            'sort_by',
+            '-created_at'
+        )
         allowed_sorts = [
-            'name', '-name', 'created_at', '-created_at', 'quantity', '-quantity'
+            'name',
+            '-name',
+            'created_at',
+            '-created_at',
+            'quantity',
+            '-quantity'
         ]
         if sort_by in allowed_sorts:
             queryset = queryset.order_by(sort_by)
@@ -59,7 +71,10 @@ class ClosetItemListView(ProfileAccessMixin, ListAPIView):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(
+            queryset,
+            many=True
+        )
         return CustomResponse.success(
             data=serializer.data,
             message="Closet items retrieved successfully",
@@ -73,9 +88,7 @@ class ClosetItemDetailView(ProfileAccessMixin, RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            item_pk = self.kwargs.get('pk')
-            # ProfileAccessMixin's get_object() tries to find a User using `pk` from kwargs.
-            # In this view, `pk` is the Item ID, so we must use request.user explicitly.
+            item_pk = self.kwargs.get('item_pk')
             user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk, user=user)
             serializer = self.get_serializer(item)
@@ -113,7 +126,7 @@ class ClosetItemUpdateView(ProfileAccessMixin, UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         try:
-            item_pk = self.kwargs.pop('pk', None)
+            item_pk = self.kwargs.pop('item_pk', None)
             user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk)
 
@@ -144,7 +157,7 @@ class ClosetItemDeleteView(ProfileAccessMixin, DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         try:
-            item_pk = self.kwargs.pop('pk', None)
+            item_pk = self.kwargs.pop('item_pk', None)
             user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk)
 
@@ -168,7 +181,7 @@ class ClosetItemToggleFavoriteView(ProfileAccessMixin, APIView):
 
     def patch(self, request, *args, **kwargs):
         try:
-            item_pk = self.kwargs.get('pk')
+            item_pk = self.kwargs.get('item_pk')
             user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk, user=user)
             item.is_favorite = not item.is_favorite
