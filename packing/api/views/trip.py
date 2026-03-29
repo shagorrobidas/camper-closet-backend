@@ -134,7 +134,10 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                 if template.trip_type:
                     data['trip_type'] = template.trip_type.id
             except (PackingTemplate.DoesNotExist, ValueError):
-                pass
+                return CustomResponse.error(
+                    message="Template not found",
+                    status_code=404
+                )
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
@@ -206,8 +209,8 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                 #             ]
                 #         )
 
-                # trip.is_template_applied = True
-                # trip.save(update_fields=['is_template_applied'])
+                trip.is_template_applied = True
+                trip.save(update_fields=['is_template_applied'])
 
         detail_serializer = TripDetailSerializer(
             trip,
@@ -422,18 +425,18 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
                         quantity=1
                     )
 
-                    # # 4. Create TripPackingItems
-                    # TripPackingItem.objects.create(
-                    #     trip=trip,
-                    #     main_category=cat_type,
-                    #     title=trip.name,
-                    #     status='active',
-                    #     template_item=t_item,
-                    #     quantity=1,
-                    #     is_required=False,
-                    #     is_packed=False,
-                    #     is_custom_item=False
-                    # )
+                    # 4. Create TripPackingItems
+                    TripPackingItem.objects.create(
+                        trip=trip,
+                        main_category=cat_type,
+                        title=trip.name,
+                        status='active',
+                        # template_item=t_item,
+                        # quantity=1,
+                        is_required=False,
+                        is_packed=False,
+                        is_custom_item=False
+                    )
 
             out = TripDetailSerializer(trip, context={'request': request})
             return CustomResponse.success(
