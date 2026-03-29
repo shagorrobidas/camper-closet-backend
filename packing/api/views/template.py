@@ -1,5 +1,7 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from packing.models import PackingTemplate
+from django.db.models import Prefetch
+from packing.models import PackingTemplate, PackingTemplateItem
+from users.permission import ProfileAccessMixin
 from packing.api.serializers import (
     PackingTemplateSerializer,
     PackingTemplateDetailSerializer
@@ -7,12 +9,23 @@ from packing.api.serializers import (
 from core.utils import CustomResponse
 
 
-class PackingTemplateListView(ListAPIView):
+class PackingTemplateListView(ProfileAccessMixin, ListAPIView):
     queryset = PackingTemplate.objects.all()
     serializer_class = PackingTemplateSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(is_system=True)
+        user = self.get_profile_user()
+        is_child_request = self.request.query_params.get('child') is not None
+
+        if is_child_request:
+            # Show templates used by the specified child
+            queryset = PackingTemplate.objects.filter(
+                trip__user=user
+            ).distinct()
+        else:
+            # Default behavior (system templates)
+            queryset = PackingTemplate.objects.filter(is_system=True)
+
         trip_type = self.request.query_params.get('trip_type')
         season = self.request.query_params.get('season')
 
@@ -36,6 +49,22 @@ class PackingTemplateListView(ListAPIView):
 class PackingTemplateDetailView(RetrieveAPIView):
     queryset = PackingTemplate.objects.all()
     serializer_class = PackingTemplateDetailSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        main_category = self.request.query_params.get('main_category')
+        sub_category = self.request.query_params.get('sub_category')
+
+        items_queryset = PackingTemplateItem.objects.all().order_by('sort_order')
+        if main_category:
+            items_queryset = items_queryset.filter(main_category_id=main_category)
+        if sub_category:
+            items_queryset = items_queryset.filter(sub_category_id=sub_category)
+
+        return queryset.prefetch_related(
+            Prefetch('items', queryset=items_queryset)
+        )
 
     def get(self, request, *args, **kwargs):
         try:
