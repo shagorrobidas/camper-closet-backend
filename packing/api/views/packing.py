@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from django.db import transaction
@@ -20,6 +21,7 @@ from django.utils import timezone
 
 
 class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
+    permission_classes = [IsAuthenticated]
     """POST to add one or more closet item selections to a packing item."""
 
     def post(self, request, *args, **kwargs):
@@ -32,32 +34,44 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
                 TripPackingItem, pk=item_pk, trip=trip
             )
 
-            # Support both single object and list of objects
+            # Support both single object, list of objects, or list of IDs
             data = request.data
             if not isinstance(data, list):
                 data = [data]
 
+            # Pre-calculate family IDs for efficient permission checks
+            family_ids = {user.id, self.request.user.id}
+            if user.parent:
+                family_ids.add(user.parent_id)
+                family_ids.update(
+                    user.parent.children.values_list('id', flat=True)
+                )
+            elif user.role == 'parent':
+                family_ids.update(user.children.values_list('id', flat=True))
+
             selections = []
             with transaction.atomic():
+                # Track current totals to validate the entire batch properly
+                initial_selections = {
+                    s.closet_item_id: s.quantity
+                    for s in packing_item.selections.all()
+                }
+                current_total_quantity = sum(initial_selections.values())
+
                 for entry in data:
-                    closet_item_id = entry.get('closet_item')
-                    quantity = int(entry.get('quantity', 1))
-                    note = entry.get('note', '')
+                    # Support simplified list of IDs: [uuid1, uuid2]
+                    if isinstance(entry, (str, int)):
+                        closet_item_id = entry
+                        quantity = 1
+                        note = ''
+                    else:
+                        closet_item_id = entry.get('closet_item')
+                        quantity = int(entry.get('quantity', 1))
+                        note = entry.get('note', '')
 
                     closet_item = get_object_or_404(
                         ClosetItem, pk=closet_item_id
                     )
-
-                    # Enforce family-wide ownership
-                    family_ids = {user.id}
-                    if user.parent:
-                        family_ids.add(user.parent_id)
-                        family_ids.update(user.parent.children.values_list('id', flat=True))
-                    elif user.role == 'parent':
-                        family_ids.update(user.children.values_list('id', flat=True))
-
-                    # Also include the authenticated user in case they are performing the action
-                    family_ids.add(self.request.user.id)
 
                     if closet_item.user_id not in family_ids:
                         raise PermissionDenied(
@@ -65,21 +79,23 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
                         )
 
                     if quantity < 1:
-                        raise ValidationError("Quantity must be at least 1.")
+                        raise ValidationError(
+                            f"Quantity for '{closet_item.name}' must be at least 1." # noqa
+                        )
 
                     if quantity > closet_item.quantity:
                         raise ValidationError(
-                            f"Selected quantity ({quantity}) exceeds available closet item quantity ({closet_item.quantity})." # noqa
+                            f"Selected quantity ({quantity}) for '{closet_item.name}' exceeds available closet item quantity ({closet_item.quantity})." # noqa
                         )
 
-                    current_total = sum(
-                        s.quantity for s in packing_item.selections.exclude(
-                            closet_item=closet_item
-                        )
-                    )
-                    if current_total + quantity > packing_item.quantity:
+                    # Update total tracking: subtract old quantity (if any),
+                    # add new one
+                    old_qty = initial_selections.get(closet_item.id, 0)
+                    new_total = current_total_quantity - old_qty + quantity
+
+                    if new_total > packing_item.quantity:
                         raise ValidationError(
-                            f"Total quantity ({current_total + quantity}) would exceed your trip requirement ({packing_item.quantity}) for {packing_item}." # noqa
+                            f"Total quantity ({new_total}) would exceed your trip requirement ({packing_item.quantity}) for {packing_item}." # noqa
                         )
 
                     selection, created = TripPackingItemSelection.objects.get_or_create( # noqa
@@ -92,6 +108,9 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
                         selection.note = note
                         selection.save(update_fields=['quantity', 'note'])
 
+                    # Update tracking for the next iteration
+                    current_total_quantity = new_total
+                    initial_selections[closet_item.id] = quantity
                     selections.append(selection)
 
             serializer = TripPackingItemSelectionSerializer(
@@ -113,6 +132,7 @@ class PackingItemSelectClosetView(ProfileAccessMixin, APIView):
 
 
 class TripBulkPackingView(ProfileAccessMixin, APIView):
+    permission_classes = [IsAuthenticated]
     """POST to add multiple closet item selections across multiple packing items in a trip.""" # noqa
 
     def post(self, request, *args, **kwargs):
@@ -235,6 +255,7 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
 
 
 class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
+    permission_classes = [IsAuthenticated]
     """DELETE to remove a closet item selection from a packing item."""
 
     def delete(self, request, *args, **kwargs):
@@ -268,6 +289,7 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
 
 
 class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
+    permission_classes = [IsAuthenticated]
     """GET smart closet item suggestions for a packing item based on sub_category name.""" # noqa
 
     def get(self, request, *args, **kwargs):
@@ -325,6 +347,7 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
 
 
 class TripEventListView(ProfileAccessMixin, ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = TripEventSerializer
 
     def get(self, request, *args, **kwargs):
@@ -346,6 +369,7 @@ class TripEventListView(ProfileAccessMixin, ListAPIView):
 class UpcomingTripEventListView(ProfileAccessMixin, ListAPIView):
     """GET a list of all upcoming events across all of a user's trips."""
     serializer_class = TripEventSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         try:
@@ -370,6 +394,7 @@ class UpcomingTripEventListView(ProfileAccessMixin, ListAPIView):
 
 class TripEventCreateView(ProfileAccessMixin, CreateAPIView):
     serializer_class = TripEventSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -389,6 +414,7 @@ class TripEventCreateView(ProfileAccessMixin, CreateAPIView):
 
 
 class TripEventDeleteView(ProfileAccessMixin, DestroyAPIView):
+    permission_classes = [IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
         try:
