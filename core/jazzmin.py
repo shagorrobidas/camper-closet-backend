@@ -1,4 +1,4 @@
-JAZZMIN_SETTINGS = {
+JAZZMIN_CONFIG = {
     "site_title": "Comper Closet Admin",
     "site_header": "Comper Closet",
     "site_brand": "Comper Closet",
@@ -55,7 +55,7 @@ JAZZMIN_SETTINGS = {
     "custom_css": "css/admin_custom.css",
 }
 
-JAZZMIN_UI_TWEAKS = {
+JAZZMIN_UI_TWEAKS_CONFIG = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
