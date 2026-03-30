@@ -23,8 +23,11 @@ class ProfileAccessMixin:
         - Optionally falls back to URL kwarg 'pk' if follow_kwarg_pk is True.
         - Defaults to authenticated user.
         """
-        # 1. Try ?child= query param first as it's explicit for child access
-        child_param = self.request.query_params.get('child')
+        # 1. Try ?child= or ?child_id= query param as it's explicit
+        child_param = (
+            self.request.query_params.get('child') or
+            self.request.query_params.get('child_id')
+        )
         pk = None
 
         if child_param:
