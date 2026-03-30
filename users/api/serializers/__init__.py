@@ -17,6 +17,7 @@ from .reset_password import (
 from .change_password import ChangePasswordSerializer
 from .logout import LogoutSerializer
 from .notification import NotificationSerializer, NotificationSettingSerializer
+from .switch_account import SwitchChildSerializer, SwitchParentSerializer
 
 
 __all__ = [
@@ -36,4 +37,6 @@ __all__ = [
     'LogoutSerializer',
     'NotificationSerializer',
     'NotificationSettingSerializer',
+    'SwitchChildSerializer',
+    'SwitchParentSerializer',
 ]
