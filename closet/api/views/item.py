@@ -13,6 +13,8 @@ from closet.api.serializers import ClosetItemSerializer
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
 from api.pagination import CustomPagination
+from packing.models import Trip
+from packing.api.serializers.trip import TripSerializer
 
 
 class ClosetItemListView(ProfileAccessMixin, ListAPIView):
@@ -91,9 +93,28 @@ class ClosetItemDetailView(ProfileAccessMixin, RetrieveAPIView):
             item_pk = self.kwargs.get('item_pk')
             user = self.get_profile_user()
             item = get_object_or_404(ClosetItem, pk=item_pk, user=user)
+
+            # Get all trips where this closet item was used
+            trips = Trip.objects.filter(
+                packing_items__selections__closet_item=item
+            ).distinct().order_by('-start_date')
+
+            last_used_trip = trips.first()
+
             serializer = self.get_serializer(item)
+            trip_serializer = TripSerializer(trips, many=True)
+            last_trip_serializer = (
+                TripSerializer(last_used_trip) if last_used_trip else None
+            )
+
+            data = serializer.data
+            data['trips'] = trip_serializer.data
+            data['last_used_trip'] = (
+                last_trip_serializer.data if last_trip_serializer else None
+            )
+
             return CustomResponse.success(
-                data=serializer.data,
+                data=data,
                 message="Closet item retrieved successfully",
                 status_code=200
             )
