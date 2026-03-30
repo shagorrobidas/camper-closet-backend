@@ -15,12 +15,16 @@ class PackingTemplateListView(ProfileAccessMixin, ListAPIView):
 
     def get_queryset(self):
         user = self.get_profile_user()
-        is_child_request = self.request.query_params.get('child_id') is not None
+        # Check if it's a child profile request (explicit child/child_id param)
+        is_child_request = any(
+            k in self.request.query_params for k in ['child', 'child_id']
+        )
 
         if is_child_request:
-            # Show templates used by the specified child
+            # Show system templates that have been used by the specified child
             queryset = PackingTemplate.objects.filter(
-                trip__user=user
+                trip__user=user,
+                is_system=True
             ).distinct()
         else:
             # Default behavior (system templates)
