@@ -15,7 +15,7 @@ class PackingTemplateListView(ProfileAccessMixin, ListAPIView):
 
     def get_queryset(self):
         user = self.get_profile_user()
-        is_child_request = self.request.query_params.get('child') is not None
+        is_child_request = self.request.query_params.get('child_id') is not None
 
         if is_child_request:
             # Show templates used by the specified child
