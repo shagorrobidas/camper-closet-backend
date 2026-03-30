@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ManageAccountSerializer(serializers.ModelSerializer):
     children = ChildSerializer(many=True, read_only=True)
     total_child = serializers.SerializerMethodField()
-    parent = UserSerializer(read_only=True)
+    # parent = UserSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -52,7 +52,7 @@ class ManageAccountSerializer(serializers.ModelSerializer):
             'full_name',
             'profile_pic',
             'date_of_birth',
-            'parent',
+            # 'parent',
             'children',
             'total_child',
             'is_email_verified',
@@ -84,6 +84,6 @@ class ManageAccountSerializer(serializers.ModelSerializer):
 
         return {
             'total_child': total_child,
-            'parent': ret,
-            'children': children
+            'my_account': ret,
+            'child_accounts': children
         }
