@@ -21,6 +21,11 @@ from .notification import (
     NotificationMarkReadView,
     NotificationSettingView,
 )
+from .switch_account import (
+    SwitchToChildView,
+    SwitchToParentView,
+    ProfileView
+)
 
 
 __all__ = [
@@ -42,4 +47,7 @@ __all__ = [
     'NotificationMarkReadView',
     'NotificationSettingView',
     'ManageAccountView',
+    'SwitchToChildView',
+    'SwitchToParentView',
+    'ProfileView',
 ]
