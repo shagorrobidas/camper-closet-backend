@@ -18,7 +18,10 @@ from .views import (
     NotificationListView,
     NotificationMarkReadView,
     NotificationSettingView,
-    ManageAccountView
+    ManageAccountView,
+    SwitchToChildView,
+    SwitchToParentView,
+    ProfileView,
 )
 
 urlpatterns = [
@@ -44,11 +47,15 @@ urlpatterns = [
         RequestOTPView.as_view(),
         name='request_otp'
     ),
+
+    # ── Login ──────────────────────────
     path(
         'login/',
         LoginView.as_view(),
         name='login'
     ),
+
+    # ── Password Reset ──────────────────────────
     path(
         'change-password/',
         ChangePasswordView.as_view(),
@@ -75,6 +82,7 @@ urlpatterns = [
         name='check_reset_status'
     ),
 
+    # ── Profile ──────────────────────────
     path(
         'profile/',
         UserProfileView.as_view(),
@@ -131,7 +139,7 @@ urlpatterns = [
     #     name='apple_social_auth'
     # ),
 
-    # ── Notifications ─────────────────────────────────────────────────────────
+    # ── Notifications ──────────────────────────
     path(
         'notifications/',
         NotificationListView.as_view(),
@@ -151,5 +159,22 @@ urlpatterns = [
         'notifications/settings/',
         NotificationSettingView.as_view(),
         name='notification-settings'
+    ),
+
+    # ── Switch Account ──────────────────────────
+    path(
+        'switch-to-child/',
+        SwitchToChildView.as_view(),
+        name='switch_to_child'
+    ),
+    path(
+        'switch-to-parent/',
+        SwitchToParentView.as_view(),
+        name='switch_to_parent'
+    ),
+    path(
+        'profile/me/',
+        ProfileView.as_view(),
+        name='profile'
     ),
 ]
