@@ -38,6 +38,10 @@ class UserProfileView(ProfileAccessMixin, generics.RetrieveAPIView):
                     context={'request': request},
                 ).data
 
+            token = request.auth
+            data['is_switched'] = token.get('is_switched', False) if token else False
+            data['switched_by'] = token.get('switched_by') if token else None
+
             return CustomResponse.success(
                 data=data,
                 message="User profile retrieved successfully.",
@@ -111,6 +115,10 @@ class ManageAccountView(ProfileAccessMixin, generics.RetrieveAPIView):
             user = self.get_profile_user()
             serializer = self.get_serializer(user)
             data = serializer.data
+
+            token = request.auth
+            data['is_switched'] = token.get('is_switched', False) if token else False
+            data['switched_by'] = token.get('switched_by') if token else None
 
             return CustomResponse.success(
                 data=data,
