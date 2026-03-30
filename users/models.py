@@ -101,6 +101,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     is_superuser = models.BooleanField(
         default=False
     )
+    last_logout = models.DateTimeField(
+        null=True,
+        blank=True
+    )
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -129,6 +133,14 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
             models.Index(fields=["email"]),
             models.Index(fields=["role"]),
         ]
+
+    @property
+    def is_parent(self):
+        return self.role == 'parent'
+
+    @property
+    def is_child(self):
+        return self.role == 'child'
 
     def __str__(self):
         return f"{self.full_name} ({self.role})"
