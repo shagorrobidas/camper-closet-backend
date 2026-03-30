@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from users.models import OTP
 import secrets
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def generate_reset_token(user_id):
@@ -103,3 +104,42 @@ def send_verification_email(user, verification_url):
     )
     email.content_subtype = 'html'
     email.send()
+
+# get tokens for user switch account
+
+
+def get_tokens_for_user(user, switched_by=None):
+    refresh = RefreshToken.for_user(user)
+    refresh['user_id'] = str(user.id)
+    refresh['email'] = user.email
+    refresh['role'] = user.role
+    refresh['full_name'] = user.full_name
+
+    if switched_by:
+        refresh['switched_by'] = str(switched_by.id)
+        refresh['is_switched'] = True
+    else:
+        refresh['is_switched'] = False
+        refresh['switched_by'] = None
+
+    return {
+        'user': {
+            'id': str(user.id),
+            'email': user.email,
+            'role': user.role,
+            'full_name': user.full_name,
+            'profile_pic': user.profile_pic.url if user.profile_pic else None,
+        },
+        'access_token': str(refresh.access_token),
+        'refresh_token': str(refresh),
+        'is_switched': refresh['is_switched'],
+        'switched_by': refresh['switched_by'],
+    }
+
+
+def blacklist_token(refresh_token):
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+    except Exception:
+        pass
