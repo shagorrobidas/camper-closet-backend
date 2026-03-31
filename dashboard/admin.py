@@ -1,3 +1,18 @@
 from django.contrib import admin
+from dashboard.models import BrandCategory, ShopWebsite
 
-# Register your models here.
+
+@admin.register(BrandCategory)
+class BrandCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    search_fields = ('name',)
+    ordering = ('name',)
+
+
+@admin.register(ShopWebsite)
+class ShopWebsiteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'website_url', 'is_active')
+    list_filter = ('is_active', 'categories')
+    search_fields = ('name', 'description')
+    ordering = ('name',)
+    filter_horizontal = ('categories',)
