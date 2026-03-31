@@ -20,7 +20,8 @@ from packing.api.views import (
     TripPackingItemUpdateView,
     UpcomingTripEventListView,
     MenualTripCreateView,
-    TripTypeListView
+    TripTypeListView,
+    ActiveIncompleteTripPackingItemListView,
 )
 
 urlpatterns = [
@@ -99,6 +100,11 @@ urlpatterns = [
         'trips/types/',
         TripTypeListView.as_view(),
         name='trip-type-list'
+    ),
+    path(
+        'trips/incomplete-packing-items/',
+        ActiveIncompleteTripPackingItemListView.as_view(),
+        name='trips-incomplete-packing-items'
     ),
 
     # Closet Selection / Matching

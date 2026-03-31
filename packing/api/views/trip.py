@@ -28,7 +28,8 @@ from closet.models import (
 from packing.api.serializers import (
     TripSerializer, TripDetailSerializer, TripPackingItemSerializer,
     TripPackingItemCreateSerializer,
-    TripTypeSerializer
+    TripTypeSerializer,
+    ActiveIncompleteTripPackingItemSerializer,
 )
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
@@ -461,6 +462,41 @@ class TripTypeListView(ProfileAccessMixin, ListAPIView):
             return CustomResponse.success(
                 data=serializer.data,
                 message="Trip types retrieved successfully",
+                status_code=200
+            )
+        except Exception as e:
+            return custom_exception_handler(e, request)
+
+
+class ActiveIncompleteTripPackingItemListView(ProfileAccessMixin, ListAPIView):
+    """
+    Returns upcoming active trips (start_date >= today) that have at least
+    one incomplete (is_packed=False) active packing item, grouped by trip.
+    """
+    serializer_class = ActiveIncompleteTripPackingItemSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user = self.get_profile_user(follow_kwarg_pk=False)
+            today = timezone.now().date()
+
+            # Upcoming active trips that still have incomplete items
+            queryset = Trip.objects.filter(
+                user=user,
+                start_date__gte=today,
+                status='active',
+                packing_items__status='active',
+                packing_items__is_packed=False,
+            ).distinct().prefetch_related(
+                'packing_items'
+            ).select_related(
+                'trip_type'
+            ).order_by('start_date')
+
+            serializer = self.get_serializer(queryset, many=True)
+            return CustomResponse.success(
+                data=serializer.data,
+                message="Incomplete packing items retrieved successfully",
                 status_code=200
             )
         except Exception as e:

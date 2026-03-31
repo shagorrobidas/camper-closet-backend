@@ -13,7 +13,8 @@ from .trip import (
     TripPackingItemUpdateView,
     TripPackingItemDeleteView,
     MenualTripCreateView,
-    TripTypeListView
+    TripTypeListView,
+    ActiveIncompleteTripPackingItemListView,
 )
 from .packing import (
     PackingItemSelectClosetView,
@@ -47,5 +48,7 @@ __all__ = [
     'TripEventCreateView',
     'TripEventDeleteView',
     'MenualTripCreateView',
-    'TripTypeListView'
+    'TripTypeListView',
+    'UpcomingTripEventListView',
+    'ActiveIncompleteTripPackingItemListView',
 ]

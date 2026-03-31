@@ -5,6 +5,7 @@ from packing.models import (
     TripPackingItemSelection,
     TripType
 )
+from django.db.models import Sum
 
 
 class TripPackingItemSelectionSerializer(serializers.ModelSerializer):
@@ -133,13 +134,27 @@ class TripDetailSerializer(TripSerializer):
 
     def get_progress(self, obj):
         packing_items = obj.packing_items.filter(status='active')
-        total = packing_items.count()
-        packed = packing_items.filter(is_packed=True).count()
-        percentage = round((packed / total) * 100, 1) if total > 0 else 0
+
+        agg = packing_items.aggregate(
+            total_qty=Sum('quantity'),
+            picked_qty=Sum('picked_quantity'),
+        )
+        total_qty = agg['total_qty'] or 0
+        picked_qty = agg['picked_qty'] or 0
+        remaining_qty = max(0, total_qty - picked_qty)
+
+        percentage = (
+            round((picked_qty / total_qty) * 100, 1)
+            if total_qty > 0 else 0
+        )
+
         return {
-            'total_items': total,
-            'packed_items': packed,
-            'remaining_items': total - packed,
+            # 'total_items': total_items,
+            # 'packed_items': packed_items,
+            # 'remaining_items': total_items - packed_items,
+            'total_quantity': total_qty,
+            'picked_quantity': picked_qty,
+            'remaining_quantity': remaining_qty,
             'percentage': percentage,
         }
 
@@ -158,3 +173,50 @@ class TripTypeSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+
+class ActiveIncompleteTripPackingItemSerializer(serializers.ModelSerializer):
+    """Trip-centric: one entry per trip, with nested incomplete
+    items and overall progress."""
+    trip_type_name = serializers.CharField(
+        source='trip_type.name', read_only=True
+    )
+    progress = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Trip
+        fields = [
+            'id',
+            'name',
+            'location',
+            'start_date',
+            'end_date',
+            'packing_deadline',
+            'trip_type',
+            'trip_type_name',
+            'status',
+            'progress',
+        ]
+
+    def get_progress(self, obj):
+        packing_items = obj.packing_items.filter(status='active')
+
+        agg = packing_items.aggregate(
+            total_qty=Sum('quantity'),
+            picked_qty=Sum('picked_quantity'),
+        )
+        total_qty = agg['total_qty'] or 0
+        picked_qty = agg['picked_qty'] or 0
+        remaining_qty = max(0, total_qty - picked_qty)
+
+        percentage = (
+            round((picked_qty / total_qty) * 100, 1)
+            if total_qty > 0 else 0
+        )
+
+        return {
+            'total_quantity': total_qty,
+            'picked_quantity': picked_qty,
+            'remaining_quantity': remaining_qty,
+            'percentage': percentage,
+        }
