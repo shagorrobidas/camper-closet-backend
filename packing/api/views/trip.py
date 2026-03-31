@@ -1,4 +1,5 @@
 import logging
+from rest_framework.permissions import IsAuthenticated
 import traceback
 from rest_framework.generics import (
     ListAPIView,
@@ -303,6 +304,7 @@ class TripPackingItemListView(ProfileAccessMixin, ListAPIView):
 
 class TripPackingItemCreateView(ProfileAccessMixin, CreateAPIView):
     serializer_class = TripPackingItemCreateSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -329,11 +331,12 @@ class TripPackingItemCreateView(ProfileAccessMixin, CreateAPIView):
 
 class TripPackingItemUpdateView(ProfileAccessMixin, UpdateAPIView):
     serializer_class = TripPackingItemSerializer
+    permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
-            item_pk = self.kwargs.get('pk')
+            item_pk = self.kwargs.get('packing_item_pk')
             user = self.get_profile_user(follow_kwarg_pk=False)
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             item = get_object_or_404(TripPackingItem, pk=item_pk, trip=trip)

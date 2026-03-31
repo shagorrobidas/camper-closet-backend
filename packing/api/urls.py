@@ -80,7 +80,7 @@ urlpatterns = [
         name='trip-packing-item-create'
     ),
     path(
-        'trips/<uuid:trip_pk>/packing-items/<uuid:pk>/update/',
+        'trips/<uuid:trip_pk>/packing-items/<uuid:packing_item_pk>/update/',
         TripPackingItemUpdateView.as_view(),
         name='trip-packing-item-update'
     ),
