@@ -11,6 +11,7 @@ from .trip import (
     TripPackingItemSelectionSerializer,
     TripTypeSerializer,
     ActiveIncompleteTripPackingItemSerializer,
+    TripStatisticsSerializer,
 )
 from .events import TripEventSerializer
 
@@ -27,4 +28,5 @@ __all__ = [
     'TripEventSerializer',
     'TripTypeSerializer',
     'ActiveIncompleteTripPackingItemSerializer',
+    'TripStatisticsSerializer',
 ]

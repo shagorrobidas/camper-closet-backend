@@ -6,6 +6,7 @@ from packing.models import (
     TripType
 )
 from django.db.models import Sum
+from django.utils import timezone
 
 
 class TripPackingItemSelectionSerializer(serializers.ModelSerializer):
@@ -91,6 +92,36 @@ class TripPackingItemCreateSerializer(serializers.ModelSerializer):
             'note',
             'sort_order',
         ]
+
+
+class TripStatisticsSerializer(serializers.Serializer):
+    active_trips = serializers.SerializerMethodField() # trip startdate start and enddate between current date
+    completed_trips = serializers.SerializerMethodField() # if tripe packeing is completed
+    past_trips = serializers.SerializerMethodField() # trip enddate is before current date
+    total_trips = serializers.SerializerMethodField()
+
+    def get_active_trips(self, obj):
+        today = timezone.now().date()
+        return obj.trips.filter(
+            start_date__lte=today,
+            end_date__gte=today,
+            status='Active'
+        ).count()
+
+    def get_completed_trips(self, obj):
+        return obj.trips.filter(
+            status='Complete'
+        ).count()
+
+    def get_past_trips(self, obj):
+        today = timezone.now().date()
+        return obj.trips.filter(
+            end_date__lt=today,
+            status='Active'
+        ).count()
+
+    def get_total_trips(self, obj):
+        return obj.trips.count()
 
 
 class TripSerializer(serializers.ModelSerializer):

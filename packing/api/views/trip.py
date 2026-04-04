@@ -30,6 +30,7 @@ from packing.api.serializers import (
     TripPackingItemCreateSerializer,
     TripTypeSerializer,
     ActiveIncompleteTripPackingItemSerializer,
+    TripStatisticsSerializer,
 )
 from users.permission import ProfileAccessMixin
 from core.utils import CustomResponse, custom_exception_handler
@@ -90,8 +91,13 @@ class TripListView(ProfileAccessMixin, ListAPIView):
             queryset = queryset.filter(name__icontains=search)
 
         serializer = self.get_serializer(queryset, many=True)
+        stats_serializer = TripStatisticsSerializer(user)
+
         return CustomResponse.success(
-            data=serializer.data,
+            data={
+                "statistics": stats_serializer.data,
+                "trips": serializer.data
+            },
             message="Trips retrieved successfully",
             status_code=200
         )
