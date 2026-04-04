@@ -57,7 +57,8 @@ class TripEventInline(admin.TabularInline):
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'user', 'trip_type', 'status', 'is_template_applied', 'start_date', 'end_date'
+        'id', 'name', 'user', 'trip_type',
+        'status', 'is_template_applied', 'start_date', 'end_date'
     )
     list_filter = ('trip_type', 'status', 'is_template_applied', 'start_date')
     search_fields = ('name', 'location', 'user__email')
