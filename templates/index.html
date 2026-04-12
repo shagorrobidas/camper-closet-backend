@@ -29,23 +29,21 @@
       <!-- Left content -->
       <div class="hero-left">
         <h1 class="hero-title">
-          Stress-free packing<br />
+          {{ site_config.hero_title|linebreaksbr }}
         </h1>
-        <span class="hero-title-blue">for the whole family.</span>
+        <span class="hero-title-blue">{{ site_config.hero_subtitle_blue }}</span>
         <p class="hero-desc">
-          Organize camp gear, travel essentials, and closet<br />
-          inventory with invisible AI. Built for busy parents<br />
-          who need simplicity, not another complex tool.
+          {{ site_config.hero_description|linebreaksbr }}
         </p>
         <div class="hero-actions">
-          <a href="#" class="store-btn store-apple">
+          <a href="{{site_config.app_store_url}}" target="_blank" class="store-btn store-apple">
             <i class="fab fa-apple"></i>
             <div class="store-text">
               <span class="store-sub">Download on the</span>
               <span class="store-main">App Store</span>
             </div>
           </a>
-          <a href="#" class="store-btn store-google">
+          <a href="{{site_config.play_store_url}}" target="_blank" class="store-btn store-google">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"
               class="gplay-svg">
               <path d="M3.18 23.54c.37.22.8.34 1.26.34.72 0 1.42-.25 2.05-.64L19.23 15.6l-3.96-3.74z" fill="#EA4335" />
@@ -66,11 +64,19 @@
       <!-- Right content -->
       <div class="hero-right">
         <div class="hero-desktop-wrap">
-          <img class="hero-desktop-img" src="{% static 'heroDesktopbg (1).png' %}" alt="App Screenshot" />
+          {% if site_config.hero_desktop_image %}
+            <img class="hero-desktop-img" src="{{ site_config.hero_desktop_image.url }}" alt="App Screenshot" />
+          {% else %}
+            <img class="hero-desktop-img" src="{% static 'heroDesktopbg (1).png' %}" alt="App Screenshot" />
+          {% endif %}
           <div class="hero-desktop-shadow"></div>
         </div>
         <!-- Mobile only frame -->
-        <img class="hero-frame-img" src="{% static 'heroFrame.png' %}" alt="App on mobile" />
+        {% if site_config.hero_mobile_frame_image %}
+          <img class="hero-frame-img" src="{{ site_config.hero_mobile_frame_image.url }}" alt="App on mobile" />
+        {% else %}
+          <img class="hero-frame-img" src="{% static 'heroFrame.png' %}" alt="App on mobile" />
+        {% endif %}
       </div>
     </section>
   </div>
@@ -79,21 +85,24 @@
   <!-- Features Section -->
   <section class="features-section">
     <div class="container">
-      <h2 class="features-title">Features</h2>
+      <h2 class="features-title">{{ site_config.features_section_title }}</h2>
       <div class="features-divider"></div>
 
       <!-- Feature 1 – Smart Closet Scanner -->
       <div class="feature-row ">
         <div class="feature-media">
-          <img src="./static/image.png" alt="Smart Closet Scanner" class="feature-img" />
+          {% if site_config.feature_1_image %}
+            <img src="{{ site_config.feature_1_image.url }}" alt="{{ site_config.feature_1_title }}" class="feature-img" />
+          {% else %}
+            <img src="{% static 'image.png' %}" alt="{{ site_config.feature_1_title }}" class="feature-img" />
+          {% endif %}
         </div>
         <div class="feature-text">
           <p class="feature-dot-title">
-            <span class="feature-dot"></span> Smart Closet Scanner
+            <span class="feature-dot"></span> {{ site_config.feature_1_title }}
           </p>
           <p class="feature-desc">
-            Snap a photo of any item. Our AI automatically detects the type,
-            size, and brand to build your inventory in seconds.
+            {{ site_config.feature_1_description|linebreaksbr }}
           </p>
         </div>
       </div>
@@ -102,16 +111,18 @@
       <div class="feature-row">
         <div class="feature-text feature-text-center">
           <p class="feature-dot-title feature-dot-right">
-            Family Accounts <span class="feature-dot"></span>
+            {{ site_config.feature_2_title }} <span class="feature-dot"></span>
           </p>
           <p class="feature-desc feature-desc-center">
-            Seamlessly switch between children's profiles. Track<br />
-            what's in the closet for Leo and what's ready for Ava<br />
-            in one tap.
+            {{ site_config.feature_2_description|linebreaksbr }}
           </p>
         </div>
         <div class="feature-media feature-media-multi">
-          <img src="{% static 'familyAccount.png' %}" alt="Family Accounts" class="feature-img" />
+          {% if site_config.feature_2_image %}
+            <img src="{{ site_config.feature_2_image.url }}" alt="{{ site_config.feature_2_title }}" class="feature-img" />
+          {% else %}
+            <img src="{% static 'familyAccount.png' %}" alt="{{ site_config.feature_2_title }}" class="feature-img" />
+          {% endif %}
         </div>
       </div>
     </div>
@@ -120,14 +131,17 @@
   <!-- Dynamic Packing Lists Section -->
   <section class="packing-section">
     <div class="container">
-      <h2 class="packing-title">Dynamic Packing Lists</h2>
+      <h2 class="packing-title">{{ site_config.packing_section_title }}</h2>
       <div class="packing-divider"></div>
       <p class="packing-desc">
-        Smart lists that update based on weather, location. Never forget a<br />
-        toothbrush (or a rain coat) again.
+        {{ site_config.packing_section_description|linebreaksbr }}
       </p>
       <div class="packing-img-wrap">
-        <img src="{% static 'packageList.png' %}" alt="Dynamic Packing List" class="packing-img" />
+        {% if site_config.packing_section_image %}
+          <img src="{{ site_config.packing_section_image.url }}" alt="{{ site_config.packing_section_title }}" class="packing-img" />
+        {% else %}
+          <img src="{% static 'packageList.png' %}" alt="{{ site_config.packing_section_title }}" class="packing-img" />
+        {% endif %}
       </div>
     </div>
   </section>
@@ -137,17 +151,17 @@
     <div class="container">
       <div class="stats-grid">
         <div class="stat-item">
-          <span class="stat-number">+200M</span>
+          <span class="stat-number">{{site_config.stat_downloads_value}}</span>
           <span class="stat-label"><i class="fas fa-download stat-icon"></i> Download</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">+480M</span>
+          <span class="stat-number">{{site_config.stat_members_value}}</span>
           <span class="stat-label"><i class="fas fa-users stat-icon"></i> Members</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-number">+18K</span>
+          <span class="stat-number">{{site_config.stat_communities_value}}</span>
           <span class="stat-label"><i class="fas fa-paw stat-icon"></i> Communities</span>
         </div>
       </div>
@@ -239,14 +253,14 @@
       <div class="container">
         <h2 class="cta-title">What are you waiting for? Download Now!</h2>
         <div class="cta-actions">
-          <a href="#" class="store-btn store-apple">
+          <a href="{{site_config.app_store_url}}" target="_blank" class="store-btn store-apple">
             <i class="fab fa-apple"></i>
             <div class="store-text">
               <span class="store-sub">Download on the</span>
               <span class="store-main">App Store</span>
             </div>
           </a>
-          <a href="#" class="store-btn store-google">
+          <a href="{{site_config.play_store_url}}" target="_blank" class="store-btn store-google">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"
               class="gplay-svg">
               <path d="M3.18 23.54c.37.22.8.34 1.26.34.72 0 1.42-.25 2.05-.64L19.23 15.6l-3.96-3.74z" fill="#EA4335" />
@@ -279,7 +293,7 @@
             Integer id orci sed ante tincidunt<br />
             tincidunt sit amet sed libero.
           </p>
-          <p class="copyright">© All Packed 2021</p>
+          <p class="copyright">© All Packed 2026</p>
         </div>
 
         <!-- Center - Company Links -->

@@ -4,6 +4,47 @@ from .models import SiteConfiguration, ContactMessage, Testimonial
 
 @admin.register(SiteConfiguration)
 class SiteConfigurationAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Social Links & App Store', {
+            'fields': (
+                'facebook_url', 'linkedin_url', 'twitter_url', 'email_address',
+                'app_store_url', 'play_store_url'
+            )
+        }),
+        ('Stats Section', {
+            'fields': (
+                'stat_downloads_value',
+                'stat_members_value',
+                'stat_communities_value'
+            )
+        }),
+        ('Hero Section', {
+            'fields': (
+                'hero_title',
+                'hero_subtitle_blue',
+                'hero_description',
+                'hero_desktop_image',
+                'hero_mobile_frame_image'
+            )
+        }),
+        ('Features Section', {
+            'fields': (
+                'features_section_title',
+                'feature_1_title',
+                'feature_1_description',
+                'feature_1_image',
+                'feature_2_title', 'feature_2_description', 'feature_2_image'
+            )
+        }),
+        ('Dynamic Packing Section', {
+            'fields': (
+                'packing_section_title',
+                'packing_section_description',
+                'packing_section_image'
+            )
+        }),
+    )
+
     def has_add_permission(self, request):
         if self.model.objects.count() > 0:
             return False

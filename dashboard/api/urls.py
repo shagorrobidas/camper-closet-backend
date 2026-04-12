@@ -6,7 +6,7 @@ from dashboard.api.views import (
 
 urlpatterns = [
     path(
-        'statics/',
+        'closet/statics/',
         DashboardStatsView.as_view(),
         name='dashboard_stats'
     ),
