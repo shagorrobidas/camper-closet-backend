@@ -432,7 +432,7 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
                         main_category=cat_type,
                         title=trip.name,
                         is_required=False,
-                        quantity=1
+                        quantity=0
                     )
 
                     # 4. Create TripPackingItems
@@ -441,8 +441,6 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
                         main_category=cat_type,
                         title=trip.name,
                         status='active',
-                        # template_item=t_item,
-                        # quantity=1,
                         is_required=False,
                         is_packed=False,
                         is_custom_item=False

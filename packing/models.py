@@ -144,7 +144,7 @@ class PackingTemplateItem(BaseModel):
 
     title = models.CharField(max_length=255, blank=True, null=True)
 
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
 
     is_required = models.BooleanField(default=True)
 
@@ -192,15 +192,15 @@ class TripPackingItem(BaseModel):
         choices=PACKING_STATUS_CHOICES,
         default='active'
     )
-    
+
     template_item = models.ForeignKey(
         PackingTemplateItem,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
-    
-    quantity = models.IntegerField(default=1)
+
+    quantity = models.IntegerField(default=0)
     picked_quantity = models.IntegerField(default=0)
 
     is_required = models.BooleanField(default=True)
@@ -218,17 +218,18 @@ class TripPackingItem(BaseModel):
     def __str__(self):
         if self.title:
             return self.title
-        return self.sub_category.name if self.sub_category else "Uncategorized Item"
+        return self.sub_category.name if self.sub_category else "Uncategorized Item" # noqa
 
     def save(self, *args, **kwargs):
-        # We need to refresh status if quantity changes to ensure is_packed is correct
         is_new = self._state.adding
-        
-        # Avoid recursion: if we are only updating status fields, just save.
         update_fields = kwargs.get('update_fields')
         if update_fields:
-            status_fields = {'picked_quantity', 'is_packed', 'is_required', 'packed_at'}
-            # If all updated fields are status fields, don't refresh again.
+            status_fields = {
+                'picked_quantity',
+                'is_packed',
+                'is_required',
+                'packed_at'
+            }
             if all(f in status_fields for f in update_fields):
                 super().save(*args, **kwargs)
                 return
@@ -247,19 +248,24 @@ class TripPackingItem(BaseModel):
         """Recalculate picked_quantity and packed status from selections."""
         result = self.selections.aggregate(total=Sum('quantity'))
         total_picked = result['total'] or 0
-        
+
         self.picked_quantity = total_picked
         if total_picked >= self.quantity:
             self.is_packed = True
-            self.is_required = False  # As requested: when quantity == picked_quantity, is_required false
+            self.is_required = False  # As requested: when quantity == picked_quantity, is_required false  # noqa
             if not self.packed_at:
                 self.packed_at = timezone.now()
         else:
             self.is_packed = False
-            self.is_required = True  # Revert if it's no longer fully picked
+            self.is_required = True  # Revert if it's no longer fully picked  # noqa
             self.packed_at = None
         self.save(
-            update_fields=['picked_quantity', 'is_packed', 'is_required', 'packed_at']
+            update_fields=[
+                'picked_quantity',
+                'is_packed',
+                'is_required',
+                'packed_at'
+            ]
         )
 
 
@@ -274,7 +280,7 @@ class TripPackingItemSelection(BaseModel):
         on_delete=models.CASCADE,
         related_name='packing_selections'
     )
-    quantity = models.IntegerField(default=1)
+    quantity = models.IntegerField(default=0)
     note = models.TextField(blank=True, null=True)
 
     def __str__(self):
