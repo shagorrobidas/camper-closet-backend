@@ -256,13 +256,39 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
 
 class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
     permission_classes = [IsAuthenticated]
-    """DELETE to remove a closet item selection from a packing item."""
+    """POST/DELETE to remove one or more closet item selections from a packing item."""
+
+    def post(self, request, *args, **kwargs):
+        return self._remove_selections(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
+        return self._remove_selections(request, *args, **kwargs)
+
+    def _remove_selections(self, request, *args, **kwargs):
         try:
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('item_pk')
             selection_pk = self.kwargs.get('selection_pk')
+            
+            # Support multiple IDs in request data OR query params
+            selection_ids = request.data.get('selection_ids', [])
+            if not selection_ids:
+                # Fallback to query params (useful for DELETE requests)
+                selection_ids = request.query_params.getlist('selection_ids')
+
+            if not isinstance(selection_ids, list):
+                selection_ids = [selection_ids]
+            
+            # Add selection_pk from URL if present
+            if selection_pk:
+                selection_ids.append(selection_pk)
+                
+            if not selection_ids:
+                return CustomResponse.error(
+                    message="No selection IDs provided",
+                    status_code=400
+                )
+
             user = self.get_profile_user()
             trip = get_object_or_404(Trip, pk=trip_pk, user=user)
             packing_item = get_object_or_404(
@@ -270,22 +296,36 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
                 pk=item_pk,
                 trip=trip
             )
-            selection = get_object_or_404(
-                TripPackingItemSelection,
-                pk=selection_pk,
+            selections = TripPackingItemSelection.objects.filter(
+                pk__in=selection_ids,
                 packing_item=packing_item
             )
-            selection.delete()
+            
+            count = selections.count()
+            if count == 0:
+                return CustomResponse.error(
+                    message="No matching selections found for this packing item",
+                    status_code=404
+                )
+                
+            # Perform bulk delete
+            selections.delete()
+            
+            # CRITICAL: Manually refresh status since QuerySet.delete() skips model signals/methods
+            packing_item.refresh_status()
+            
             item_serializer = TripPackingItemSerializer(
                 packing_item, context={'request': request}
             )
             return CustomResponse.success(
                 data=item_serializer.data,
-                message="Selection removed successfully",
+                message=f"{count} selection(s) removed successfully",
                 status_code=200
             )
         except Exception as e:
             return custom_exception_handler(e, request)
+
+
 
 
 class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):

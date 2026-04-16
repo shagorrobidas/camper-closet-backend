@@ -118,10 +118,15 @@ urlpatterns = [
         ClosetMatchSuggestionView.as_view(),
         name='packing-item-suggest-closet'
     ),
+    # path(
+    #     'trips/<uuid:trip_pk>/packing-items/<uuid:item_pk>/selections/<uuid:selection_pk>/remove/', # noqa
+    #     PackingItemRemoveClosetView.as_view(),
+    #     name='packing-item-remove-selection'
+    # ),
     path(
-        'trips/<uuid:trip_pk>/packing-items/<uuid:item_pk>/selections/<uuid:selection_pk>/remove/', # noqa
+        'trips/<uuid:trip_pk>/packing-items/<uuid:item_pk>/remove-selections/',
         PackingItemRemoveClosetView.as_view(),
-        name='packing-item-remove-selection'
+        name='packing-item-remove-selections'
     ),
 
     # Trip Events / Calendar
