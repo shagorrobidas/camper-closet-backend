@@ -60,6 +60,7 @@ class RegisterParentSerializer(_PasswordMixin, serializers.ModelSerializer):
             password=validated_data['password'],
             full_name=validated_data.get('full_name', ''),
             date_of_birth=validated_data.get('date_of_birth'),
+            is_email_verified=True
         )
         return user
 
