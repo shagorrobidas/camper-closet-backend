@@ -94,13 +94,17 @@ class PackingTemplate(BaseModel):
 
     trip_type = models.ForeignKey(
         TripType,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
 
     season = models.CharField(
         max_length=20,
         choices=SEASON_CHOICES,
-        default='Summer'
+        default='Summer',
+        null=True,
+        blank=True
     )
 
     description = models.TextField(
@@ -114,7 +118,7 @@ class PackingTemplate(BaseModel):
         null=True
     )
 
-    sort_order = models.IntegerField(default=0)
+    sort_order = models.IntegerField(default=0, null=True, blank=True)
 
     is_system = models.BooleanField(default=True)
 
