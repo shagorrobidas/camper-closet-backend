@@ -2,7 +2,7 @@ JAZZMIN_CONFIG = {
     "site_title": "Comper Closet Admin",
     "site_header": "Comper Closet",
     "site_brand": "Comper Closet",
-    "site_logo": "images/logo.png",
+    "site_logo": "images/logo1.png",
     "welcome_sign": "Welcome to the Comper Closet Admin Panel",
     "copyright": "Comper Closet",
     "search_model": ["auth.User"],
