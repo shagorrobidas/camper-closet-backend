@@ -22,6 +22,7 @@ from packing.api.views import (
     MenualTripCreateView,
     TripTypeListView,
     ActiveIncompleteTripPackingItemListView,
+    PackingTemplateCreateAPIView,
 )
 
 urlpatterns = [
@@ -30,6 +31,11 @@ urlpatterns = [
         'templates/',
         PackingTemplateListView.as_view(),
         name='packing-template-list'
+    ),
+    path(
+        'templates/create-full/',
+        PackingTemplateCreateAPIView.as_view(),
+        name='packing-template-create-full'
     ),
     path(
         'templates/<uuid:pk>/',

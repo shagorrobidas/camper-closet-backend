@@ -2,6 +2,7 @@ from .template import (
     PackingTemplateListView,
     PackingTemplateDetailView,
 )
+from .create_template import PackingTemplateCreateAPIView
 from .trip import (
     TripListView,
     TripDetailView,
@@ -52,5 +53,5 @@ __all__ = [
     'TripTypeListView',
     'UpcomingTripEventListView',
     'ActiveIncompleteTripPackingItemListView',
-
+    'PackingTemplateCreateAPIView',
 ]
