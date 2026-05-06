@@ -5,7 +5,7 @@ from django.conf import settings
 
 class ItemCategoryType(BaseModel):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=5, null=True, blank=True)
 
     def __str__(self):
         return self.name
