@@ -18,19 +18,19 @@ class UserAdmin(admin.ModelAdmin):
     ordering = ('id',)
 
 
-@admin.register(OTP)
-class OTPAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'otp', 'purpose', 'created_at', 'expires_at')
-    list_filter = ('purpose',)
-    search_fields = ('user__email', 'otp')
+# @admin.register(OTP)
+# class OTPAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'user', 'otp', 'purpose', 'created_at', 'expires_at')
+#     list_filter = ('purpose',)
+#     search_fields = ('user__email', 'otp')
 
 
-@admin.register(EmailVerification)
-class EmailVerificationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'token', 'created_at', 'expires_at')
-    list_filter = ('created_at', 'expires_at')
-    search_fields = ('user__email', 'token')
-    ordering = ('-created_at',)
+# @admin.register(EmailVerification)
+# class EmailVerificationAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'user', 'token', 'created_at', 'expires_at')
+#     list_filter = ('created_at', 'expires_at')
+#     search_fields = ('user__email', 'token')
+#     ordering = ('-created_at',)
 
 
 @admin.register(Notification)

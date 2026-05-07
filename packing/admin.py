@@ -72,92 +72,92 @@ class TripPackingItemInline(admin.TabularInline):
     )
 
 
-class TripEventInline(admin.TabularInline):
-    model = TripEvent
-    extra = 1
+# class TripEventInline(admin.TabularInline):
+#     model = TripEvent
+#     extra = 1
 
 
-@admin.register(Trip)
-class TripAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'user',
-        'trip_type',
-        'status',
-        'is_template_applied',
-        'start_date',
-        'end_date'
-    )
-    list_filter = (
-        'trip_type',
-        'status',
-        'is_template_applied',
-        'start_date'
-    )
-    search_fields = ('name', 'location', 'user__email')
-    inlines = [TripPackingItemInline, TripEventInline]
+# @admin.register(Trip)
+# class TripAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'id',
+#         'name',
+#         'user',
+#         'trip_type',
+#         'status',
+#         'is_template_applied',
+#         'start_date',
+#         'end_date'
+#     )
+#     list_filter = (
+#         'trip_type',
+#         'status',
+#         'is_template_applied',
+#         'start_date'
+#     )
+#     search_fields = ('name', 'location', 'user__email')
+#     inlines = [TripPackingItemInline, TripEventInline]
 
 
-class TripPackingItemSelectionInline(admin.TabularInline):
-    model = TripPackingItemSelection
-    extra = 1
-    raw_id_fields = ('closet_item',)
+# class TripPackingItemSelectionInline(admin.TabularInline):
+#     model = TripPackingItemSelection
+#     extra = 1
+#     raw_id_fields = ('closet_item',)
 
 
-@admin.register(TripPackingItem)
-class TripPackingItemAdmin(admin.ModelAdmin):
-    list_display = (
-        '__str__',
-        'trip',
-        'status',
-        'main_category',
-        'sub_category',
-        'title',
-        'quantity',
-        'picked_quantity',
-        'is_packed'
-    )
-    list_filter = (
-        'status',
-        'main_category',
-        'sub_category',
-        'is_packed',
-        'is_custom_item'
-    )
-    search_fields = (
-        'trip__name',
-        'title',
-        'note',
-        'sub_category__name'
-    )
-    inlines = [TripPackingItemSelectionInline]
-    raw_id_fields = (
-        'trip',
-        'main_category',
-        'sub_category',
-        'template_item'
-    )
+# @admin.register(TripPackingItem)
+# class TripPackingItemAdmin(admin.ModelAdmin):
+#     list_display = (
+#         '__str__',
+#         'trip',
+#         'status',
+#         'main_category',
+#         'sub_category',
+#         'title',
+#         'quantity',
+#         'picked_quantity',
+#         'is_packed'
+#     )
+#     list_filter = (
+#         'status',
+#         'main_category',
+#         'sub_category',
+#         'is_packed',
+#         'is_custom_item'
+#     )
+#     search_fields = (
+#         'trip__name',
+#         'title',
+#         'note',
+#         'sub_category__name'
+#     )
+#     inlines = [TripPackingItemSelectionInline]
+#     raw_id_fields = (
+#         'trip',
+#         'main_category',
+#         'sub_category',
+#         'template_item'
+#     )
 
 
-@admin.register(TripPackingItemSelection)
-class TripPackingItemSelectionAdmin(admin.ModelAdmin):
-    list_display = (
-        'packing_item',
-        'closet_item',
-        'quantity'
-    )
-    raw_id_fields = (
-        'packing_item',
-        'closet_item'
-    )
+# @admin.register(TripPackingItemSelection)
+# class TripPackingItemSelectionAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'packing_item',
+#         'closet_item',
+#         'quantity'
+#     )
+#     raw_id_fields = (
+#         'packing_item',
+#         'closet_item'
+#     )
 
 
-@admin.register(TripEvent)
-class TripEventAdmin(admin.ModelAdmin):
-    list_display = (
-        'title',
-        'trip',
-        'event_type',
-        'date'
-    )
+# @admin.register(TripEvent)
+# class TripEventAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'title',
+#         'trip',
+#         'event_type',
+#         'date'
+#     )
