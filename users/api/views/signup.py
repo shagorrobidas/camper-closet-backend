@@ -41,8 +41,8 @@ class RegisterParentView(generics.CreateAPIView):
 
             logger.info(f"New parent registered: {user.email}")
 
-            # otp_obj = create_otp(user, 'email_verification')
-            # send_otp_email_task(user.id, otp_obj.otp, 'email_verification')
+            otp_obj = create_otp(user, 'email_verification')
+            send_otp_email_task(user.id, otp_obj.otp, 'email_verification')
 
             return CustomResponse.success(
                 message=(
