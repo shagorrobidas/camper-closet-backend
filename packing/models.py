@@ -172,7 +172,9 @@ class TripPackingItem(BaseModel):
     trip = models.ForeignKey(
         Trip,
         on_delete=models.CASCADE,
-        related_name='packing_items'
+        related_name='packing_items',
+        null=True,
+        blank=True
     )
 
     main_category = models.ForeignKey(
@@ -189,7 +191,11 @@ class TripPackingItem(BaseModel):
         blank=True
     )
 
-    title = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
 
     status = models.CharField(
         max_length=20,
@@ -204,12 +210,28 @@ class TripPackingItem(BaseModel):
         blank=True
     )
 
-    quantity = models.IntegerField(default=0)
-    picked_quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(
+        default=0,
+        null=True,
+        blank=True
+    )
+    picked_quantity = models.IntegerField(
+        default=0,
+        null=True,
+        blank=True
+    )
 
-    is_required = models.BooleanField(default=True)
+    is_required = models.BooleanField(
+        default=True,
+        null=True,
+        blank=True
+    )
 
-    is_packed = models.BooleanField(default=False)
+    is_packed = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
+    )
 
     packed_at = models.DateTimeField(null=True, blank=True)
 
