@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from django.db.models import Prefetch
-from packing.models import PackingTemplate, PackingTemplateItem
+from packing.models import PackingTemplate, PackingTemplateItem, PackingTemplateCategory
 from users.permission import ProfileAccessMixin
 from packing.api.serializers import (
     PackingTemplateSerializer,
@@ -66,7 +66,12 @@ class PackingTemplateDetailView(RetrieveAPIView):
         if sub_category:
             items_queryset = items_queryset.filter(sub_category_id=sub_category)
 
+        categories_queryset = PackingTemplateCategory.objects.all().prefetch_related(
+            Prefetch('items', queryset=items_queryset)
+        ).order_by('sort_order')
+
         return queryset.prefetch_related(
+            Prefetch('categories', queryset=categories_queryset),
             Prefetch('items', queryset=items_queryset)
         )
 
