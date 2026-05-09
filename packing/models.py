@@ -126,6 +126,23 @@ class PackingTemplate(BaseModel):
         return self.title
 
 
+class PackingTemplateCategory(BaseModel):
+    template = models.ForeignKey(
+        PackingTemplate,
+        on_delete=models.CASCADE,
+        related_name='categories'
+    )
+    name = models.CharField(max_length=255)
+    sort_order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.template.title} - {self.name}"
+
+    class Meta:
+        verbose_name_plural = "Packing Template Categories"
+        ordering = ['sort_order', 'created_at']
+
+
 class PackingTemplateItem(BaseModel):
 
     template = models.ForeignKey(
@@ -134,18 +151,14 @@ class PackingTemplateItem(BaseModel):
         related_name='items'
     )
 
-    main_category = models.ForeignKey(
-        ItemCategoryType,
-        on_delete=models.CASCADE
-    )
-
-    sub_category = models.ForeignKey(
-        ItemCategory,
+    category = models.ForeignKey(
+        PackingTemplateCategory,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='items'
     )
-    
+
     brand_category = models.ForeignKey(
         'dashboard.BrandCategory',
         on_delete=models.SET_NULL,
@@ -167,8 +180,8 @@ class PackingTemplateItem(BaseModel):
 
     def __str__(self):
         if self.title:
-            return self.template.title + " - " + self.title
-        return self.template.title + " - " + self.sub_category.name
+            return f"{self.template.title} - {self.title}"
+        return f"{self.template.title} - Item {self.id}"
 
 
 class TripPackingItem(BaseModel):
