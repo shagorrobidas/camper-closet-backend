@@ -166,11 +166,7 @@ class TripCreateView(ProfileAccessMixin, CreateAPIView):
                     TripPackingItem.objects.create(
                         trip=trip,
                         status='active',
-                        main_category=t_item.main_category,
-                        sub_category=t_item.sub_category,
-                        title=t_item.title or (
-                            t_item.sub_category.name if t_item.sub_category else ''  # noqa
-                        ),
+                        title=t_item.title or '',
                         template_item=t_item,
                         quantity=required_qty,
                         picked_quantity=0,
@@ -429,7 +425,6 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
                 for cat_type in cat_types:
                     PackingTemplateItem.objects.create(
                         template=template,
-                        main_category=cat_type,
                         title=trip.name,
                         is_required=False,
                         quantity=0
