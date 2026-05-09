@@ -145,6 +145,15 @@ class PackingTemplateItem(BaseModel):
         null=True,
         blank=True
     )
+    
+    brand_category = models.ForeignKey(
+        'dashboard.BrandCategory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    show_shop_url = models.BooleanField(default=False)
 
     title = models.CharField(max_length=255, blank=True, null=True)
 

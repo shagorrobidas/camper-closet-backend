@@ -45,20 +45,25 @@ class PackingTemplateItemAdmin(admin.ModelAdmin):
         'template',
         'main_category',
         'sub_category',
+        'brand_category',
         'title',
         'quantity',
         'is_required',
+        'show_shop_url',
         'sort_order'
     )
     list_filter = (
         'template',
         'main_category',
         'sub_category',
-        'is_required'
+        'brand_category',
+        'is_required',
+        'show_shop_url'
     )
     search_fields = (
         'template__title', 'title', 'note',
-        'main_category__name', 'sub_category__name'
+        'main_category__name', 'sub_category__name',
+        'brand_category__name'
     )
 
 

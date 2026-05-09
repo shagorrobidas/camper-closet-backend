@@ -10,6 +10,10 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
     sub_category_name = serializers.CharField(
         source='sub_category.name', read_only=True
     )
+    brand_category_name = serializers.CharField(
+        source='brand_category.name', read_only=True
+    )
+    shop_urls = serializers.SerializerMethodField()
 
     class Meta:
         model = PackingTemplateItem
@@ -20,9 +24,13 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
             'main_category_name',
             'sub_category',
             'sub_category_name',
+            'brand_category',
+            'brand_category_name',
             'title',
             'quantity',
             'is_required',
+            'show_shop_url',
+            'shop_urls',
             'note',
             'sort_order',
             'created_at',
@@ -33,6 +41,19 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+    def get_shop_urls(self, obj):
+        if obj.show_shop_url and obj.brand_category:
+            return list(obj.brand_category.shop_websites.filter(
+                is_active=True
+            ).values_list('website_url', flat=True))
+        return []
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not instance.show_shop_url:
+            ret.pop('shop_urls', None)
+        return ret
 
 
 class PackingTemplateSerializer(serializers.ModelSerializer):

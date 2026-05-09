@@ -41,6 +41,8 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
         source='sub_category.name', read_only=True
     )
     selections = TripPackingItemSelectionSerializer(many=True, read_only=True)
+    shop_urls = serializers.SerializerMethodField()
+    show_shop_url = serializers.SerializerMethodField()
 
     class Meta:
         model = TripPackingItem
@@ -62,6 +64,8 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
             'is_packed',
             'packed_at',
             'is_custom_item',
+            'show_shop_url',
+            'shop_urls',
             'note',
             'sort_order',
             'created_at',
@@ -78,6 +82,24 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         ]
+
+    def get_show_shop_url(self, obj):
+        if obj.template_item:
+            return obj.template_item.show_shop_url
+        return False
+
+    def get_shop_urls(self, obj):
+        if obj.template_item and obj.template_item.show_shop_url and obj.template_item.brand_category:
+            return list(obj.template_item.brand_category.shop_websites.filter(
+                is_active=True
+            ).values_list('website_url', flat=True))
+        return []
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not (instance.template_item and instance.template_item.show_shop_url): 
+            ret.pop('shop_urls', None)
+        return ret
 
 
 class TripPackingItemCreateSerializer(serializers.ModelSerializer):
