@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from celery.schedules import crontab
-from core.jazzmin import JAZZMIN_CONFIG, JAZZMIN_UI_TWEAKS_CONFIG
+# from core.jazzmin import JAZZMIN_CONFIG, JAZZMIN_UI_TWEAKS_CONFIG
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # New BASE_DIR because we are in core/settings/base.py
@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 
 DJANGO_APPS = [
-    'jazzmin',
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -113,6 +113,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Large form support (Packing Template Inlines)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 
 # Static files (CSS, JavaScript, Images)
@@ -219,5 +222,5 @@ CELERY_BEAT_SCHEDULE = {
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
-JAZZMIN_SETTINGS = JAZZMIN_CONFIG
-JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS_CONFIG
+# JAZZMIN_SETTINGS = JAZZMIN_CONFIG
+# JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS_CONFIG
