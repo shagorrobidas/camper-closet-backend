@@ -19,6 +19,7 @@ Django==6.0.2
 django-celery-beat==2.9.0
 django-filter==25.2
 django-jazzmin==3.0.4
+django-nested-admin==4.1.6
 django-timezone-field==7.2.1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
@@ -46,6 +47,7 @@ jiter==0.13.0
 kombu==5.6.2
 Markdown==3.10.2
 msgpack==1.1.2
+mysql-connector-python==9.7.0
 openai==2.6.1
 packaging==26.0
 pillow==12.1.1
@@ -62,6 +64,7 @@ PyJWT==2.11.0
 python-crontab==3.3.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
+python-monkey-business==1.1.0
 redis==7.4.0
 requests==2.32.5
 rsa==4.9.1
