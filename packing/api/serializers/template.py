@@ -1,15 +1,9 @@
 from rest_framework import serializers
-from packing.models import PackingTemplate, PackingTemplateItem
+from packing.models import PackingTemplate, PackingTemplateItem, PackingTemplateCategory
 from django.db.models import Sum
 
 
 class PackingTemplateItemSerializer(serializers.ModelSerializer):
-    main_category_name = serializers.CharField(
-        source='main_category.name', read_only=True
-    )
-    sub_category_name = serializers.CharField(
-        source='sub_category.name', read_only=True
-    )
     brand_category_name = serializers.CharField(
         source='brand_category.name', read_only=True
     )
@@ -20,10 +14,7 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'template',
-            'main_category',
-            'main_category_name',
-            'sub_category',
-            'sub_category_name',
+            'category',
             'brand_category',
             'brand_category_name',
             'title',
@@ -54,6 +45,14 @@ class PackingTemplateItemSerializer(serializers.ModelSerializer):
         if not instance.show_shop_url:
             ret.pop('shop_urls', None)
         return ret
+
+
+class PackingTemplateCategorySerializer(serializers.ModelSerializer):
+    items = PackingTemplateItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PackingTemplateCategory
+        fields = ['id', 'name', 'sort_order', 'items']
 
 
 class PackingTemplateSerializer(serializers.ModelSerializer):
@@ -91,7 +90,8 @@ class PackingTemplateSerializer(serializers.ModelSerializer):
 
 
 class PackingTemplateDetailSerializer(PackingTemplateSerializer):
+    categories = PackingTemplateCategorySerializer(many=True, read_only=True)
     items = PackingTemplateItemSerializer(many=True, read_only=True)
 
     class Meta(PackingTemplateSerializer.Meta):
-        fields = PackingTemplateSerializer.Meta.fields + ['items']
+        fields = PackingTemplateSerializer.Meta.fields + ['categories', 'items']
