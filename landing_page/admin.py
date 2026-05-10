@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from .models import SiteConfiguration, ContactMessage, Testimonial
 
 
 @admin.register(SiteConfiguration)
-class SiteConfigurationAdmin(admin.ModelAdmin):
+class SiteConfigurationAdmin(ModelAdmin):
     fieldsets = (
         ('Social Links & App Store', {
             'fields': (
@@ -55,7 +56,7 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
 
 
 @admin.register(ContactMessage)
-class ContactMessageAdmin(admin.ModelAdmin):
+class ContactMessageAdmin(ModelAdmin):
     list_display = ('name', 'email', 'created_at')
     search_fields = ('name', 'email', 'message')
     readonly_fields = ('name', 'email', 'message', 'created_at')
@@ -65,7 +66,7 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 
 @admin.register(Testimonial)
-class TestimonialAdmin(admin.ModelAdmin):
+class TestimonialAdmin(ModelAdmin):
     list_display = (
         'author_name', 'author_role', 'rating', 'is_active', 'created_at'
     )

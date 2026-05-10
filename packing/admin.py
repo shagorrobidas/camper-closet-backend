@@ -1,4 +1,5 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin, TabularInline
 from packing.models import (
     TripType, Trip,
     PackingTemplate, PackingTemplateItem, PackingTemplateCategory,
@@ -7,31 +8,31 @@ from packing.models import (
 
 
 @admin.register(TripType)
-class TripTypeAdmin(admin.ModelAdmin):
+class TripTypeAdmin(ModelAdmin):
     list_display = ('name', 'code', 'created_at')
     search_fields = ('name', 'code')
 
 
-class PackingTemplateItemInline(admin.TabularInline):
+class PackingTemplateItemInline(TabularInline):
     model = PackingTemplateItem
     extra = 1
     raw_id_fields = ('category',)
 
 
-class PackingTemplateCategoryInline(admin.TabularInline):
+class PackingTemplateCategoryInline(TabularInline):
     model = PackingTemplateCategory
     extra = 1
 
 
 @admin.register(PackingTemplateCategory)
-class PackingTemplateCategoryAdmin(admin.ModelAdmin):
+class PackingTemplateCategoryAdmin(ModelAdmin):
     list_display = ('name', 'template', 'sort_order')
     list_filter = ('template',)
     search_fields = ('name', 'template__title')
 
 
 @admin.register(PackingTemplate)
-class PackingTemplateAdmin(admin.ModelAdmin):
+class PackingTemplateAdmin(ModelAdmin):
     list_display = (
         'title',
         'trip_type',
@@ -52,7 +53,7 @@ class PackingTemplateAdmin(admin.ModelAdmin):
 
 
 @admin.register(PackingTemplateItem)
-class PackingTemplateItemAdmin(admin.ModelAdmin):
+class PackingTemplateItemAdmin(ModelAdmin):
     list_display = (
         'template',
         'category',
@@ -75,7 +76,7 @@ class PackingTemplateItemAdmin(admin.ModelAdmin):
     )
 
 
-class TripPackingItemInline(admin.TabularInline):
+class TripPackingItemInline(TabularInline):
     model = TripPackingItem
     extra = 1
     raw_id_fields = (
@@ -85,13 +86,13 @@ class TripPackingItemInline(admin.TabularInline):
     )
 
 
-class TripEventInline(admin.TabularInline):
+class TripEventInline(TabularInline):
     model = TripEvent
     extra = 1
 
 
 @admin.register(Trip)
-class TripAdmin(admin.ModelAdmin):
+class TripAdmin(ModelAdmin):
     list_display = (
         'id',
         'name',
@@ -112,14 +113,14 @@ class TripAdmin(admin.ModelAdmin):
     inlines = [TripPackingItemInline, TripEventInline]
 
 
-class TripPackingItemSelectionInline(admin.TabularInline):
+class TripPackingItemSelectionInline(TabularInline):
     model = TripPackingItemSelection
     extra = 1
     raw_id_fields = ('closet_item',)
 
 
 @admin.register(TripPackingItem)
-class TripPackingItemAdmin(admin.ModelAdmin):
+class TripPackingItemAdmin(ModelAdmin):
     list_display = (
         '__str__',
         'trip',
@@ -154,7 +155,7 @@ class TripPackingItemAdmin(admin.ModelAdmin):
 
 
 @admin.register(TripPackingItemSelection)
-class TripPackingItemSelectionAdmin(admin.ModelAdmin):
+class TripPackingItemSelectionAdmin(ModelAdmin):
     list_display = (
         'packing_item',
         'closet_item',
@@ -167,7 +168,7 @@ class TripPackingItemSelectionAdmin(admin.ModelAdmin):
 
 
 @admin.register(TripEvent)
-class TripEventAdmin(admin.ModelAdmin):
+class TripEventAdmin(ModelAdmin):
     list_display = (
         'title',
         'trip',

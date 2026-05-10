@@ -1,21 +1,22 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin, TabularInline
 from closet.models import ItemCategoryType, ItemCategory, ClosetItem
 
 
-class ItemCategoryInline(admin.TabularInline):
+class ItemCategoryInline(TabularInline):
     model = ItemCategory
     extra = 1
     autocomplete_fields = ("type",)
 
 
-class ClosetItemInline(admin.TabularInline):
+class ClosetItemInline(TabularInline):
     model = ClosetItem
     extra = 1
     autocomplete_fields = ("user", "main_category", "sub_category")
 
 
 @admin.register(ItemCategoryType)
-class ItemCategoryTypeAdmin(admin.ModelAdmin):
+class ItemCategoryTypeAdmin(ModelAdmin):
     list_display = (
         "id",
         "name",
@@ -29,7 +30,7 @@ class ItemCategoryTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(ItemCategory)
-class ItemCategoryAdmin(admin.ModelAdmin):
+class ItemCategoryAdmin(ModelAdmin):
     list_display = (
         "id",
         "name",
@@ -55,7 +56,7 @@ class ItemCategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(ClosetItem)
-class ClosetItemAdmin(admin.ModelAdmin):
+class ClosetItemAdmin(ModelAdmin):
     list_display = (
         "id",
         "name",

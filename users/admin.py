@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from users.models import User, OTP, EmailVerification, Notification, NotificationSetting
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ModelAdmin):
     list_display = (
         'pk', 'email', 'role', 'full_name',
         'is_email_verified',
@@ -18,23 +19,8 @@ class UserAdmin(admin.ModelAdmin):
     ordering = ('id',)
 
 
-# @admin.register(OTP)
-# class OTPAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'user', 'otp', 'purpose', 'created_at', 'expires_at')
-#     list_filter = ('purpose',)
-#     search_fields = ('user__email', 'otp')
-
-
-# @admin.register(EmailVerification)
-# class EmailVerificationAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'user', 'token', 'created_at', 'expires_at')
-#     list_filter = ('created_at', 'expires_at')
-#     search_fields = ('user__email', 'token')
-#     ordering = ('-created_at',)
-
-
 @admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
+class NotificationAdmin(ModelAdmin):
     list_display = (
         'id', 'user', 'type', 'title', 'is_read', 'created_at'
     )
@@ -44,7 +30,7 @@ class NotificationAdmin(admin.ModelAdmin):
 
 
 @admin.register(NotificationSetting)
-class NotificationSettingAdmin(admin.ModelAdmin):
+class NotificationSettingAdmin(ModelAdmin):
     list_display = (
         'id', 'user', 'enabled', 'packing_reminders',
         'milestone_achievements', 'weekly_summaries'
