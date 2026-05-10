@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from users.models import User
 
 
 class LoginSerializer(serializers.Serializer):
@@ -18,14 +19,23 @@ class LoginSerializer(serializers.Serializer):
             })
 
         # Authenticate the user with the provided credentials
-        user = authenticate(
-            request=self.context.get('request'),
-            email=email, password=password
-        )
-
-        if not user:
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
             raise serializers.ValidationError({
-                "message": "Invalid email or password",
+                "message": "User not found",
+                "code": 404
+            })
+
+        if not user.is_active:
+            raise serializers.ValidationError({
+                "message": "User account is disabled",
+                "code": 400
+            })
+
+        if not user.check_password(password):
+            raise serializers.ValidationError({
+                "message": "Password does not match",
                 "code": 400
             })
 
