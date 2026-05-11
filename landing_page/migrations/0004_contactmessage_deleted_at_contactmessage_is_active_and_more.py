@@ -12,51 +12,66 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='contactmessage',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='contactmessage',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='contactmessage',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True),
-        ),
-        migrations.AddField(
-            model_name='siteconfiguration',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='siteconfiguration',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='siteconfiguration',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='siteconfiguration',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True),
-        ),
-        migrations.AddField(
-            model_name='testimonial',
-            name='deleted_at',
-            field=models.DateTimeField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='testimonial',
-            name='updated_at',
-            field=models.DateTimeField(auto_now=True),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL("ALTER TABLE landing_page_contactmessage ADD COLUMN IF NOT EXISTS deleted_at timestamp with time zone NULL;"),
+                migrations.RunSQL("ALTER TABLE landing_page_contactmessage ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT true;"),
+                migrations.RunSQL("ALTER TABLE landing_page_contactmessage ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone NOT NULL DEFAULT now();"),
+                migrations.RunSQL("ALTER TABLE landing_page_siteconfiguration ADD COLUMN IF NOT EXISTS created_at timestamp with time zone NOT NULL DEFAULT now();"),
+                migrations.RunSQL("ALTER TABLE landing_page_siteconfiguration ADD COLUMN IF NOT EXISTS deleted_at timestamp with time zone NULL;"),
+                migrations.RunSQL("ALTER TABLE landing_page_siteconfiguration ADD COLUMN IF NOT EXISTS is_active boolean NOT NULL DEFAULT true;"),
+                migrations.RunSQL("ALTER TABLE landing_page_siteconfiguration ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone NOT NULL DEFAULT now();"),
+                migrations.RunSQL("ALTER TABLE landing_page_testimonial ADD COLUMN IF NOT EXISTS deleted_at timestamp with time zone NULL;"),
+                migrations.RunSQL("ALTER TABLE landing_page_testimonial ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone NOT NULL DEFAULT now();"),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='contactmessage',
+                    name='deleted_at',
+                    field=models.DateTimeField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='contactmessage',
+                    name='is_active',
+                    field=models.BooleanField(default=True),
+                ),
+                migrations.AddField(
+                    model_name='contactmessage',
+                    name='updated_at',
+                    field=models.DateTimeField(auto_now=True),
+                ),
+                migrations.AddField(
+                    model_name='siteconfiguration',
+                    name='created_at',
+                    field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+                    preserve_default=False,
+                ),
+                migrations.AddField(
+                    model_name='siteconfiguration',
+                    name='deleted_at',
+                    field=models.DateTimeField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='siteconfiguration',
+                    name='is_active',
+                    field=models.BooleanField(default=True),
+                ),
+                migrations.AddField(
+                    model_name='siteconfiguration',
+                    name='updated_at',
+                    field=models.DateTimeField(auto_now=True),
+                ),
+                migrations.AddField(
+                    model_name='testimonial',
+                    name='deleted_at',
+                    field=models.DateTimeField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='testimonial',
+                    name='updated_at',
+                    field=models.DateTimeField(auto_now=True),
+                ),
+            ]
         ),
         migrations.RunSQL(
             sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP IDENTITY IF EXISTS; ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP DEFAULT;',
