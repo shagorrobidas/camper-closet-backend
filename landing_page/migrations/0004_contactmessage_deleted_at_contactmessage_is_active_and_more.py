@@ -58,15 +58,39 @@ class Migration(migrations.Migration):
             name='updated_at',
             field=models.DateTimeField(auto_now=True),
         ),
+        migrations.RunSQL(
+            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP DEFAULT;',
+            reverse_sql=''
+        ),
+        migrations.RunSQL(
+            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id TYPE uuid USING (md5(random()::text || clock_timestamp()::text)::uuid);',
+            reverse_sql=''
+        ),
         migrations.AlterField(
             model_name='contactmessage',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
         ),
+        migrations.RunSQL(
+            sql='ALTER TABLE landing_page_siteconfiguration ALTER COLUMN id DROP DEFAULT;',
+            reverse_sql=''
+        ),
+        migrations.RunSQL(
+            sql="ALTER TABLE landing_page_siteconfiguration ALTER COLUMN id TYPE uuid USING '00000000-0000-0000-0000-000000000001'::uuid;",
+            reverse_sql=''
+        ),
         migrations.AlterField(
             model_name='siteconfiguration',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+        ),
+        migrations.RunSQL(
+            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id DROP DEFAULT;',
+            reverse_sql=''
+        ),
+        migrations.RunSQL(
+            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id TYPE uuid USING (md5(random()::text || clock_timestamp()::text)::uuid);',
+            reverse_sql=''
         ),
         migrations.AlterField(
             model_name='testimonial',

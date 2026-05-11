@@ -117,6 +117,8 @@ class SiteConfiguration(BaseModel):
     )
 
 
+    CONFIG_ID = "00000000-0000-0000-0000-000000000001"
+
     class Meta:
         verbose_name = "Site Configuration"
         verbose_name_plural = "Site Configuration"
@@ -125,12 +127,12 @@ class SiteConfiguration(BaseModel):
         return "Site Configuration"
 
     def save(self, *args, **kwargs):
-        self.pk = 1
+        self.pk = self.CONFIG_ID
         super(SiteConfiguration, self).save(*args, **kwargs)
 
     @classmethod
     def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
+        obj, created = cls.objects.get_or_create(pk=cls.CONFIG_ID)
         return obj
 
 
