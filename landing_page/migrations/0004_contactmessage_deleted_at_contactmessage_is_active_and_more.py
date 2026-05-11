@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             reverse_sql=''
         ),
         migrations.RunSQL(
-            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id TYPE uuid USING (md5(random()::text || clock_timestamp()::text)::uuid);',
+            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id TYPE uuid USING (md5(id::text)::uuid);',
             reverse_sql=''
         ),
         migrations.AlterField(
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
             reverse_sql=''
         ),
         migrations.RunSQL(
-            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id TYPE uuid USING (md5(random()::text || clock_timestamp()::text)::uuid);',
+            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id TYPE uuid USING (md5(id::text)::uuid);',
             reverse_sql=''
         ),
         migrations.AlterField(
