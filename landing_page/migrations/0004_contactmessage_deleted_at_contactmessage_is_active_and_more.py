@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.RunSQL(
-            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP DEFAULT;',
+            sql='ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP IDENTITY IF EXISTS; ALTER TABLE landing_page_contactmessage ALTER COLUMN id DROP DEFAULT IF EXISTS;',
             reverse_sql=''
         ),
         migrations.RunSQL(
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
             field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
         ),
         migrations.RunSQL(
-            sql='ALTER TABLE landing_page_siteconfiguration ALTER COLUMN id DROP DEFAULT;',
+            sql='ALTER TABLE landing_page_siteconfiguration ALTER COLUMN id DROP IDENTITY IF EXISTS; ALTER TABLE landing_page_siteconfiguration ALTER COLUMN id DROP DEFAULT IF EXISTS;',
             reverse_sql=''
         ),
         migrations.RunSQL(
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
             field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
         ),
         migrations.RunSQL(
-            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id DROP DEFAULT;',
+            sql='ALTER TABLE landing_page_testimonial ALTER COLUMN id DROP IDENTITY IF EXISTS; ALTER TABLE landing_page_testimonial ALTER COLUMN id DROP DEFAULT IF EXISTS;',
             reverse_sql=''
         ),
         migrations.RunSQL(
