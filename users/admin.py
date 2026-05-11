@@ -17,6 +17,7 @@ class UserAdmin(ModelAdmin):
     )
     search_fields = ('email', 'full_name')
     ordering = ('id',)
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')
 
 
 @admin.register(Notification)
@@ -27,6 +28,7 @@ class NotificationAdmin(ModelAdmin):
     list_filter = ('type', 'is_read', 'created_at')
     search_fields = ('user__email', 'title', 'body')
     ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')
 
 
 @admin.register(NotificationSetting)
@@ -40,3 +42,4 @@ class NotificationSettingAdmin(ModelAdmin):
         'milestone_achievements', 'weekly_summaries'
     )
     search_fields = ('user__email',)
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')

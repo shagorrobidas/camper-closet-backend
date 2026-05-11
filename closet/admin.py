@@ -26,6 +26,7 @@ class ItemCategoryTypeAdmin(ModelAdmin):
     )
     search_fields = ("name", "code")
     ordering = ("name",)
+    readonly_fields = ("created_at", "updated_at", "deleted_at")
     inlines = [ItemCategoryInline]
 
 
@@ -52,6 +53,7 @@ class ItemCategoryAdmin(ModelAdmin):
     )
     autocomplete_fields = ("type", "user")
     ordering = ("-created_at",)
+    readonly_fields = ("created_at", "updated_at", "deleted_at")
     inlines = [ClosetItemInline]
 
 
@@ -85,3 +87,4 @@ class ClosetItemAdmin(ModelAdmin):
     )
     autocomplete_fields = ("user", "main_category", "sub_category")
     ordering = ("-created_at",)
+    readonly_fields = ("created_at", "updated_at", "deleted_at")

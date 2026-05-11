@@ -45,6 +45,7 @@ class SiteConfigurationAdmin(ModelAdmin):
             )
         }),
     )
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')
 
     def has_add_permission(self, request):
         if self.model.objects.count() > 0:
@@ -59,7 +60,7 @@ class SiteConfigurationAdmin(ModelAdmin):
 class ContactMessageAdmin(ModelAdmin):
     list_display = ('name', 'email', 'created_at')
     search_fields = ('name', 'email', 'message')
-    readonly_fields = ('name', 'email', 'message', 'created_at')
+    readonly_fields = ('name', 'email', 'message', 'created_at', 'updated_at', 'deleted_at')
 
     def has_add_permission(self, request):
         return False
@@ -72,3 +73,4 @@ class TestimonialAdmin(ModelAdmin):
     )
     list_filter = ('is_active', 'rating')
     search_fields = ('author_name', 'text')
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')

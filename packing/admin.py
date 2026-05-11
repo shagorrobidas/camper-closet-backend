@@ -11,17 +11,32 @@ from packing.models import (
 class TripTypeAdmin(ModelAdmin):
     list_display = ('name', 'code', 'created_at')
     search_fields = ('name', 'code')
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 class PackingTemplateItemInline(TabularInline):
     model = PackingTemplateItem
     extra = 1
-    raw_id_fields = ('category',)
+    exclude = ('deleted_at',)
+    # raw_id_fields = ('category',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "category":
+            import re
+            match = re.search(r'packingtemplate/([^/]+)/change', request.path)
+            if match:
+                template_id = match.group(1)
+                kwargs["queryset"] = PackingTemplateCategory.objects.filter(template_id=template_id)
+            else:
+                kwargs["queryset"] = PackingTemplateCategory.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class PackingTemplateCategoryInline(TabularInline):
     model = PackingTemplateCategory
     extra = 1
+    exclude = ('deleted_at',)
 
 
 @admin.register(PackingTemplateCategory)
@@ -29,6 +44,8 @@ class PackingTemplateCategoryAdmin(ModelAdmin):
     list_display = ('name', 'template', 'sort_order')
     list_filter = ('template',)
     search_fields = ('name', 'template__title')
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 @admin.register(PackingTemplate)
@@ -50,6 +67,13 @@ class PackingTemplateAdmin(ModelAdmin):
     )
     search_fields = ('title', 'description')
     inlines = [PackingTemplateCategoryInline, PackingTemplateItemInline]
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
+
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
 
 
 @admin.register(PackingTemplateItem)
@@ -74,6 +98,19 @@ class PackingTemplateItemAdmin(ModelAdmin):
         'template__title', 'title', 'note',
         'brand_category__name'
     )
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "category":
+            import re
+            match = re.search(r'packingtemplateitem/([^/]+)/change', request.path)
+            if match:
+                item_id = match.group(1)
+                item = self.model.objects.filter(id=item_id).first()
+                if item:
+                    kwargs["queryset"] = PackingTemplateCategory.objects.filter(template=item.template)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class TripPackingItemInline(TabularInline):
@@ -111,6 +148,8 @@ class TripAdmin(ModelAdmin):
     )
     search_fields = ('name', 'location', 'user__email')
     inlines = [TripPackingItemInline, TripEventInline]
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 class TripPackingItemSelectionInline(TabularInline):
@@ -152,6 +191,8 @@ class TripPackingItemAdmin(ModelAdmin):
         'sub_category',
         'template_item'
     )
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 @admin.register(TripPackingItemSelection)
@@ -165,6 +206,8 @@ class TripPackingItemSelectionAdmin(ModelAdmin):
         'packing_item',
         'closet_item'
     )
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 @admin.register(TripEvent)
@@ -175,3 +218,5 @@ class TripEventAdmin(ModelAdmin):
         'event_type',
         'date'
     )
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)

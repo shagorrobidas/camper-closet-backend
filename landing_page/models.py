@@ -1,7 +1,8 @@
 from django.db import models
+from core.models import BaseModel
 
 
-class SiteConfiguration(models.Model):
+class SiteConfiguration(BaseModel):
     # Social URLs
     facebook_url = models.URLField(blank=True, default='')
     linkedin_url = models.URLField(blank=True, default='')
@@ -133,17 +134,16 @@ class SiteConfiguration(models.Model):
         return obj
 
 
-class ContactMessage(models.Model):
+class ContactMessage(BaseModel):
     name = models.CharField(max_length=255)
     email = models.EmailField()
     message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message from {self.name} ({self.email})"
 
 
-class Testimonial(models.Model):
+class Testimonial(BaseModel):
     author_name = models.CharField(max_length=100)
     author_role = models.CharField(max_length=100)
     author_location = models.CharField(max_length=100)
@@ -153,7 +153,6 @@ class Testimonial(models.Model):
         upload_to='testimonials/', blank=True, null=True
     )
     is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.author_name} - {self.author_role}"

@@ -24,3 +24,15 @@
 .main-sidebar .user-panel .image {
     padding-left: 0 !important;
 }
+
+/* Fix horizontal scroll for tabular inlines in Unfold Admin */
+.unfold-table-container, 
+.inline-group fieldset.module {
+    overflow-x: auto !important;
+    max-width: 100vw !important;
+}
+
+.tabular.inline-related table {
+    width: 100% !important;
+    min-width: 800px; /* Force minimum width to trigger scroll if needed */
+}
