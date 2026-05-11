@@ -73,7 +73,13 @@ def custom_exception_handler(exc: Exception, context: Optional[Any] = None):
                         error_msgs.extend([str(item) for item in v])
                     else:
                         error_msgs.append(str(v))
-                errors = {"message": " ".join(error_msgs)}
+                
+                combined_msg = " ".join(error_msgs)
+                errors = {"message": combined_msg}
+                
+                # If message is still the default, update it with the specific error
+                if message == "An error occurred":
+                    message = combined_msg
             else:
                 errors = None
         elif isinstance(error_data, list):
