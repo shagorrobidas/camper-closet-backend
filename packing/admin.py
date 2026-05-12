@@ -117,6 +117,7 @@ class TripPackingItemInline(TabularInline):
     model = TripPackingItem
     extra = 1
     raw_id_fields = (
+        'category',
         'main_category',
         'sub_category',
         'template_item'
@@ -164,6 +165,7 @@ class TripPackingItemAdmin(ModelAdmin):
         '__str__',
         'trip',
         'status',
+        'category',
         'main_category',
         'sub_category',
         'title',
@@ -187,6 +189,7 @@ class TripPackingItemAdmin(ModelAdmin):
     inlines = [TripPackingItemSelectionInline]
     raw_id_fields = (
         'trip',
+        'category',
         'main_category',
         'sub_category',
         'template_item'
