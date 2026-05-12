@@ -3,9 +3,11 @@ from packing.models import (
     Trip,
     TripPackingItem,
     TripPackingItemSelection,
-    TripType
+    TripType,
+    PackingTemplateCategory
 )
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.db import models
 from django.utils import timezone
 
 
@@ -34,13 +36,13 @@ class TripPackingItemSelectionSerializer(serializers.ModelSerializer):
 
 
 class TripPackingItemSerializer(serializers.ModelSerializer):
-    main_category_name = serializers.CharField(
-        source='main_category.name', read_only=True
-    )
-    sub_category_name = serializers.CharField(
-        source='sub_category.name', read_only=True
-    )
     selections = TripPackingItemSelectionSerializer(many=True, read_only=True)
+    category_name = serializers.CharField(
+        source='template_item.category.name', read_only=True, allow_null=True
+    )
+    category_id = serializers.UUIDField(
+        source='template_item.category.id', read_only=True, allow_null=True
+    )
     shop_urls = serializers.SerializerMethodField()
     show_shop_url = serializers.SerializerMethodField()
 
@@ -49,10 +51,8 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'trip',
-            'main_category',
-            'main_category_name',
-            'sub_category',
-            'sub_category_name',
+            'category_name',
+            'category_id',
             'title',
             'status',
             'template_item',
@@ -89,7 +89,8 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
         return False
 
     def get_shop_urls(self, obj):
-        if obj.template_item and obj.template_item.show_shop_url and obj.template_item.brand_category:
+        # noqa
+        if obj.template_item and obj.template_item.show_shop_url and obj.template_item.brand_category: # noqa
             return list(obj.template_item.brand_category.shop_websites.filter(
                 is_active=True
             ).values_list('website_url', flat=True))
@@ -97,7 +98,9 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if not (instance.template_item and instance.template_item.show_shop_url): 
+        if not (
+            instance.template_item and instance.template_item.show_shop_url
+        ):
             ret.pop('shop_urls', None)
         return ret
 
@@ -117,9 +120,9 @@ class TripPackingItemCreateSerializer(serializers.ModelSerializer):
 
 
 class TripStatisticsSerializer(serializers.Serializer):
-    active_trips = serializers.SerializerMethodField() # trip startdate start and enddate between current date
-    completed_trips = serializers.SerializerMethodField() # if tripe packeing is completed
-    past_trips = serializers.SerializerMethodField() # trip enddate is before current date
+    active_trips = serializers.SerializerMethodField()
+    completed_trips = serializers.SerializerMethodField()
+    past_trips = serializers.SerializerMethodField()
     total_trips = serializers.SerializerMethodField()
 
     def get_active_trips(self, obj):
@@ -178,12 +181,69 @@ class TripSerializer(serializers.ModelSerializer):
         ]
 
 
+class TripPackingCategorySerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='name')
+    packing_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PackingTemplateCategory
+        fields = ['id', 'category', 'sort_order', 'packing_items']
+
+    def get_packing_items(self, obj):
+        trip = self.context.get('trip')
+        if not trip:
+            return []
+        items = TripPackingItem.objects.filter(
+            trip=trip,
+            template_item__category=obj,
+            status='active'
+        ).order_by('sort_order')
+        return TripPackingItemSerializer(
+            items,
+            many=True,
+            context=self.context
+        ).data
+
+
 class TripDetailSerializer(TripSerializer):
-    packing_items = TripPackingItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
     progress = serializers.SerializerMethodField()
 
     class Meta(TripSerializer.Meta):
-        fields = TripSerializer.Meta.fields + ['packing_items', 'progress']
+        fields = TripSerializer.Meta.fields + ['items', 'progress']
+
+    def get_items(self, obj):
+        # Get categories from the template
+        categories = []
+        if obj.template:
+            categories = list(obj.template.categories.all().order_by('sort_order'))
+        
+        # Serialize existing categories
+        context = self.context.copy()
+        context['trip'] = obj
+        serialized_data = TripPackingCategorySerializer(
+            categories, many=True, context=context
+        ).data
+
+        # Handle items without a category (custom items or items with null category)
+        # We include items where template_item is null OR template_item.category is null
+        uncategorized_items = obj.packing_items.filter(
+            status='active'
+        ).filter(
+            Q(template_item__isnull=True) | Q(template_item__category__isnull=True)
+        ).order_by('sort_order')
+
+        if uncategorized_items.exists():
+            serialized_data.append({
+                "id": None,
+                "category": "Uncategorized",
+                "sort_order": 999,
+                "packing_items": TripPackingItemSerializer(
+                    uncategorized_items, many=True, context=self.context
+                ).data
+            })
+
+        return serialized_data
 
     def get_progress(self, obj):
         packing_items = obj.packing_items.filter(status='active')
