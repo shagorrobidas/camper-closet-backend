@@ -22,6 +22,7 @@ from .views import (
     SwitchToChildView,
     SwitchToParentView,
     ProfileView,
+    FirebaseAuthView
 )
 
 urlpatterns = [
@@ -54,7 +55,11 @@ urlpatterns = [
         LoginView.as_view(),
         name='login'
     ),
-
+    path(
+        'login/firebase/',
+        FirebaseAuthView.as_view(),
+        name='login-firebase'
+    ),
     # ── Password Reset ──────────────────────────
     path(
         'change-password/',

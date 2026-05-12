@@ -9,6 +9,12 @@ from django.utils import timezone
 import uuid
 
 
+class AuthProvider(models.TextChoices):
+    EMAIL = 'email', 'Email'
+    GOOGLE = 'google', 'Google'
+    APPLE = 'apple', 'Apple'
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -71,6 +77,11 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         blank=True,
         null=True
     )
+    profile_pic_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True
+    )
     date_of_birth = models.DateField(
         blank=True,
         null=True
@@ -86,7 +97,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     )
     auth_provider = models.CharField(
         max_length=50,
-        default='email'
+        choices=AuthProvider.choices,
+        default=AuthProvider.EMAIL
     )
     username = models.CharField(
         max_length=150,

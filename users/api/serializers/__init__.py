@@ -18,7 +18,7 @@ from .change_password import ChangePasswordSerializer
 from .logout import LogoutSerializer
 from .notification import NotificationSerializer, NotificationSettingSerializer
 from .switch_account import SwitchChildSerializer, SwitchParentSerializer
-
+from .social_auth import FirebaseAuthSerializer
 
 __all__ = [
     'RegisterSerializer',

@@ -75,3 +75,6 @@ celerybeat-schedule
 
 # Django migrations (optional - uncomment if you want to ignore migrations)
 # */migrations/
+
+# firebase key
+serviceAccountKey.json

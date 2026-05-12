@@ -26,6 +26,7 @@ from .switch_account import (
     SwitchToParentView,
     ProfileView
 )
+from.social_auth import FirebaseAuthView
 
 
 __all__ = [
@@ -50,4 +51,5 @@ __all__ = [
     'SwitchToChildView',
     'SwitchToParentView',
     'ProfileView',
+    'FirebaseAuthView',
 ]
