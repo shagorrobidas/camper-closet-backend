@@ -112,7 +112,15 @@ class TripDetailView(ProfileAccessMixin, RetrieveAPIView):
             user = self.get_profile_user(follow_kwarg_pk=False)
             logger.info(f"trip_pk: {trip_pk}")
             logger.info(f"user: {user}")
-            trip = get_object_or_404(Trip, pk=trip_pk, user=user)
+            trip = get_object_or_404(
+                Trip.objects.select_related('template', 'trip_type').prefetch_related(
+                    'template__categories',
+                    'packing_items__template_item__category',
+                    'packing_items__selections__closet_item'
+                ),
+                pk=trip_pk,
+                user=user
+            )
             logger.info(f"trip: {trip}")
             serializer = self.get_serializer(trip)
             return CustomResponse.success(
