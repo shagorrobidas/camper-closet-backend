@@ -37,12 +37,8 @@ class TripPackingItemSelectionSerializer(serializers.ModelSerializer):
 
 class TripPackingItemSerializer(serializers.ModelSerializer):
     selections = TripPackingItemSelectionSerializer(many=True, read_only=True)
-    category_name = serializers.CharField(
-        source='template_item.category.name', read_only=True, allow_null=True
-    )
-    category_id = serializers.UUIDField(
-        source='template_item.category.id', read_only=True, allow_null=True
-    )
+    category_name = serializers.SerializerMethodField()
+    category_id = serializers.SerializerMethodField()
     shop_urls = serializers.SerializerMethodField()
     show_shop_url = serializers.SerializerMethodField()
 
@@ -83,6 +79,20 @@ class TripPackingItemSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    def get_category_name(self, obj):
+        if obj.template_item and obj.template_item.category:
+            return obj.template_item.category.name
+        if obj.category:
+            return obj.category.name
+        return None
+
+    def get_category_id(self, obj):
+        if obj.template_item and obj.template_item.category:
+            return obj.template_item.category.id
+        if obj.category:
+            return obj.category.id
+        return None
+
     def get_show_shop_url(self, obj):
         if obj.template_item:
             return obj.template_item.show_shop_url
@@ -111,6 +121,7 @@ class TripPackingItemCreateSerializer(serializers.ModelSerializer):
         fields = [
             'main_category',
             'sub_category',
+            'category',
             'title',
             'quantity',
             'is_required',
@@ -195,8 +206,9 @@ class TripPackingCategorySerializer(serializers.ModelSerializer):
             return []
         items = TripPackingItem.objects.filter(
             trip=trip,
-            template_item__category=obj,
             status='active'
+        ).filter(
+            Q(template_item__category=obj) | Q(category=obj)
         ).order_by('sort_order')
         return TripPackingItemSerializer(
             items,
@@ -230,7 +242,8 @@ class TripDetailSerializer(TripSerializer):
         uncategorized_items = obj.packing_items.filter(
             status='active'
         ).filter(
-            Q(template_item__isnull=True) | Q(template_item__category__isnull=True)
+            (Q(template_item__isnull=True) | Q(template_item__category__isnull=True)) &
+            Q(category__isnull=True)
         ).order_by('sort_order')
 
         if uncategorized_items.exists():
