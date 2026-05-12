@@ -232,6 +232,14 @@ class TripPackingItem(BaseModel):
         blank=True
     )
 
+    category = models.ForeignKey(
+        PackingTemplateCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='trip_items'
+    )
+
     quantity = models.IntegerField(
         default=0,
         null=True,
