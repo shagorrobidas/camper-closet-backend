@@ -325,11 +325,28 @@ class TripPackingItemCreateView(ProfileAccessMixin, CreateAPIView):
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            item = serializer.save(
-                trip=trip,
-                is_custom_item=True,
-                status='active'
-            )
+            
+            with transaction.atomic():
+                item = serializer.save(
+                    trip=trip,
+                    is_custom_item=True,
+                    status='active'
+                )
+                
+                # If trip has a non-system template, add this item to the template too
+                if trip.template and not trip.template.is_system:
+                    t_item = PackingTemplateItem.objects.create(
+                        template=trip.template,
+                        category=item.category,
+                        title=item.title,
+                        quantity=item.quantity,
+                        is_required=item.is_required,
+                        note=item.note,
+                        sort_order=item.sort_order
+                    )
+                    item.template_item = t_item
+                    item.save(update_fields=['template_item'])
+
             out = TripPackingItemSerializer(item, context={'request': request})
             return CustomResponse.success(
                 data=out.data,
