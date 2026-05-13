@@ -2,20 +2,19 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from django.contrib.auth.tokens import default_token_generator
 from users.api.serializers import (
     ResetPasswordSerializer,
     VerifyPasswordResetOTPSerializer,
     SetNewPasswordSerializer
     
 )
-from users.models import User
+from users.models import User, OTP
 from users.tasks import send_otp_email_task
 from users.utils import (
     create_otp,
-    verify_otp,
-    generate_reset_token
+    verify_otp
 )
-from django.core.cache import cache
 from datetime import timedelta
 from django.utils import timezone
 from core.utils import CustomResponse, custom_exception_handler
@@ -36,13 +35,6 @@ class RequestPasswordView(GenericAPIView):
                 user = User.objects.get(email=email)
                 otp_obj = create_otp(user, 'password_reset')
                 send_otp_email_task(user.id, otp_obj.otp, 'password_reset')
-
-                # Store reset request timestamp in cache
-                cache.set(
-                    f"password_reset_request_{user.id}",
-                    timezone.now(),
-                    3600
-                )
 
                 return CustomResponse.success(
                     message="Password reset OTP has been sent",
@@ -73,12 +65,7 @@ class VerifyPasswordResetOTPView(GenericAPIView):
                 user = User.objects.get(email=email)
                 
                 if verify_otp(user, otp, 'password_reset'):
-                    reset_token = generate_reset_token(user.id)
-                    cache.set(
-                        f"password_reset_token_{user.id}",
-                        reset_token,
-                        3600
-                    )
+                    reset_token = default_token_generator.make_token(user)
                     data = {
                         "reset_token": reset_token,
                         "next_step": "set_new_password"
@@ -112,34 +99,19 @@ class SetNewPasswordView(GenericAPIView):
 
             email = serializer.validated_data['email']
             new_password = serializer.validated_data['new_password']
+            reset_token = serializer.validated_data.get('reset_token')
 
             try:
                 user = User.objects.get(email=email)
-                reset_token = request.data.get('reset_token')
                 
-                if not reset_token:
-                    return CustomResponse.error(
-                        message="Reset token is required",
-                        status_code=status.HTTP_400_BAD_REQUEST
-                    )
-
-                cached_token = cache.get(f"password_reset_token_{user.id}")
-                
-                if not cached_token:
+                if not default_token_generator.check_token(user, reset_token):
                     return CustomResponse.error(
                         message="Password reset token has expired or not found",
                         status_code=status.HTTP_400_BAD_REQUEST
                     )
 
-                if cached_token != reset_token:
-                    return CustomResponse.error(
-                        message="Invalid reset token",
-                        status_code=status.HTTP_400_BAD_REQUEST
-                    )
                 user.set_password(new_password)
                 user.save()
-                cache.delete(f"password_reset_token_{user.id}")
-                cache.delete(f"password_reset_request_{user.id}")
                 return CustomResponse.success(
                     message="Password reset successfully",
                     data={"next_step": "login"},
@@ -169,14 +141,15 @@ class CheckPasswordResetStatusView(GenericAPIView):
                 )
             try:
                 user = User.objects.get(email=email)
-                reset_request_time = cache.get(
-                    f"password_reset_request_{user.id}"
-                )
+                latest_otp = OTP.objects.filter(
+                    user=user,
+                    purpose='password_reset'
+                ).order_by('-created_at').first()
 
-                if reset_request_time:
-                    time_diff = timezone.now() - reset_request_time
+                if latest_otp:
+                    time_diff = timezone.now() - latest_otp.created_at
                     if time_diff > timedelta(hours=1):
-                        data ={
+                        data = {
                             "is_expired": True,
                             "status": "expired",
                             "can_retry": True
