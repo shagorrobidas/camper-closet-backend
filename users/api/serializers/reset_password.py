@@ -12,6 +12,7 @@ class VerifyPasswordResetOTPSerializer(serializers.Serializer):
 
 class SetNewPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    reset_token = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, min_length=6)
     confirm_password = serializers.CharField(required=True)
 
