@@ -34,7 +34,7 @@ class RequestPasswordView(GenericAPIView):
             try:
                 user = User.objects.get(email=email)
                 otp_obj = create_otp(user, 'password_reset')
-                send_otp_email_task(user.id, otp_obj.otp, 'password_reset')
+                # send_otp_email_task(user.id, otp_obj.otp, 'password_reset')
 
                 return CustomResponse.success(
                     message="Password reset OTP has been sent",
