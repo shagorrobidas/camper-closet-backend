@@ -1,18 +1,25 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from users.models import User, OTP, EmailVerification, Notification, NotificationSetting
+from users.models import (
+    User,
+    OTP,
+    EmailVerification,
+    Notification,
+    NotificationSetting,
+    UserSubscriptionHistory
+)
 
 
 @admin.register(User)
 class UserAdmin(ModelAdmin):
     list_display = (
         'pk', 'email', 'role', 'full_name',
-        'is_email_verified',
+        'is_email_verified', 'is_subscribed',
         'is_active', 'is_superuser'
     )
     list_filter = (
         'email', 'full_name',
-        'is_email_verified',
+        'is_email_verified', 'is_subscribed',
         'is_active', 'is_staff', 'is_superuser'
     )
     search_fields = ('email', 'full_name')
@@ -42,4 +49,14 @@ class NotificationSettingAdmin(ModelAdmin):
         'milestone_achievements', 'weekly_summaries'
     )
     search_fields = ('user__email',)
+    readonly_fields = ('created_at', 'updated_at', 'deleted_at')
+
+
+@admin.register(UserSubscriptionHistory)
+class UserSubscriptionHistoryAdmin(ModelAdmin):
+    list_display = (
+        'id', 'user', 'product_id', 'subscription_status', 'status', 'start_time', 'expiry_time'
+    )
+    list_filter = ('subscription_status', 'status', 'start_time', 'expiry_time')
+    search_fields = ('user__email', 'product_id', 'order_id')
     readonly_fields = ('created_at', 'updated_at', 'deleted_at')

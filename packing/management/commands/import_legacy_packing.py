@@ -4,7 +4,7 @@ import traceback
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
-from users.models import User
+from users.models import User, UserSubscriptionHistory
 from packing.models import (
     TripType, Trip, PackingTemplate, 
     PackingTemplateCategory, PackingTemplateItem
@@ -29,6 +29,7 @@ class Command(BaseCommand):
         PackingTemplateCategory.objects.all().delete()
         PackingTemplate.objects.all().delete()
         ClosetItem.objects.all().delete()
+        UserSubscriptionHistory.objects.all().delete()
 
         # Mappings
         user_map = {}
@@ -38,8 +39,10 @@ class Command(BaseCommand):
         item_category_name_map = {}
         legacy_cat_id_name_map = {}
 
-        camping_type, _ = TripType.objects.get_or_create(name='Camping', defaults={'code': 'CAMP'})
-        clothing_main, _ = ItemCategoryType.objects.get_or_create(name='Clothing')
+        camping_type, _ = TripType.objects.get_or_create(
+            name='Camping', defaults={'code': 'CAMP'})
+        clothing_main, _ = ItemCategoryType.objects.get_or_create(
+            name='Clothing')
         
         def get_sub_cat(name):
             name = name or 'Miscellaneous'
@@ -52,7 +55,7 @@ class Command(BaseCommand):
 
         tables = [
             'users', 'camps', 'packing_categories', 'packing_items', 
-            'camper_camps', 'campers', 'camper_closets'
+            'camper_camps', 'campers', 'camper_closets', 'user_subscription_histories'
         ]
         data = {table: [] for table in tables}
         
@@ -79,14 +82,21 @@ class Command(BaseCommand):
                 first_name = self.clean_val(row[1])
                 last_name = self.clean_val(row[2])
                 email = self.clean_val(row[3]).lower()
+                is_sub = True if row[11] == '1' else False
+                
                 user, created = User.objects.get_or_create(
                     email=email,
                     defaults={
                         'full_name': f"{first_name} {last_name or ''}".strip(),
                         'role': 'parent',
                         'is_email_verified': True if row[4] != 'NULL' else False,
+                        'is_subscribed': is_sub,
                     }
                 )
+                if not created and user.is_subscribed != is_sub:
+                    user.is_subscribed = is_sub
+                    user.save(update_fields=['is_subscribed'])
+                    
                 if created:
                     user.set_password('user@1234')
                     user.save()
@@ -213,7 +223,57 @@ class Command(BaseCommand):
                 if closet_fail < 10: # Log first few errors
                     self.stdout.write(f"  Closet Error: {e}")
 
-        self.stdout.write(self.style.SUCCESS(f'Import completed! Closet Success: {closet_success}, Fail: {closet_fail}'))
+        # 7. Import Subscription Histories
+        sub_len = len(data['user_subscription_histories'])
+        self.stdout.write(f"Migrating Subscription Histories ({sub_len} rows)...")
+        sub_success = 0
+        sub_fail = 0
+        for row in data['user_subscription_histories']:
+            try:
+                legacy_user_id = int(row[1])
+                if legacy_user_id in user_map:
+                    user = user_map[legacy_user_id]
+                    
+                    start_time = None
+                    start_str = self.clean_val(row[7])
+                    if start_str:
+                        try:
+                            start_time = datetime.datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')
+                        except:
+                            pass
+                        
+                    expiry_time = None
+                    expiry_str = self.clean_val(row[8])
+                    if expiry_str:
+                        try:
+                            expiry_time = datetime.datetime.strptime(expiry_str, '%Y-%m-%d %H:%M:%S')
+                        except:
+                            pass
+                    
+                    status_val = True if row[13] == '1' else False
+                    
+                    UserSubscriptionHistory.objects.create(
+                        user=user,
+                        subscription_status=self.clean_val(row[2]),
+                        device_type=self.clean_val(row[3]),
+                        product_id=self.clean_val(row[4]),
+                        purchase_token=self.clean_val(row[5]),
+                        order_id=self.clean_val(row[6]),
+                        start_time=start_time,
+                        expiry_time=expiry_time,
+                        price_currency_code=self.clean_val(row[9]),
+                        price_amount=self.clean_val(row[10]),
+                        country_code=self.clean_val(row[11]),
+                        payment_state=self.clean_val(row[12]),
+                        status=status_val
+                    )
+                    sub_success += 1
+            except Exception as e:
+                sub_fail += 1
+                if sub_fail < 10:
+                    self.stdout.write(f"  Subscription Error: {e}")
+
+        self.stdout.write(self.style.SUCCESS(f'Import completed! Closet Success: {closet_success}, Sub Success: {sub_success}'))
 
     def parse_values(self, values_str):
         rows = []

@@ -106,6 +106,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         blank=True,
         null=True
     )
+    is_subscribed = models.BooleanField(
+        default=False
+    )
 
     is_staff = models.BooleanField(
         default=False
@@ -236,3 +239,26 @@ class NotificationSetting(BaseModel):
 
     def __str__(self):
         return f"Settings for {self.user.email}"
+
+
+class UserSubscriptionHistory(BaseModel):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscription_histories'
+    )
+    subscription_status = models.CharField(max_length=255, blank=True, null=True)
+    device_type = models.CharField(max_length=255, blank=True, null=True)
+    product_id = models.CharField(max_length=255)
+    purchase_token = models.CharField(max_length=255, blank=True, null=True)
+    order_id = models.CharField(max_length=255)
+    start_time = models.DateTimeField(null=True, blank=True)
+    expiry_time = models.DateTimeField(null=True, blank=True)
+    price_currency_code = models.CharField(max_length=255, blank=True, null=True)
+    price_amount = models.CharField(max_length=255, blank=True, null=True)
+    country_code = models.CharField(max_length=255, blank=True, null=True)
+    payment_state = models.CharField(max_length=255, blank=True, null=True)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Subscription {self.product_id} for {self.user.email}"
