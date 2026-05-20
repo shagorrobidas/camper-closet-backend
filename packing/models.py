@@ -183,6 +183,9 @@ class PackingTemplateItem(BaseModel):
 
     sort_order = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ['title']
+
     def __str__(self):
         if self.title:
             return f"{self.template.title} - {self.title}"

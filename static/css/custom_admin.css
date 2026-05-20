@@ -1,0 +1,33 @@
+/* Global Django Admin / Unfold Red Theme Delete Button Customizations */
+
+/* 1. Standard Django & Unfold Delete Buttons and Links */
+.deletelink,
+a.deletelink,
+button.deletelink,
+[class*="deletelink"],
+[class*="delete-link"],
+button[name="_delete"],
+a[href*="/delete/"],
+a[id*="delete"],
+button[id*="delete"] {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Hover and active states */
+.deletelink:hover,
+a.deletelink:hover,
+button.deletelink:hover,
+[class*="deletelink"]:hover,
+[class*="delete-link"]:hover,
+a[href*="/delete/"]:hover,
+a[id*="delete"]:hover,
+button[id*="delete"]:hover {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2) !important;
+}

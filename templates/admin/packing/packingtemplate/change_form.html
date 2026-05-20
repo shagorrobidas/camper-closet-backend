@@ -55,72 +55,72 @@
         }
 
         /* Inputs, Dropdowns and selects background overrides in dark mode */
-        .dark input[type="text"],
-        .dark input[type="number"],
-        .dark input[type="url"],
-        .dark select {
+        .dark .saas-bg input[type="text"],
+        .dark .saas-bg input[type="number"],
+        .dark .saas-bg input[type="url"],
+        .dark .saas-bg select {
             background-color: #1f2937 !important;
             color: #f3f4f6 !important;
             border-color: #374151 !important;
         }
 
-        .dark input[type="text"]::placeholder,
-        .dark input[type="url"]::placeholder {
+        .dark .saas-bg input[type="text"]::placeholder,
+        .dark .saas-bg input[type="url"]::placeholder {
             color: #6b7280 !important;
         }
 
-        .dark input:focus,
-        .dark select:focus {
+        .dark .saas-bg input:focus,
+        .dark .saas-bg select:focus {
             border-color: #6366f1 !important;
             background-color: #111827 !important;
             outline: none !important;
         }
 
         /* Table header and row overrides in dark mode */
-        .dark th {
+        .dark .saas-bg th {
             background-color: #1f2937 !important;
             color: #9ca3af !important;
             border-color: #374151 !important;
         }
 
-        .dark td {
+        .dark .saas-bg td {
             border-color: #1f2937 !important;
         }
 
-        .dark tr:hover {
+        .dark .saas-bg tr:hover {
             background-color: rgba(31, 41, 55, 0.5) !important;
         }
 
         /* Border colors in dark mode */
-        .dark .border-slate-100 {
+        .dark .saas-bg .border-slate-100 {
             border-color: #1f2937 !important;
         }
-        .dark .border-slate-200 {
+        .dark .saas-bg .border-slate-200 {
             border-color: #1f2937 !important;
         }
 
         /* Text colors in dark mode */
-        .dark .text-slate-900 {
+        .dark .saas-bg .text-slate-900 {
             color: #f8fafc !important;
         }
-        .dark .text-slate-800 {
+        .dark .saas-bg .text-slate-800 {
             color: #f3f4f6 !important;
         }
-        .dark .text-slate-700 {
+        .dark .saas-bg .text-slate-700 {
             color: #cbd5e1 !important;
         }
-        .dark .text-slate-600 {
+        .dark .saas-bg .text-slate-600 {
             color: #94a3b8 !important;
         }
-        .dark .text-slate-500 {
+        .dark .saas-bg .text-slate-500 {
             color: #64748b !important;
         }
-        .dark .text-slate-400 {
+        .dark .saas-bg .text-slate-400 {
             color: #4b5563 !important;
         }
 
         /* Utility classes in dark mode */
-        .dark .bg-slate-50 {
+        .dark .saas-bg .bg-slate-50 {
             background-color: #1f2937 !important;
         }
 
@@ -129,6 +129,125 @@
         }
         .dark .saas-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #6b7280;
+        }
+
+        /* DEVELOPER STRUCTURAL ACCORDION VIEW STYLES */
+        .developer-structural-view {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+        
+        .developer-structural-view-btn {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+        }
+        
+        .developer-structural-view-btn:hover {
+            border-color: #0f172a !important;
+            color: #0f172a !important;
+        }
+
+        /* Support class-based dark mode */
+        .dark .developer-structural-view {
+            background-color: #0d121f !important;
+            border: 1px solid #1f2937 !important;
+            color: #cbd5e1 !important;
+        }
+        
+        .dark .developer-structural-view-btn {
+            background-color: #0d121f !important;
+            border: 1px solid #1f2937 !important;
+            color: #94a3b8 !important;
+        }
+        
+        .dark .developer-structural-view-btn:hover {
+            border-color: #cbd5e1 !important;
+            color: #cbd5e1 !important;
+        }
+
+        /* Support media-preferenced dark mode for FULL UI & Developer view */
+        @media (prefers-color-scheme: dark) {
+            .saas-bg {
+                background-color: #090d16 !important;
+                color: #cbd5e1 !important;
+            }
+            .saas-card {
+                background-color: #111827 !important;
+                border-color: #1f2937 !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+            }
+            .saas-bg input[type="text"],
+            .saas-bg input[type="number"],
+            .saas-bg input[type="url"],
+            .saas-bg select {
+                background-color: #1f2937 !important;
+                color: #f3f4f6 !important;
+                border-color: #374151 !important;
+            }
+            .saas-bg input[type="text"]::placeholder,
+            .saas-bg input[type="url"]::placeholder {
+                color: #6b7280 !important;
+            }
+            .saas-bg input:focus,
+            .saas-bg select:focus {
+                border-color: #6366f1 !important;
+                background-color: #111827 !important;
+                outline: none !important;
+            }
+            .saas-bg th {
+                background-color: #1f2937 !important;
+                color: #9ca3af !important;
+                border-color: #374151 !important;
+            }
+            .saas-bg td {
+                border-color: #1f2937 !important;
+            }
+            .saas-bg tr:hover {
+                background-color: rgba(31, 41, 55, 0.5) !important;
+            }
+            .saas-bg .border-slate-100 {
+                border-color: #1f2937 !important;
+            }
+            .saas-bg .border-slate-200 {
+                border-color: #1f2937 !important;
+            }
+            .saas-bg .text-slate-900 {
+                color: #f8fafc !important;
+            }
+            .saas-bg .text-slate-800 {
+                color: #f3f4f6 !important;
+            }
+            .saas-bg .text-slate-700 {
+                color: #cbd5e1 !important;
+            }
+            .saas-bg .text-slate-600 {
+                color: #94a3b8 !important;
+            }
+            .saas-bg .text-slate-500 {
+                color: #64748b !important;
+            }
+            .saas-bg .text-slate-400 {
+                color: #4b5563 !important;
+            }
+            .saas-bg .bg-slate-50 {
+                background-color: #1f2937 !important;
+            }
+            .developer-structural-view {
+                background-color: #0d121f !important;
+                border: 1px solid #1f2937 !important;
+                color: #cbd5e1 !important;
+            }
+            .developer-structural-view-btn {
+                background-color: #0d121f !important;
+                border: 1px solid #1f2937 !important;
+                color: #94a3b8 !important;
+            }
+            .developer-structural-view-btn:hover {
+                border-color: #cbd5e1 !important;
+                color: #cbd5e1 !important;
+            }
         }
     </style>
 {% endblock %}
@@ -171,17 +290,8 @@
                             </div>
                         </div>
 
-                        <!-- Actions (Reorder and Update) -->
+                        <!-- Actions (Update) -->
                         <div class="flex items-center gap-3">
-                            <button 
-                                type="button" 
-                                @click="triggerReorder()" 
-                                class="saas-input h-10 px-4 border border-slate-200 dark:border-slate-800 hover:border-slate-800 dark:hover:border-slate-500 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-350 hover:text-slate-900 dark:hover:text-slate-100 bg-white dark:bg-slate-900 transition duration-200 flex items-center gap-2"
-                            >
-                                <span class="material-symbols-outlined text-sm">reorder</span>
-                                <span>Reorder Alphabetically</span>
-                            </button>
-                            
                             <button 
                                 type="button" 
                                 @click="submitForm()" 
@@ -196,7 +306,7 @@
                     <!-- 2. MODEL-WISE SETTINGS GRID -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 items-end pb-3">
                         <!-- Camp Name Input -->
-                        <div class="flex flex-col xl:col-span-2">
+                        <div class="flex flex-col xl:col-span-3">
                             <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Camp Name</label>
                             <input 
                                 type="text" 
@@ -237,15 +347,8 @@
                             </select>
                         </div>
 
-                        <!-- Sort Order Input -->
-                        <div class="flex flex-col">
-                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Sort Order</label>
-                            <input 
-                                type="number" 
-                                x-model.number="sortOrder" 
-                                class="h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-medium w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
-                            >
-                        </div>
+                        <!-- Sort Order Input (Hidden) -->
+                        <input type="hidden" x-model.number="sortOrder">
 
                         <!-- Is System Template Toggle -->
                         <div class="flex items-center justify-between h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg w-full cursor-pointer hover:border-slate-350 dark:hover:border-slate-700 transition duration-150 select-none" @click="isSystem = !isSystem">
@@ -276,6 +379,7 @@
 
                     <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
 
+                    {% comment %}
                     <!-- 3. DYNAMIC CATEGORIES TABULAR PANEL -->
                     <div class="space-y-4 pt-2">
                         <div class="flex items-center justify-between">
@@ -330,7 +434,7 @@
                                                 <button 
                                                     type="button" 
                                                     @click.stop="deleteCategory(cat.id)" 
-                                                    class="w-7 h-7 rounded-md text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition duration-200 mx-auto"
+                                                    class="w-7 h-7 rounded-md text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition duration-200 mx-auto"
                                                     title="Delete Category"
                                                 >
                                                     <span class="material-symbols-outlined text-sm font-medium">delete</span>
@@ -356,6 +460,7 @@
                     </div>
 
                     <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
+                    {% endcomment %}
 
                     <!-- 4. DYNAMIC ITEMS TABULAR PANEL -->
                     <div class="space-y-4 pt-2">
@@ -491,7 +596,7 @@
                                                 <button 
                                                     type="button" 
                                                     @click="deleteItem(item.id)" 
-                                                    class="w-7 h-7 rounded-md text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition duration-200 mx-auto"
+                                                    class="w-7 h-7 rounded-md text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center justify-center transition duration-200 mx-auto"
                                                     title="Delete Item"
                                                 >
                                                     <span class="material-symbols-outlined text-sm font-medium">delete</span>
@@ -704,7 +809,7 @@
             <button 
                 type="button"
                 @click="open = !open" 
-                class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-slate-350 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-800 dark:hover:border-slate-200 transition duration-300 shadow-sm"
+                class="developer-structural-view-btn w-full flex items-center justify-between px-6 py-4 rounded-2xl transition duration-300 shadow-sm"
             >
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-slate-500 font-normal">construction</span>
@@ -727,7 +832,7 @@
             x-transition:enter="transition ease-out duration-200 transform"
             x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-            class="mt-4 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm"
+            class="developer-structural-view mt-4 p-6 rounded-2xl shadow-sm"
         >
             {{ block.super }}
         </div>
