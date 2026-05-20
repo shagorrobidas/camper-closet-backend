@@ -1,0 +1,177 @@
+{% extends "unfold/layouts/base.html" %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+<style>
+    .font-poppins {
+        font-family: 'Poppins', sans-serif;
+    }
+    .font-inter {
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
+<div class="px-6 py-16 max-w-3xl mx-auto font-inter min-h-[80vh] flex flex-col justify-center">
+    <!-- Header Section -->
+    <div class="mb-10 text-center relative z-10">
+        <div class="inline-flex items-center space-x-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+            <span class="material-symbols-outlined text-[14px] leading-none">auto_awesome</span>
+            <span>AI-Powered Extraction</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white font-jakarta tracking-tight">
+            Generate Packing Template
+        </h1>
+    </div>
+
+    <!-- Main Centered Container -->
+    <div class="relative w-full max-w-2xl mx-auto">
+        <!-- Decorative Ambient Glow -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-[2rem] blur opacity-20 dark:opacity-30"></div>
+        
+        <!-- Glassmorphism Card -->
+        <div class="relative glassmorphism rounded-[2rem] p-8 md:p-10 border border-white/40 dark:border-gray-800/60 shadow-2xl transition-all duration-300">
+            <form method="post" enctype="multipart/form-data" class="space-y-6" id="upload_form">
+                {% csrf_token %}
+                
+                <!-- File Upload Box -->
+                <div class="group relative rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 p-14 text-center transition-all duration-300 hover:border-indigo-500 premium-gradient-bg cursor-pointer overflow-hidden" id="dropzone">
+                    <input type="file" name="packing_file" id="packing_file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept=".pdf,.png,.jpg,.jpeg,.bmp,.webp" required onchange="handleFileSelected(this)">
+                    
+                    <div class="space-y-4 pointer-events-none relative z-0">
+                        <!-- Icon and Animation -->
+                        <div class="w-20 h-20 mx-auto rounded-full bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-all duration-300 group-hover:scale-110 group-hover:shadow-indigo-500/20">
+                            <span class="material-symbols-outlined" style="font-size: 36px;">cloud_upload</span>
+                        </div>
+                        
+                        <div class="space-y-1.5">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 font-jakarta tracking-tight" id="file_label_text">
+                                Drop your packing list here
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                                or <span class="text-indigo-600 dark:text-indigo-400 font-semibold underline decoration-2 decoration-indigo-200 dark:decoration-indigo-800/60">browse file</span> from device
+                            </p>
+                        </div>
+                        
+                        <div class="text-[11px] uppercase tracking-wider font-bold text-gray-400 dark:text-gray-500 pt-2">
+                            PDF, PNG, JPG (UP TO 20MB)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected File Preview Card (Hidden by default) -->
+                <div id="file_preview_card" class="hidden flex items-center justify-between p-4 bg-white/60 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700/50 rounded-xl transition-all duration-300 backdrop-blur-sm">
+                    <div class="flex items-center space-x-4 min-w-0">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-xl">description</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gray-900 dark:text-white truncate" id="preview_filename"></p>
+                            <p class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider" id="preview_filesize"></p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-gray-400 hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-full hover:bg-white dark:hover:bg-gray-800 transition duration-150 shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-gray-700" onclick="removeSelectedFile()">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
+
+                <!-- Interactive Action Buttons -->
+                <div class="flex items-center justify-between pt-2">
+                    <a href="{% url 'admin:packing_packingtemplate_changelist' %}" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-semibold text-sm transition-colors duration-200 px-2 py-1">
+                        Cancel
+                    </a>
+                    <button type="submit" id="submit_btn" class="bg-gray-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-xl hover:shadow-indigo-500/25 transition-all duration-300 flex items-center space-x-2 cursor-pointer transform hover:-translate-y-0.5">
+                        <span class="material-symbols-outlined text-[18px] leading-none">auto_awesome</span>
+                        <span>Extract Document</span>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Loading Overlay Card (Animated, Hidden by default) -->
+            <div id="loading_card" class="hidden absolute inset-0 z-20 glassmorphism rounded-[2rem] flex flex-col items-center justify-center p-8 text-center space-y-6 animate-pulse">
+                <div class="relative w-24 h-24 mx-auto">
+                    <!-- Multi-layer Spinner -->
+                    <div class="absolute inset-0 rounded-full border-4 border-gray-200/50 dark:border-gray-700/50"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-t-indigo-600 dark:border-t-indigo-400 animate-spin"></div>
+                    <!-- Inner pulsating glow -->
+                    <div class="absolute inset-4 rounded-full bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center animate-pulse">
+                        <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-2xl">auto_awesome</span>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-xl font-extrabold text-gray-900 dark:text-white font-jakarta tracking-tight">Analyzing Document</h3>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-300 max-w-sm mx-auto">
+                        Extracting items and categorizing data...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag and drop event handlers
+    const dropzone = document.getElementById('dropzone');
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, e => {
+            e.preventDefault();
+            dropzone.classList.add('border-indigo-500', 'bg-indigo-50/20');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, e => {
+            e.preventDefault();
+            dropzone.classList.remove('border-indigo-500', 'bg-indigo-50/20');
+        }, false);
+    });
+
+    function handleFileSelected(input) {
+        if (input.files && input.files.length > 0) {
+            const file = input.files[0];
+            document.getElementById('preview_filename').textContent = file.name;
+            document.getElementById('preview_filesize').textContent = formatBytes(file.size);
+            
+            document.getElementById('file_preview_card').classList.remove('hidden');
+            document.getElementById('dropzone').classList.add('hidden');
+        }
+    }
+
+    function removeSelectedFile() {
+        const fileInput = document.getElementById('packing_file');
+        fileInput.value = ''; // Clear value
+        
+        document.getElementById('file_preview_card').classList.add('hidden');
+        document.getElementById('dropzone').classList.remove('hidden');
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // Show loading spinner upon form submission
+    document.getElementById('upload_form').addEventListener('submit', function(e) {
+        const fileInput = document.getElementById('packing_file');
+        if (fileInput.files && fileInput.files.length > 0) {
+            // Hide form card content, show loader
+            document.getElementById('submit_btn').disabled = true;
+            document.getElementById('submit_btn').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('loading_card').classList.remove('hidden');
+            
+            // Allow form submission to proceed
+        } else {
+            e.preventDefault();
+            alert('Please select a file to upload.');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,735 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- Load clean Poppins & Inter typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Clean SaaS Scrollbar styling */
+        .saas-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .saas-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .saas-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .saas-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Light minimalist theme & dark mode theme styles */
+        .saas-bg {
+            background-color: #f8fafc;
+        }
+        
+        .saas-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* PERFECT HAND-CRAFTED DARK THEME STYLES - ROBUST OVERRIDES FOR DARK MODE CLASS */
+        .dark .saas-bg {
+            background-color: #090d16 !important;
+            color: #cbd5e1 !important;
+        }
+        
+        .dark .saas-card {
+            background-color: #111827 !important;
+            border-color: #1f2937 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Inputs, Dropdowns and selects background overrides in dark mode */
+        .dark input[type="text"],
+        .dark input[type="number"],
+        .dark input[type="url"],
+        .dark select {
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+            border-color: #374151 !important;
+        }
+
+        .dark input[type="text"]::placeholder,
+        .dark input[type="url"]::placeholder {
+            color: #6b7280 !important;
+        }
+
+        .dark input:focus,
+        .dark select:focus {
+            border-color: #6366f1 !important;
+            background-color: #111827 !important;
+            outline: none !important;
+        }
+
+        /* Table header and row overrides in dark mode */
+        .dark th {
+            background-color: #1f2937 !important;
+            color: #9ca3af !important;
+            border-color: #374151 !important;
+        }
+
+        .dark td {
+            border-color: #1f2937 !important;
+        }
+
+        .dark tr:hover {
+            background-color: rgba(31, 41, 55, 0.5) !important;
+        }
+
+        /* Border colors in dark mode */
+        .dark .border-slate-100 {
+            border-color: #1f2937 !important;
+        }
+        .dark .border-slate-200 {
+            border-color: #1f2937 !important;
+        }
+
+        /* Text colors in dark mode */
+        .dark .text-slate-900 {
+            color: #f8fafc !important;
+        }
+        .dark .text-slate-800 {
+            color: #f3f4f6 !important;
+        }
+        .dark .text-slate-700 {
+            color: #cbd5e1 !important;
+        }
+        .dark .text-slate-600 {
+            color: #94a3b8 !important;
+        }
+        .dark .text-slate-500 {
+            color: #64748b !important;
+        }
+        .dark .text-slate-400 {
+            color: #4b5563 !important;
+        }
+
+        /* Utility classes in dark mode */
+        .dark .bg-slate-50 {
+            background-color: #1f2937 !important;
+        }
+
+        .dark .saas-scrollbar::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        .dark .saas-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if original %}
+        <!-- Modern SaaS Admin Dashboard Wrapper -->
+        <div 
+            x-data="campDashboard()" 
+            x-init="init()"
+            class="saas-bg font-inter min-h-screen p-6 md:p-8 -m-6 md:-m-8 text-slate-700 dark:text-slate-350 relative z-20 transition-colors duration-200"
+        >
+            <!-- Hidden django submit form to execute custom atomic database saves -->
+            <form id="custom-save-form" method="POST" action="" class="hidden">
+                {% csrf_token %}
+                <input type="hidden" name="_save_custom" value="1">
+                <input type="hidden" name="camp_name" :value="campName">
+                <input type="hidden" name="season" :value="selectedSeason">
+                <input type="hidden" name="trip_type_id" :value="selectedTripType">
+                <input type="hidden" name="is_system" :value="isSystem ? '1' : '0'">
+                <input type="hidden" name="sort_order" :value="sortOrder">
+                <input type="hidden" name="description" :value="description">
+                <input type="hidden" name="payload" :value="JSON.stringify({categories: categories, items: items})">
+            </form>
+
+            <div class="max-w-[1600px] mx-auto">
+                
+                <!-- SINGLE UNIFIED CLEAN & MINIMAL SAAS CARD -->
+                <div class="saas-card rounded-2xl p-8 space-y-8">
+                    
+                    <!-- 1. HEADER SECTION -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-5">
+                        <!-- Closet Dashboard Badge -->
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-[#0B1528] dark:bg-indigo-600 flex items-center justify-center text-white shadow-sm flex-shrink-0">
+                                <span class="material-symbols-outlined text-2xl font-light">explore</span>
+                            </div>
+                            <div>
+                                <h1 class="font-poppins text-base font-semibold text-slate-900 dark:text-slate-100 leading-none">Camp Packing List Management</h1>
+                            </div>
+                        </div>
+
+                        <!-- Actions (Reorder and Update) -->
+                        <div class="flex items-center gap-3">
+                            <button 
+                                type="button" 
+                                @click="triggerReorder()" 
+                                class="saas-input h-10 px-4 border border-slate-200 dark:border-slate-800 hover:border-slate-800 dark:hover:border-slate-500 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-350 hover:text-slate-900 dark:hover:text-slate-100 bg-white dark:bg-slate-900 transition duration-200 flex items-center gap-2"
+                            >
+                                <span class="material-symbols-outlined text-sm">reorder</span>
+                                <span>Reorder Alphabetically</span>
+                            </button>
+                            
+                            <button 
+                                type="button" 
+                                @click="submitForm()" 
+                                class="h-10 px-5 bg-[#0B1528] dark:bg-indigo-600 hover:bg-[#162540] dark:hover:bg-indigo-500 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow transition duration-200 flex items-center gap-2"
+                            >
+                                <span class="material-symbols-outlined text-sm font-bold">check</span>
+                                <span>Update Changes</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. MODEL-WISE SETTINGS GRID -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 items-end pb-3">
+                        <!-- Camp Name Input -->
+                        <div class="flex flex-col xl:col-span-2">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Camp Name</label>
+                            <input 
+                                type="text" 
+                                x-model="campName" 
+                                class="h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-medium w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 dark:focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
+                                placeholder="Enter camp name"
+                            >
+                        </div>
+
+                        <!-- Trip Type Dropdown -->
+                        <div class="flex flex-col">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Trip Type</label>
+                            <select 
+                                x-model="selectedTripType" 
+                                class="h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-medium w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
+                            >
+                                <option value="">None (Select Trip Type)</option>
+                                {% for tt in trip_types %}
+                                    <option value="{{ tt.id }}">{{ tt.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Season Choices Dropdown -->
+                        <div class="flex flex-col">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Season</label>
+                            <select 
+                                x-model="selectedSeason" 
+                                class="h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-medium w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
+                            >
+                                <option value="Summer">Summer</option>
+                                <option value="Winter">Winter</option>
+                                <option value="Rainy">Rainy</option>
+                                <option value="Autumn">Autumn</option>
+                                <option value="Late Autumn">Late Autumn</option>
+                                <option value="Spring">Spring</option>
+                                <option value="None">None</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort Order Input -->
+                        <div class="flex flex-col">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Sort Order</label>
+                            <input 
+                                type="number" 
+                                x-model.number="sortOrder" 
+                                class="h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-medium w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
+                            >
+                        </div>
+
+                        <!-- Is System Template Toggle -->
+                        <div class="flex items-center justify-between h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg w-full cursor-pointer hover:border-slate-350 dark:hover:border-slate-700 transition duration-150 select-none" @click="isSystem = !isSystem">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">System Template</span>
+                            <!-- Toggle Switch -->
+                            <div 
+                                class="w-9 h-5 rounded-full p-0.5 transition-colors duration-200 flex-shrink-0"
+                                :class="isSystem ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-slate-300 dark:bg-slate-800'"
+                            >
+                                <div 
+                                    class="bg-white w-4 h-4 rounded-full shadow-sm transform duration-200"
+                                    :class="isSystem ? 'translate-x-4' : 'translate-x-0'"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <!-- Description TextField Input -->
+                        <div class="flex flex-col md:col-span-2 xl:col-span-6 mt-2">
+                            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Description</label>
+                            <input 
+                                type="text" 
+                                x-model="description" 
+                                class="h-10 px-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-800 dark:text-slate-200 font-normal w-full focus:border-slate-800 dark:focus:border-indigo-500 focus:ring-1 focus:ring-slate-800/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200"
+                                placeholder="Add template overview..."
+                            >
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
+
+                    <!-- 3. DYNAMIC CATEGORIES TABULAR PANEL -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center justify-between">
+                            <h2 class="font-poppins text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base text-slate-500 dark:text-slate-400">folder_open</span>
+                                <span>Categories</span>
+                            </h2>
+                        </div>
+
+                        <div class="saas-scrollbar overflow-x-auto border border-slate-100 dark:border-slate-800 rounded-xl">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="saas-scrollbar bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+
+                                        <th class="py-3.5 px-4">Category Name</th>
+                                        <th class="py-3.5 px-4 w-40">Sort Order</th>
+                                        <th class="py-3.5 px-4 w-14 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/40 text-xs">
+                                    <template x-for="(cat, index) in categories" :key="cat.id">
+                                        <tr 
+                                            class="hover:saas-bg/40 hover:bg-slate-50/40 dark:hover:bg-slate-950/40 transition duration-100 cursor-pointer"
+                                            :class="activeCategoryId === cat.id ? 'bg-indigo-500/5 dark:bg-indigo-500/10' : ''"
+                                            @click="activeCategoryId = cat.id"
+                                        >
+
+                                            
+                                            <!-- Category name input -->
+                                            <td class="py-2.5 px-2">
+                                                <input 
+                                                    type="text" 
+                                                    x-model="cat.name" 
+                                                    class="w-full h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 transition duration-150 uppercase tracking-wider"
+                                                    placeholder="Enter category name"
+                                                    @click.stop
+                                                >
+                                            </td>
+
+                                            <!-- Sort order field -->
+                                            <td class="py-2.5 px-2">
+                                                <input 
+                                                    type="number" 
+                                                    x-model.number="cat.sort_order" 
+                                                    class="w-full h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-100 transition duration-150"
+                                                    @click.stop
+                                                >
+                                            </td>
+
+                                            <!-- Delete category action -->
+                                            <td class="py-2.5 px-2 text-center">
+                                                <button 
+                                                    type="button" 
+                                                    @click.stop="deleteCategory(cat.id)" 
+                                                    class="w-7 h-7 rounded-md text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition duration-200 mx-auto"
+                                                    title="Delete Category"
+                                                >
+                                                    <span class="material-symbols-outlined text-sm font-medium">delete</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add Category Trigger -->
+                        <div class="flex justify-between items-center pt-2">
+                            <button 
+                                type="button" 
+                                @click="addCategory()" 
+                                class="h-9 px-4 border border-dashed border-slate-300 dark:border-slate-850 hover:border-slate-800 dark:hover:border-slate-200 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2 transition duration-200 bg-white dark:bg-slate-900"
+                            >
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                <span>Add Category</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
+
+                    <!-- 4. DYNAMIC ITEMS TABULAR PANEL -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <h2 class="font-poppins text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-base text-slate-500 dark:text-slate-400">list_alt</span>
+                                    <span>Packing Items</span>
+                                </h2>
+                                <span class="text-xs bg-[#0B1528]/10 dark:bg-indigo-500/20 text-[#0B1528] dark:text-indigo-400 px-2.5 py-0.5 rounded-full font-medium" x-text="getCategoryLabel()"></span>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <!-- Category Filter Selection Box for Items -->
+                                <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800 text-xs hidden sm:flex">
+                                    <span class="text-slate-400 uppercase font-bold text-[9px] tracking-wider">Active Filter:</span>
+                                    <select 
+                                        x-model="activeCategoryId" 
+                                        class="bg-transparent border-0 p-0 text-slate-800 dark:text-slate-200 font-semibold focus:ring-0 cursor-pointer"
+                                    >
+                                        <option value="all">All Categories</option>
+                                        <option value="uncategorized">Uncategorized</option>
+                                        <template x-for="cat in categories" :key="cat.id">
+                                            <option :value="cat.id" x-text="cat.name"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <!-- Live Search Input -->
+                                <div class="relative w-full sm:w-64">
+                                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-sm">search</span>
+                                    <input 
+                                        type="text" 
+                                        x-model="searchQuery" 
+                                        placeholder="Search packing items..." 
+                                        class="w-full h-9 pl-9 pr-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 rounded-lg text-xs font-medium transition duration-150 text-slate-800 dark:text-slate-200"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clean Responsive SaaS Table -->
+                        <div class="saas-scrollbar overflow-x-auto border border-slate-100 dark:border-slate-800 rounded-xl">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="saas-scrollbar bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3.5 px-4 w-36">Category</th>
+                                        <th class="py-3.5 px-4 min-w-[200px]">Packing Items</th>
+                                        <th class="py-3.5 px-4 w-16">Qty</th>
+                                        <th class="py-3.5 px-4 w-36">Note</th>
+                                        <th class="py-3.5 px-4 w-36">Sentences</th>
+                                        <th class="py-3.5 px-4 w-20 text-center">Shop Now Enable</th>
+
+                                        <th class="py-3.5 px-4 w-14 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/40 text-xs">
+                                    <template x-for="(item, index) in filteredItems()" :key="item.id">
+                                        <tr class="hover:saas-bg/40 hover:bg-slate-50/40 dark:hover:bg-slate-950/40 transition duration-100">
+                                            <!-- Category Select Dropdown (Avoid Alpine race condition via static render fallback) -->
+                                            <td class="py-2.5 px-2">
+                                                <select 
+                                                    x-model="item.category_id" 
+                                                    class="w-full h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-medium transition duration-150 text-slate-800 dark:text-slate-200"
+                                                >
+                                                    <option value="">UNCATEGORIZED</option>
+                                                    {% for category in original.categories.all %}
+                                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                                    {% endfor %}
+                                                    <!-- Dynamic rendering fallback for newly added unsaved categories -->
+                                                    <template x-for="cat in categories.filter(c => c.id.startsWith('temp_'))" :key="cat.id">
+                                                        <option :value="cat.id" x-text="cat.name"></option>
+                                                    </template>
+                                                </select>
+                                            </td>
+
+                                            <!-- Packing Item Title Input -->
+                                            <td class="py-2.5 px-2">
+                                                <input 
+                                                    type="text" 
+                                                    x-model="item.title" 
+                                                    class="w-full h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-semibold text-slate-800 dark:text-slate-200 transition duration-150"
+                                                    placeholder="Enter item title"
+                                                >
+                                            </td>
+
+                                            <!-- Quantity Number Input -->
+                                            <td class="py-2.5 px-2">
+                                                <input 
+                                                    type="number" 
+                                                    x-model.number="item.quantity" 
+                                                    class="w-full h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs text-center font-bold text-slate-800 dark:text-slate-200 transition duration-150"
+                                                    min="0"
+                                                >
+                                            </td>
+
+                                            <!-- Note Text Input -->
+                                            <td class="py-2.5 px-2">
+                                                <input 
+                                                    type="text" 
+                                                    x-model="item.note" 
+                                                    class="w-full h-8 px-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs text-slate-650 dark:text-slate-300 transition duration-150"
+                                                    placeholder="Item note"
+                                                >
+                                            </td>
+
+                                            <!-- Brand Category Select Dropdown (Added as requested) -->
+                                            <td class="py-2.5 px-2">
+                                                <select 
+                                                    x-model="item.brand_category_id" 
+                                                    class="w-full h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-medium transition duration-150 text-slate-800 dark:text-slate-200"
+                                                >
+                                                    <option value="">NONE</option>
+                                                    {% for bc in brand_categories %}
+                                                        <option value="{{ bc.id }}">{{ bc.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+
+                                            <!-- Shop Now Enable Toggle (show_shop_url) -->
+                                            <td class="py-2.5 px-2 text-center">
+                                                <input 
+                                                    type="checkbox" 
+                                                    x-model="item.show_shop_url" 
+                                                    class="w-4 h-4 rounded bg-slate-100 dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-slate-[#0B1528] dark:text-indigo-650 focus:ring-[#0B1528] dark:focus:ring-indigo-500 cursor-pointer"
+                                                >
+                                            </td>
+
+
+
+                                            <!-- Delete Red Trash Icon -->
+                                            <td class="py-2.5 px-2 text-center">
+                                                <button 
+                                                    type="button" 
+                                                    @click="deleteItem(item.id)" 
+                                                    class="w-7 h-7 rounded-md text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center transition duration-200 mx-auto"
+                                                    title="Delete Item"
+                                                >
+                                                    <span class="material-symbols-outlined text-sm font-medium">delete</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add Packing Item Trigger -->
+                        <div class="flex justify-between items-center pt-2">
+                            <button 
+                                type="button" 
+                                @click="addItem()" 
+                                class="h-9 px-4 border border-dashed border-slate-300 dark:border-slate-850 hover:border-slate-800 dark:hover:border-slate-200 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2 transition duration-200 bg-white dark:bg-slate-900"
+                            >
+                                <span class="material-symbols-outlined text-sm">add</span>
+                                <span>Add Packing Item</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Serialized JSON state data storage blocks -->
+        <script id="categories-data" type="application/json">
+            [
+                {% for category in original.categories.all %}
+                    {
+                        "id": "{{ category.id }}",
+                        "name": "{{ category.name|escapejs }}",
+                        "is_required": "Yes",
+                        "sort_order": {{ category.sort_order }}
+                    }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        </script>
+
+        <script id="items-data" type="application/json">
+            [
+                {% for item in original.items.all %}
+                    {
+                        "id": "{{ item.id }}",
+                        "category_id": "{{ item.category.id|default:'' }}",
+                        "brand_category_id": "{{ item.brand_category.id|default:'' }}",
+                        "title": "{{ item.title|escapejs }}",
+                        "quantity": {{ item.quantity }},
+                        "is_required": {% if item.is_required %}true{% else %}false{% endif %},
+                        "show_shop_url": {% if item.show_shop_url %}true{% else %}false{% endif %},
+                        "note_raw": "{{ item.note|escapejs }}"
+                    }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+        </script>
+
+        <!-- Dynamic dashboard controller logic in Alpine.js -->
+        <script>
+            function campDashboard() {
+                return {
+                    campName: "{{ original.title|escapejs }}",
+                    selectedSeason: "{{ original.season|escapejs }}",
+                    selectedTripType: "{{ original.trip_type.id|default:'' }}",
+                    isSystem: {% if original.is_system %}true{% else %}false{% endif %},
+                    sortOrder: {{ original.sort_order|default:0 }},
+                    description: "{{ original.description|default:''|escapejs }}",
+                    
+                    categories: [],
+                    items: [],
+                    activeCategoryId: 'all',
+                    searchQuery: '',
+
+
+                    init() {
+                        const catJson = document.getElementById('categories-data').textContent;
+                        this.categories = JSON.parse(catJson || '[]');
+
+                        const itemsJson = document.getElementById('items-data').textContent;
+                        const itemsRaw = JSON.parse(itemsJson || '[]');
+
+                        this.items = itemsRaw.map(item => {
+                            let noteText = "";
+                            let sentencesText = "";
+                            let urlText = "";
+                            
+                            try {
+                                if (item.note_raw && item.note_raw.startsWith('{')) {
+                                    const parsed = JSON.parse(item.note_raw);
+                                    noteText = parsed.note || "";
+                                    sentencesText = parsed.sentences || "";
+                                    urlText = parsed.url || "";
+                                } else {
+                                    noteText = item.note_raw || "";
+                                }
+                            } catch(e) {
+                                noteText = item.note_raw || "";
+                            }
+                            
+                            return {
+                                id: item.id,
+                                category_id: item.category_id || "",
+                                brand_category_id: item.brand_category_id || "",
+                                title: item.title || "",
+                                quantity: item.quantity || 0,
+                                is_required: item.is_required,
+                                show_shop_url: item.show_shop_url,
+                                note: noteText,
+                                sentences: sentencesText,
+                                url: urlText
+                            };
+                        });
+                    },
+
+
+
+                    getCategoryLabel() {
+                        if (this.activeCategoryId === 'all') return 'All Categories';
+                        if (this.activeCategoryId === 'uncategorized') return 'Uncategorized';
+                        const cat = this.categories.find(c => c.id === this.activeCategoryId);
+                        return cat ? cat.name : 'Unknown';
+                    },
+
+                    filteredItems() {
+                        return this.items.filter(item => {
+                            if (this.activeCategoryId !== 'all') {
+                                if (this.activeCategoryId === 'uncategorized') {
+                                    if (item.category_id !== '') return false;
+                                } else {
+                                    if (item.category_id !== this.activeCategoryId) return false;
+                                }
+                            }
+                            if (this.searchQuery.trim() !== '') {
+                                const query = this.searchQuery.toLowerCase();
+                                return item.title.toLowerCase().includes(query) || 
+                                       (item.note && item.note.toLowerCase().includes(query)) ||
+                                       (item.sentences && item.sentences.toLowerCase().includes(query));
+                            }
+                            return true;
+                        });
+                    },
+
+                    addCategory() {
+                        const tempId = 'temp_cat_' + Math.random().toString(36).substr(2, 9);
+                        this.categories.push({
+                            id: tempId,
+                            name: 'NEW CATEGORY',
+                            is_required: 'Yes',
+                            sort_order: this.categories.length
+                        });
+                        this.activeCategoryId = tempId;
+                    },
+
+                    deleteCategory(id) {
+                        this.categories = this.categories.filter(c => c.id !== id);
+                        this.items.forEach(item => {
+                            if (item.category_id === id) {
+                                item.category_id = '';
+                            }
+                        });
+                        if (this.activeCategoryId === id) {
+                            this.activeCategoryId = 'all';
+                        }
+                    },
+
+                    addItem() {
+                        const tempId = 'temp_item_' + Math.random().toString(36).substr(2, 9);
+                        let defaultCatId = '';
+                        if (this.activeCategoryId !== 'all' && this.activeCategoryId !== 'uncategorized') {
+                            defaultCatId = this.activeCategoryId;
+                        } else if (this.categories.length > 0) {
+                            defaultCatId = this.categories[0].id;
+                        }
+                        this.items.push({
+                            id: tempId,
+                            category_id: defaultCatId,
+                            brand_category_id: '',
+                            title: '',
+                            quantity: 1,
+                            is_required: true,
+                            show_shop_url: false,
+                            note: '',
+                            sentences: '',
+                            url: ''
+                        });
+                    },
+
+                    deleteItem(id) {
+                        this.items = this.items.filter(i => i.id !== id);
+                    },
+
+                    triggerReorder() {
+                        this.items.sort((a, b) => a.title.localeCompare(b.title));
+                        alert('Sorted all elements alphabetically! Click "Update Changes" to save the reordered packing items list.');
+                    },
+
+                    submitForm() {
+                        document.getElementById('custom-save-form').submit();
+                    }
+                };
+            }
+        </script>
+    {% endif %}
+
+    <!-- ACCORDION WRAPPER: Native Django Unfold editors reserved for developers -->
+    <div x-data="{ open: false }" class="font-inter mt-12 mb-8 max-w-[1600px] mx-auto relative z-10">
+        {% if original %}
+            <button 
+                type="button"
+                @click="open = !open" 
+                class="w-full flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-slate-350 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-800 dark:hover:border-slate-200 transition duration-300 shadow-sm"
+            >
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-slate-500 font-normal">construction</span>
+                    <div class="text-left">
+                        <span class="text-xs font-bold uppercase tracking-wider block text-slate-900 dark:text-slate-100">Developer structural view</span>
+                        <span class="text-[11px] text-slate-400 dark:text-slate-500 font-light">Toggle base Django database forms & settings controls</span>
+                    </div>
+                </div>
+                <span 
+                    class="material-symbols-outlined transition-transform duration-300 text-slate-400" 
+                    :class="open ? 'rotate-180 text-slate-800' : ''"
+                >
+                    keyboard_arrow_down
+                </span>
+            </button>
+        {% endif %}
+
+        <div 
+            x-show="open" 
+            x-transition:enter="transition ease-out duration-200 transform"
+            x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            class="mt-4 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm"
+        >
+            {{ block.super }}
+        </div>
+    </div>
+{% endblock %}
