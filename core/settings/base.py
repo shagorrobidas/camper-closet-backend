@@ -232,6 +232,7 @@ UNFOLD = {
     "SITE_HEADER": "Comper Closet Admin",
     "SITE_TITLE": "Comper Closet Admin Portal",
     "INDEX_TITLE": "Comper Closet Admin Portal",
+    "THEME": "dark",
     "STYLES": [
         lambda request: "css/custom_admin.css",
     ],
