@@ -153,7 +153,6 @@ class PackingTemplateAdmin(ModelAdmin):
         'season_badge',
         'system_badge',
         'status_badge',
-        'sort_order',
         'created_at'
     )
     list_filter = (
@@ -164,11 +163,11 @@ class PackingTemplateAdmin(ModelAdmin):
     )
     search_fields = ('title', 'description')
     readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+    exclude = ('deleted_at', 'sort_order')
 
     fieldsets = (
         ("General Information", {
-            "fields": ("title", "trip_type", "season", "sort_order", "is_active"),
+            "fields": ("title", "trip_type", "season", "is_active"),
         }),
         ("Template Details & Media", {
             "fields": ("description", "image", "is_system"),
