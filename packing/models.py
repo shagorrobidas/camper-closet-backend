@@ -122,6 +122,10 @@ class PackingTemplate(BaseModel):
 
     is_system = models.BooleanField(default=True)
 
+    @property
+    def required_items_count(self):
+        return self.items.filter(is_required=True, deleted_at__isnull=True).count()
+
     def __str__(self):
         return self.title
 
@@ -163,10 +167,11 @@ class PackingTemplateItem(BaseModel):
         'dashboard.BrandCategory',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        verbose_name="Sentences"
     )
 
-    show_shop_url = models.BooleanField(default=False)
+    show_shop_url = models.BooleanField(default=False, verbose_name="Shop Now Enable")
 
     title = models.CharField(max_length=255, blank=True, null=True)
 
