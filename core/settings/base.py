@@ -229,6 +229,9 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 # JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS_CONFIG
 
 UNFOLD = {
+    "SITE_HEADER": "Comper Closet Admin",
+    "SITE_TITLE": "Comper Closet Admin Portal",
+    "INDEX_TITLE": "Comper Closet Admin Portal",
     "STYLES": [
         lambda request: "css/custom_admin.css",
     ],
