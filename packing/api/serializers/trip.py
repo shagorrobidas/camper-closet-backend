@@ -7,7 +7,6 @@ from packing.models import (
     PackingTemplateCategory
 )
 from django.db.models import Sum, Q
-from django.db import models
 from django.utils import timezone
 
 
@@ -228,8 +227,9 @@ class TripDetailSerializer(TripSerializer):
         # Get categories from the template
         categories = []
         if obj.template:
-            categories = list(obj.template.categories.all().order_by('sort_order'))
-        
+            categories = list(
+                obj.template.categories.all().order_by('sort_order')
+            )
         # Serialize existing categories
         context = self.context.copy()
         context['trip'] = obj
@@ -237,13 +237,18 @@ class TripDetailSerializer(TripSerializer):
             categories, many=True, context=context
         ).data
 
-        # Handle items without a category (custom items or items with null category)
-        # We include items where template_item is null OR template_item.category is null
         uncategorized_items = obj.packing_items.filter(
             status='active'
         ).filter(
-            (Q(template_item__isnull=True) | Q(template_item__category__isnull=True)) &
-            Q(category__isnull=True)
+            (
+                Q(
+                    template_item__isnull=True
+                ) | Q(
+                    template_item__category__isnull=True
+                )
+            ) & Q(
+                    category__isnull=True
+                )
         ).order_by('sort_order')
 
         if uncategorized_items.exists():
