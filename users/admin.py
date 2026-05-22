@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from unfold.admin import ModelAdmin, TabularInline
 from users.models import (
     User,
@@ -9,6 +10,19 @@ from users.models import (
     UserSubscriptionHistory
 )
 from packing.models import Trip
+
+
+class UserAdminForm(forms.ModelForm):
+    new_password = forms.CharField(
+        label="Change Password",
+        required=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        help_text="Leave blank if you do not want to change the user's password."
+    )
+
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class TripInline(TabularInline):
@@ -34,8 +48,53 @@ class TripInline(TabularInline):
     packed_quantity.short_description = "Packed Quantity"
 
 
+class UserPackingTemplateInline(TabularInline):
+    model = Trip
+    verbose_name = "Camp Template"
+    verbose_name_plural = "Camp Templates"
+    extra = 0
+    show_change_link = True
+    fields = ('trip_name', 'template_link', 'template_trip_type', 'template_season', 'template_total_quantity')
+    readonly_fields = ('trip_name', 'template_link', 'template_trip_type', 'template_season', 'template_total_quantity')
+    can_delete = False
+    tab = True
+    show_count = True
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(template__isnull=False).select_related('template')
+
+    def trip_name(self, obj):
+        return obj.name
+    trip_name.short_description = "Camper Name"
+
+    def template_link(self, obj):
+        from django.utils.safestring import mark_safe
+        if obj.template:
+            url = f"/admin/packing/packingtemplate/{obj.template.id}/change/"
+            return mark_safe(f'<a href="{url}" class="text-indigo-600 hover:text-indigo-900 font-bold hover:underline">{obj.template.title}</a>')
+        return "None"
+    template_link.short_description = "Camp Template"
+
+    def template_trip_type(self, obj):
+        return obj.template.trip_type.name if obj.template and obj.template.trip_type else "None"
+    template_trip_type.short_description = "Camp Type"
+
+    def template_season(self, obj):
+        return obj.template.season if obj.template else "None"
+    template_season.short_description = "Season"
+
+    def template_total_quantity(self, obj):
+        from django.db.models import Sum
+        if obj.template:
+            val = obj.template.items.aggregate(total=Sum('quantity'))['total']
+            return val or 0
+        return 0
+    template_total_quantity.short_description = "Total Quantity"
+
+
 @admin.register(User)
 class UserAdmin(ModelAdmin):
+    form = UserAdminForm
     list_display = (
         'pk', 'email', 'role', 'full_name',
         'is_email_verified', 'is_subscribed',
@@ -49,7 +108,13 @@ class UserAdmin(ModelAdmin):
     search_fields = ('email', 'full_name')
     ordering = ('id',)
     readonly_fields = ('created_at', 'updated_at', 'deleted_at')
-    inlines = [TripInline]
+    inlines = [TripInline, UserPackingTemplateInline]
+
+    def save_model(self, request, obj, form, change):
+        new_pass = form.cleaned_data.get('new_password')
+        if new_pass:
+            obj.set_password(new_pass)
+        super().save_model(request, obj, form, change)
 
 
 # @admin.register(Notification)

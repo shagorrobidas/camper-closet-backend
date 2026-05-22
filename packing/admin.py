@@ -151,6 +151,7 @@ class PackingTemplateAdmin(ModelAdmin):
         'title',
         'trip_type',
         'season_badge',
+        'total_quantity',
         # 'system_badge',
         # 'status_badge',
         'created_at'
@@ -164,6 +165,12 @@ class PackingTemplateAdmin(ModelAdmin):
     search_fields = ('title', 'description')
     readonly_fields = ('created_at', 'updated_at')
     exclude = ('deleted_at', 'sort_order')
+
+    @display(description="Total Quantity")
+    def total_quantity(self, obj):
+        from django.db.models import Sum
+        val = obj.items.aggregate(total=Sum('quantity'))['total']
+        return val or 0
 
     fieldsets = (
         ("General Information", {
