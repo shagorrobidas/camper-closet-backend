@@ -1,6 +1,5 @@
 import logging
 from rest_framework.permissions import IsAuthenticated
-import traceback
 from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
@@ -16,13 +15,10 @@ from packing.models import (
     PackingTemplate,
     TripPackingItem,
     PackingTemplateItem,
-    TripPackingItemSelection,
     TripEvent,
     TripType
 )
 from closet.models import (
-    ClosetItem,
-    ItemCategory,
     ItemCategoryType
 )
 from packing.api.serializers import (
