@@ -60,7 +60,7 @@ class SiteConfiguration(BaseModel):
         max_length=255, verbose_name="Features Section Main Title",
         default="Features", blank=True
     )
-    
+
     # Feature 1
     feature_1_title = models.CharField(
         max_length=255, verbose_name="Feature 1 Title",
@@ -115,7 +115,6 @@ class SiteConfiguration(BaseModel):
         upload_to='site_images/', verbose_name="Packing Section Image",
         blank=True, null=True
     )
-
 
     CONFIG_ID = "00000000-0000-0000-0000-000000000001"
 
