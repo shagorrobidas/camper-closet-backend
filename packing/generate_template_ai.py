@@ -52,7 +52,9 @@ class PackingItem(BaseModel):
     """A single item inside a packing-list category."""
 
     title: str = Field(..., description="Normalised item name")
-    quantity: Optional[int] = Field(None, description="Numeric quantity, null if unknown")
+    quantity: Optional[int] = Field(
+        None, description="Numeric quantity, null if unknown"
+    )
     is_required: bool = Field(True)
     note: Optional[str] = Field(None)
 
@@ -136,7 +138,9 @@ class ImagePreprocessor:
         h, w = img.shape[:2]
         if max(h, w) < 1200:
             scale = 1200 / max(h, w)
-            img = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+            img = cv2.resize(
+                img, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC
+            )
         return img
 
     @staticmethod
@@ -151,7 +155,11 @@ class ImagePreprocessor:
             return img
         h, w = img.shape[:2]
         M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-        return cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        return cv2.warpAffine(
+            img, M, (w, h),
+            flags=cv2.INTER_CUBIC,
+            borderMode=cv2.BORDER_REPLICATE
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -160,10 +168,10 @@ class ImagePreprocessor:
 
 
 class DocumentLoader:
-    """Loads a PDF or image file and returns a list of PIL Images (one per page)."""
+    """Loads a PDF or image file and returns a list of PIL Images (one per page).""" # noqa
 
     IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".webp"}
-    PDF_EXTS   = {".pdf"}
+    PDF_EXTS = {".pdf"}
 
     def __init__(self, dpi: int = 300) -> None:
         self.dpi = dpi
@@ -185,7 +193,9 @@ class DocumentLoader:
         pages = []
         for page in doc:
             pix = page.get_pixmap(matrix=mat, alpha=False)
-            pages.append(Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB"))
+            pages.append(
+                Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB")
+            )
         doc.close()
         logger.info("PDF loaded — %d page(s)", len(pages))
         return pages
@@ -210,7 +220,9 @@ class OCREngine:
         for i, page in enumerate(pages):
             logger.info("OCR — page %d / %d", i + 1, len(pages))
             clean = self.preprocessor.preprocess(page)
-            text  = pytesseract.image_to_string(clean, lang=self.lang, config=self.CONFIG)
+            text = pytesseract.image_to_string(
+                clean, lang=self.lang, config=self.CONFIG
+            )
             parts.append(text)
         return "\n\n---PAGE BREAK---\n\n".join(parts)
 
@@ -221,51 +233,51 @@ class OCREngine:
 
 
 _SYSTEM_PROMPT = """
-You are an expert document parser for packing lists (camps, travel, schools, expeditions).
+    You are an expert document parser for packing lists (camps, travel, schools, expeditions).
 
-Your job:
-1. Read the OCR text provided.
-2. Extract ALL items, categories, quantities, and notes.
-3. Return ONLY a valid JSON object — no markdown, no commentary.
+    Your job:
+    1. Read the OCR text provided.
+    2. Extract ALL items, categories, quantities, and notes.
+    3. Return ONLY a valid JSON object — no markdown, no commentary.
 
-JSON Schema:
-{
-  "title":       string,
-  "description": string | null,
-  "season":      string | null,
-  "trip_type":   string | null,
-  "is_system":   true,
-  "categories": [
+    JSON Schema:
     {
-      "name":       string,
-      "sort_order": integer,
-      "items": [
+    "title":       string,
+    "description": string | null,
+    "season":      string | null,
+    "trip_type":   string | null,
+    "is_system":   true,
+    "categories": [
         {
-          "title":       string,
-          "quantity":    integer | null,
-          "is_required": boolean,
-          "note":        string | null
+        "name":       string,
+        "sort_order": integer,
+        "items": [
+            {
+            "title":       string,
+            "quantity":    integer | null,
+            "is_required": boolean,
+            "note":        string | null
+            }
+        ]
         }
-      ]
+    ]
     }
-  ]
-}
 
-Rules:
-- Detect categories from context (CLOTHING, TOILETRIES, LINENS, UNIFORMS, EQUIPMENT, ACCESSORIES, MISCELLANEOUS, or any other logical group).
-- Normalise item names to title case, remove stray symbols.
-- Parse word quantities ("two", "a pair", "1 pr") → integers.
-- Quantity absent or unclear → null.
-- is_required: false ONLY when text says optional / recommended / suggested.
-- Ignore headers, footers, page numbers, decorative text.
-- Consolidate duplicates across pages.
-""".strip()
+    Rules:
+    - Detect categories from context (CLOTHING, TOILETRIES, LINENS, UNIFORMS, EQUIPMENT, ACCESSORIES, MISCELLANEOUS, or any other logical group).
+    - Normalise item names to title case, remove stray symbols.
+    - Parse word quantities ("two", "a pair", "1 pr") → integers.
+    - Quantity absent or unclear → null.
+    - is_required: false ONLY when text says optional / recommended / suggested.
+    - Ignore headers, footers, page numbers, decorative text.
+    - Consolidate duplicates across pages.
+    """.strip()   # noqa
 
 
 class AIExtractionService:
-    """Sends OCR text (+ optional vision pages) to OpenAI and returns a validated PackingList."""
+    """Sends OCR text (+ optional vision pages) to OpenAI and returns a validated PackingList."""  # noqa
 
-    MODEL      = "gpt-4o"
+    MODEL = "gpt-4o"
     MAX_TOKENS = 4096
 
     def __init__(self, api_key: Optional[str] = None) -> None:
@@ -274,7 +286,7 @@ class AIExtractionService:
             raise EnvironmentError("OPENAI_API_KEY not set. Add it to .env")
         self.client = OpenAI(api_key=key)
 
-    def extract(self, ocr_text: str, vision_pages: Optional[list[Image.Image]] = None) -> PackingList:
+    def extract(self, ocr_text: str, vision_pages: Optional[list[Image.Image]] = None) -> PackingList:   # noqa
         messages = self._build_messages(ocr_text, vision_pages)
         logger.info("Calling OpenAI %s…", self.MODEL)
         response = self.client.chat.completions.create(
@@ -288,21 +300,27 @@ class AIExtractionService:
         logger.info("Response received — %d chars", len(raw))
         return self._validate(raw)
 
-    def _build_messages(self, ocr_text: str, vision_pages: Optional[list[Image.Image]]) -> list[dict]:
+    def _build_messages(
+            self, ocr_text: str,
+            vision_pages: Optional[list[Image.Image]]
+    ) -> list[dict]:
         user_content: list[dict] = []
         if vision_pages:
             for page in vision_pages:
                 b64 = self._to_b64(page)
                 user_content.append({
                     "type": "image_url",
-                    "image_url": {"url": f"data:image/png;base64,{b64}", "detail": "high"},
+                    "image_url": {
+                        "url": f"data:image/png;base64,{b64}",
+                        "detail": "high"
+                    },
                 })
-        
+
         prompt = "Extract the packing list JSON."
         if ocr_text:
-            prompt = f"<ocr_text>\n{ocr_text[:12_000]}\n</ocr_text>\n\n{prompt}"
+            prompt = f"<ocr_text>\n{ocr_text[:12_000]}\n</ocr_text>\n\n{prompt}"  # noqa
         else:
-            prompt = f"Please read the provided document images carefully and {prompt}"
+            prompt = f"Please read the provided document images carefully and {prompt}"   # noqa
 
         user_content.append({
             "type": "text",
@@ -356,9 +374,9 @@ class PackingListAI:
         ocr_lang: str = "eng",
     ) -> None:
         self.use_vision = use_vision
-        self.loader     = DocumentLoader()
-        self.ocr        = OCREngine(lang=ocr_lang)
-        self.ai         = AIExtractionService(api_key=api_key)
+        self.loader = DocumentLoader()
+        self.ocr = OCREngine(lang=ocr_lang)
+        self.ai = AIExtractionService(api_key=api_key)
         logger.info("PackingListAI ready")
 
     def process_file(self, file_path: Union[str, Path]) -> dict:
@@ -367,14 +385,16 @@ class PackingListAI:
 
         Accepts: PDF, JPG, PNG, BMP, TIFF, WebP
         """
-        path  = Path(file_path)
+        path = Path(file_path)
         pages = self.loader.load(path)
         logger.info("Loaded %d page(s) from %s", len(pages), path.name)
 
         try:
             ocr_text = self.ocr.extract_text(pages)
         except Exception as e:
-            logger.warning("Local Tesseract OCR failed or not found, falling back to Vision-only mode: %s", e)
+            logger.warning(
+                "Local Tesseract OCR failed or not found, falling back to Vision-only mode: %s",  str(e)   # noqa
+            )
             ocr_text = ""
 
         if ocr_text:
