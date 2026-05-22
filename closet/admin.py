@@ -18,11 +18,8 @@ class ClosetItemInline(TabularInline):
 @admin.register(ItemCategoryType)
 class ItemCategoryTypeAdmin(ModelAdmin):
     list_display = (
-        "id",
         "name",
         "code",
-        "created_at",
-        "updated_at",
     )
     search_fields = ("name", "code")
     ordering = ("name",)
@@ -33,7 +30,6 @@ class ItemCategoryTypeAdmin(ModelAdmin):
 @admin.register(ItemCategory)
 class ItemCategoryAdmin(ModelAdmin):
     list_display = (
-        "id",
         "name",
         "user",
         "type",
@@ -66,8 +62,6 @@ class ClosetItemAdmin(ModelAdmin):
         "sub_category_name",
         "brand",
         "quantity",
-        "is_scanned",
-        "is_favorite",
         "created_at",
     )
     list_filter = (
