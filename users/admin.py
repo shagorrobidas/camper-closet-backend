@@ -10,6 +10,7 @@ from users.models import (
     UserSubscriptionHistory
 )
 from packing.models import Trip
+from closet.models import ClosetItem
 
 
 from django.utils.safestring import mark_safe
@@ -22,35 +23,20 @@ class TogglePasswordInput(forms.PasswordInput):
         input_id = attrs.get('id') or f"id_{name}"
         
         toggle_html = f"""
-        <div class="relative flex items-center w-full">
+        <div class="flex flex-col gap-1 w-full max-w-lg">
             {html}
-            <button type="button" id="{btn_id}" class="absolute right-3 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-0 border-0 p-0 bg-transparent cursor-pointer flex items-center justify-center">
-                <svg id="{btn_id}-eye" class="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <svg id="{btn_id}-eye-off" class="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-slate-600 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-2 mt-1">
+                <input type="checkbox" id="{btn_id}" class="rounded border-slate-300 dark:border-slate-800 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                <label for="{btn_id}" class="text-xs font-semibold text-slate-500 dark:text-slate-400 cursor-pointer select-none">Show password</label>
+            </div>
         </div>
         <script>
             (function() {{
-                const btn = document.getElementById('{btn_id}');
+                const checkbox = document.getElementById('{btn_id}');
                 const input = document.getElementById('{input_id}');
-                const eye = document.getElementById('{btn_id}-eye');
-                const eyeOff = document.getElementById('{btn_id}-eye-off');
-                if (btn && input) {{
-                    btn.addEventListener('click', function() {{
-                        if (input.type === 'password') {{
-                            input.type = 'text';
-                            eye.classList.add('hidden');
-                            eyeOff.classList.remove('hidden');
-                        }} else {{
-                            input.type = 'password';
-                            eye.classList.remove('hidden');
-                            eyeOff.classList.add('hidden');
-                        }}
+                if (checkbox && input) {{
+                    checkbox.addEventListener('change', function() {{
+                        input.type = checkbox.checked ? 'text' : 'password';
                     }});
                 }}
             }})();
@@ -139,6 +125,19 @@ class UserPackingTemplateInline(TabularInline):
     template_total_quantity.short_description = "Total Quantity"
 
 
+class ClosetItemInline(TabularInline):
+    model = ClosetItem
+    verbose_name = "Closet Item"
+    verbose_name_plural = "Closet Items"
+    extra = 0
+    show_change_link = True
+    fields = ('name', 'main_category', 'sub_category', 'brand', 'size', 'quantity', 'is_favorite')
+    readonly_fields = ('name', 'main_category', 'sub_category', 'brand', 'size', 'quantity', 'is_favorite')
+    can_delete = False
+    tab = True
+    show_count = True
+
+
 @admin.register(User)
 class UserAdmin(ModelAdmin):
     form = UserAdminForm
@@ -155,7 +154,7 @@ class UserAdmin(ModelAdmin):
     search_fields = ('email', 'full_name')
     ordering = ('id',)
     readonly_fields = ('created_at', 'updated_at', 'deleted_at')
-    inlines = [TripInline, UserPackingTemplateInline]
+    inlines = [TripInline, UserPackingTemplateInline, ClosetItemInline]
 
     def save_model(self, request, obj, form, change):
         new_pass = form.cleaned_data.get('new_password')
