@@ -1,5 +1,5 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin
+from unfold.admin import ModelAdmin, TabularInline
 from users.models import (
     User,
     OTP,
@@ -8,6 +8,16 @@ from users.models import (
     NotificationSetting,
     UserSubscriptionHistory
 )
+from packing.models import Trip
+
+
+class TripInline(TabularInline):
+    model = Trip
+    extra = 0
+    show_change_link = True
+    fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
+    readonly_fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
+    can_delete = False
 
 
 @admin.register(User)
@@ -25,6 +35,7 @@ class UserAdmin(ModelAdmin):
     search_fields = ('email', 'full_name')
     ordering = ('id',)
     readonly_fields = ('created_at', 'updated_at', 'deleted_at')
+    inlines = [TripInline]
 
 
 # @admin.register(Notification)
