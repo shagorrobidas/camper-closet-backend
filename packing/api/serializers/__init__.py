@@ -13,6 +13,7 @@ from .trip import (
     ActiveIncompleteTripPackingItemSerializer,
     TripStatisticsSerializer,
 )
+from .create_template import PackingTemplateCreateSerializer
 from .events import TripEventSerializer
 
 
@@ -29,4 +30,5 @@ __all__ = [
     'TripTypeSerializer',
     'ActiveIncompleteTripPackingItemSerializer',
     'TripStatisticsSerializer',
+    'PackingTemplateCreateSerializer',
 ]
