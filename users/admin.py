@@ -15,11 +15,23 @@ class TripInline(TabularInline):
     model = Trip
     extra = 0
     show_change_link = True
-    fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
-    readonly_fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
+    fields = ('name', 'trip_type', 'status', 'start_date', 'end_date', 'total_quantity', 'packed_quantity')
+    readonly_fields = ('name', 'trip_type', 'status', 'start_date', 'end_date', 'total_quantity', 'packed_quantity')
     can_delete = False
     tab = True
     show_count = True
+
+    def total_quantity(self, obj):
+        from django.db.models import Sum
+        val = obj.packing_items.aggregate(total=Sum('quantity'))['total']
+        return val or 0
+    total_quantity.short_description = "Total Quantity"
+
+    def packed_quantity(self, obj):
+        from django.db.models import Sum
+        val = obj.packing_items.aggregate(total=Sum('picked_quantity'))['total']
+        return val or 0
+    packed_quantity.short_description = "Packed Quantity"
 
 
 @admin.register(User)
