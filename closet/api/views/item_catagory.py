@@ -27,7 +27,11 @@ class ItemCategoryListView(ProfileAccessMixin, ListAPIView):
             except ValueError:
                 # Otherwise filter by the ItemCategoryType's name or code
                 queryset = queryset.filter(
-                    Q(type__name__iexact=type_param) | Q(type__code__iexact=type_param)
+                    Q(
+                        type__name__iexact=type_param
+                    ) | Q(
+                        type__code__iexact=type_param
+                    )
                 )
 
         search = request.query_params.get('search')
@@ -48,7 +52,6 @@ class ItemCategoryCreateView(ProfileAccessMixin, CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # We use get_profile_user to support ?child= for parent/child accounts
             user = self.get_profile_user()
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
