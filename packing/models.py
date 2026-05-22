@@ -57,9 +57,19 @@ class Trip(BaseModel):
 
     is_template_applied = models.BooleanField(default=False)
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        "Camp Name",
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
-    location = models.CharField(max_length=255)
+    location = models.CharField(
+        "Camp Location",
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
     start_date = models.DateField()
     end_date = models.DateField()
@@ -76,6 +86,10 @@ class Trip(BaseModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Camper"
+        verbose_name_plural = "Campers"
 
 
 class PackingTemplate(BaseModel):
