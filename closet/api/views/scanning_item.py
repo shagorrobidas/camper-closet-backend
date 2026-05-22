@@ -57,39 +57,39 @@ class ScanItemView(ProfileAccessMixin, APIView):
             b64_image = base64.b64encode(file_bytes).decode("utf-8")
 
             # Remove the dot from extension for data URL
-            mime_type = "image/jpeg" if ext in ['.jpg', '.jpeg'] else "image/png"
+            mime_type = "image/jpeg" if ext in ['.jpg', '.jpeg'] else "image/png"    # noqa
 
-            response = client.chat.completions.create( 
+            response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "system",
                         "content": (
-                            "You are an AI that extracts product details from images. "
-                            "Always return valid JSON with keys: title, color, size, brand, description, quantity. "
+                            "You are an AI that extracts product details from images. "   # noqa
+                            "Always return valid JSON with keys: title, color, size, brand, description, quantity. "   # noqa
                             "The 'quantity' must be a number (e.g., 1). "
-                            "The 'color' must be a JSON array of 6-character hex color codes (e.g., ['#FF0000', '#000000']) representing the dominant colors."
+                            "The 'color' must be a JSON array of 6-character hex color codes (e.g., ['#FF0000', '#000000']) representing the dominant colors."   # noqa
                         )
                     },
                     {
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": "Analyze this image and return product details including numeric quantity."},
+                            {"type": "text", "text": "Analyze this image and return product details including numeric quantity."},   # noqa
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:{mime_type};base64,{b64_image}"
+                                    "url": f"data:{mime_type};base64,{b64_image}"  # noqa
                                 }
                             }
                         ]
                     }
                 ],
                 max_tokens=300,
-                response_format={ "type": "json_object" }
+                response_format={"type": "json_object"}
             )
 
             content = response.choices[0].message.content
-            
+
             # Parse the text response into JSON if it succeeds
             try:
                 parsed_data = json.loads(content)
