@@ -82,7 +82,9 @@ class ClosetItem(BaseModel):
         help_text="Store multiple color codes or names as a JSON array"
     )
     size = models.CharField(
-        max_length=100
+        max_length=100,
+        blank=True,
+        null=True
     )
     quantity = models.IntegerField(
         default=1
