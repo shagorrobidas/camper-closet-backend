@@ -18,6 +18,8 @@ class TripInline(TabularInline):
     fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
     readonly_fields = ('name', 'trip_type', 'status', 'start_date', 'end_date')
     can_delete = False
+    tab = True
+    show_count = True
 
 
 @admin.register(User)
