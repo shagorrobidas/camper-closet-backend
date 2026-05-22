@@ -151,8 +151,8 @@ class PackingTemplateAdmin(ModelAdmin):
         'title',
         'trip_type',
         'season_badge',
-        'system_badge',
-        'status_badge',
+        # 'system_badge',
+        # 'status_badge',
         'created_at'
     )
     list_filter = (
@@ -454,12 +454,10 @@ class TripEventInline(TabularInline):
 @admin.register(Trip)
 class TripAdmin(ModelAdmin):
     list_display = (
-        'id',
-        'name',
         'user',
-        'trip_type',
-        'status',
-        'is_template_applied',
+        'camp_name',
+        'camp_type',
+        'camp_status',
         'start_date',
         'end_date'
     )
@@ -471,6 +469,19 @@ class TripAdmin(ModelAdmin):
     )
     search_fields = ('name', 'location', 'user__email')
     inlines = [TripPackingItemInline, TripEventInline]
+
+    @display(description="Camp Name", ordering="name")
+    def camp_name(self, obj):
+        return obj.name
+
+    @display(description="Camp Type", ordering="name")
+    def camp_type(self, obj):
+        return obj.trip_type.name
+
+    @display(description="Camp Status", ordering="name")
+    def camp_status(self, obj):
+        return obj.status
+    
     readonly_fields = ('created_at', 'updated_at')
     exclude = ('deleted_at',)
 
@@ -481,58 +492,58 @@ class TripPackingItemSelectionInline(TabularInline):
     raw_id_fields = ('closet_item',)
 
 
-@admin.register(TripPackingItem)
-class TripPackingItemAdmin(ModelAdmin):
-    list_display = (
-        '__str__',
-        'trip',
-        'status',
-        'category',
-        'main_category',
-        'sub_category',
-        'title',
-        'quantity',
-        'picked_quantity',
-        'is_packed'
-    )
-    list_filter = (
-        'status',
-        'main_category',
-        'sub_category',
-        'is_packed',
-        'is_custom_item'
-    )
-    search_fields = (
-        'trip__name',
-        'title',
-        'note',
-        'sub_category__name'
-    )
-    inlines = [TripPackingItemSelectionInline]
-    raw_id_fields = (
-        'trip',
-        'category',
-        'main_category',
-        'sub_category',
-        'template_item'
-    )
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(TripPackingItem)
+# class TripPackingItemAdmin(ModelAdmin):
+#     list_display = (
+#         '__str__',
+#         'trip',
+#         'status',
+#         'category',
+#         'main_category',
+#         'sub_category',
+#         'title',
+#         'quantity',
+#         'picked_quantity',
+#         'is_packed'
+#     )
+#     list_filter = (
+#         'status',
+#         'main_category',
+#         'sub_category',
+#         'is_packed',
+#         'is_custom_item'
+#     )
+#     search_fields = (
+#         'trip__name',
+#         'title',
+#         'note',
+#         'sub_category__name'
+#     )
+#     inlines = [TripPackingItemSelectionInline]
+#     raw_id_fields = (
+#         'trip',
+#         'category',
+#         'main_category',
+#         'sub_category',
+#         'template_item'
+#     )
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)
 
 
-@admin.register(TripPackingItemSelection)
-class TripPackingItemSelectionAdmin(ModelAdmin):
-    list_display = (
-        'packing_item',
-        'closet_item',
-        'quantity'
-    )
-    raw_id_fields = (
-        'packing_item',
-        'closet_item'
-    )
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(TripPackingItemSelection)
+# class TripPackingItemSelectionAdmin(ModelAdmin):
+#     list_display = (
+#         'packing_item',
+#         'closet_item',
+#         'quantity'
+#     )
+#     raw_id_fields = (
+#         'packing_item',
+#         'closet_item'
+#     )
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)
 
 
 # @admin.register(TripEvent)
