@@ -174,11 +174,14 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
                     family_ids = {user.id}
                     if user.parent:
                         family_ids.add(user.parent_id)
-                        family_ids.update(user.parent.children.values_list('id', flat=True))
+                        family_ids.update(
+                            user.parent.children.values_list('id', flat=True)
+                        )
                     elif user.role == 'parent':
-                        family_ids.update(user.children.values_list('id', flat=True))
-                    
-                    # Also include the authenticated user in case they are performing the action
+                        family_ids.update(
+                            user.children.values_list('id', flat=True)
+                        )
+
                     family_ids.add(self.request.user.id)
 
                     if closet_item.user_id not in family_ids:
@@ -194,33 +197,32 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
                             f"Selected quantity ({quantity}) for closet item '{closet_item.name}' exceeds available quantity ({closet_item.quantity})." # noqa
                         )
 
-                    # Check if total quantity (existing + new) exceeds the 
-                    # required quantity. For bulk select, we also need to 
-                    # account for multiple entries for the same 
-                    # packing_item in this request.
                     request_total_for_this_item = sum(
-                        entry.get('quantity', 1) 
-                        for entry in data 
+                        entry.get('quantity', 1)
+                        for entry in data
                         if entry.get('packing_item') == item_pk
+                    )
+                    print(
+                        f"Request total for packing item {item_pk}: {request_total_for_this_item}" # noqa
                     )
                     existing_total_for_this_item = sum(
                         s.quantity for s in packing_item.selections.all()
                     )
-                    
+
                     # We need a more complex check if we want to support partial updates in the same request,   # noqa
                     # but for simplicity let's check total for the packing_item against its goal # noqa
-                    # wait, get_or_create handles updates. 
+                    # wait, get_or_create handles updates.
                     # Let's just track the 'planned' total for this packing_item. # noqa
                     if existing_total_for_this_item + quantity > packing_item.quantity: # noqa
                         # This is a bit tricky with get_or_create if we are updating an existing selection. # noqa
                         # Let's just calculate what the final state would be.
                         pass # We'll refine this if needed, but the simple check above covers most cases. # noqa
-                    
+
                     # Simpler check: ensure individual selection doesn't exceed requirement  # noqa
                     # (or total doesn't exceed)
                     # For now, let's at least enforce the closet item limit as it's most critical. # noqa
                     if quantity > closet_item.quantity:
-                         raise ValidationError(f"Insufficient stock for {closet_item.name}") # noqa
+                        raise ValidationError(f"Insufficient stock for {closet_item.name}") # noqa
 
                     # Create or update selection
                     selection, created = TripPackingItemSelection.objects.get_or_create( # noqa
@@ -232,7 +234,7 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
                         selection.quantity = quantity
                         selection.note = note
                         selection.save(update_fields=['quantity', 'note'])
-                    
+
                     all_selections.append(selection)
                     affected_packing_items.add(packing_item)
 
@@ -256,7 +258,7 @@ class TripBulkPackingView(ProfileAccessMixin, APIView):
 
 class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
     permission_classes = [IsAuthenticated]
-    """POST/DELETE to remove one or more closet item selections from a packing item."""
+    """POST/DELETE to remove one or more closet item selections from a packing item."""   # noqa
 
     def post(self, request, *args, **kwargs):
         return self._remove_selections(request, *args, **kwargs)
@@ -269,7 +271,7 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
             trip_pk = self.kwargs.get('trip_pk')
             item_pk = self.kwargs.get('item_pk')
             selection_pk = self.kwargs.get('selection_pk')
-            
+
             # Support multiple IDs in request data OR query params
             selection_ids = request.data.get('selection_ids', [])
             if not selection_ids:
@@ -278,11 +280,11 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
 
             if not isinstance(selection_ids, list):
                 selection_ids = [selection_ids]
-            
+
             # Add selection_pk from URL if present
             if selection_pk:
                 selection_ids.append(selection_pk)
-                
+
             if not selection_ids:
                 return CustomResponse.error(
                     message="No selection IDs provided",
@@ -300,20 +302,20 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
                 pk__in=selection_ids,
                 packing_item=packing_item
             )
-            
+
             count = selections.count()
             if count == 0:
                 return CustomResponse.error(
-                    message="No matching selections found for this packing item",
+                    message="No matching selections found for this packing item",  # noqa
                     status_code=404
                 )
-                
+
             # Perform bulk delete
             selections.delete()
-            
-            # CRITICAL: Manually refresh status since QuerySet.delete() skips model signals/methods
+
+            # CRITICAL: Manually refresh status since QuerySet.delete() skips model signals/methods      # noqa
             packing_item.refresh_status()
-            
+
             item_serializer = TripPackingItemSerializer(
                 packing_item, context={'request': request}
             )
@@ -324,8 +326,6 @@ class PackingItemRemoveClosetView(ProfileAccessMixin, APIView):
             )
         except Exception as e:
             return custom_exception_handler(e, request)
-
-
 
 
 class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
@@ -352,7 +352,9 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
             family_ids = {user.id}
             if user.parent:
                 family_ids.add(user.parent_id)
-                family_ids.update(user.parent.children.values_list('id', flat=True))
+                family_ids.update(
+                    user.parent.children.values_list('id', flat=True)
+                )
             elif user.role == 'parent':
                 family_ids.update(user.children.values_list('id', flat=True))
 
@@ -362,7 +364,7 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
                 is_active=True
             ).exclude(id__in=already_selected_ids)
 
-            # Match by Name to account for duplicate category records across users
+            # Match by Name to account for duplicate category records across users  # noqa
             if packing_item.sub_category:
                 queryset = queryset.filter(
                     sub_category__name__iexact=packing_item.sub_category.name
@@ -371,7 +373,7 @@ class ClosetMatchSuggestionView(ProfileAccessMixin, APIView):
                 queryset = queryset.filter(
                     main_category__name__iexact=packing_item.main_category.name
                 )
-            
+
             suggestions = queryset.order_by('-quantity')
 
             serializer = ClosetItemSerializer(
