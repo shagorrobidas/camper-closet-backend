@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django import forms
+from django.contrib.auth.models import Group
+from django.contrib.admin.sites import NotRegistered
 from unfold.admin import ModelAdmin, TabularInline
 from users.models import (
     User,
@@ -12,8 +14,14 @@ from users.models import (
 from packing.models import Trip
 from closet.models import ClosetItem
 
+try:
+    admin.site.unregister(Group)
+except NotRegistered:
+    pass
+
 
 from django.utils.safestring import mark_safe
+
 
 class TogglePasswordInput(forms.PasswordInput):
     def render(self, name, value, attrs=None, renderer=None):
@@ -142,9 +150,12 @@ class ClosetItemInline(TabularInline):
 class UserAdmin(ModelAdmin):
     form = UserAdminForm
     list_display = (
-        'pk', 'email', 'role', 'full_name',
-        'is_email_verified', 'is_subscribed',
-        'is_active', 'is_superuser'
+        'email',
+        'full_name',
+        'role',
+        'auth_provider',
+        'is_email_verified',
+        'is_subscribed',
     )
     list_filter = (
         'email', 'full_name',
