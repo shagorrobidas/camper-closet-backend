@@ -60,11 +60,10 @@ class ItemCategoryAdmin(ModelAdmin):
 @admin.register(ClosetItem)
 class ClosetItemAdmin(ModelAdmin):
     list_display = (
-        "id",
-        "name",
-        "user",
-        "main_category",
-        "sub_category",
+        "closet_item_name",
+        "user_email",
+        "main_category_name",
+        "sub_category_name",
         "brand",
         "quantity",
         "is_scanned",
@@ -88,3 +87,19 @@ class ClosetItemAdmin(ModelAdmin):
     autocomplete_fields = ("user", "main_category", "sub_category")
     ordering = ("-created_at",)
     readonly_fields = ("created_at", "updated_at", "deleted_at")
+
+    @admin.display(description="User email")
+    def user_email(self, obj):
+        return obj.user.email if obj.user else "None"
+
+    @admin.display(description="Main category name")
+    def main_category_name(self, obj):
+        return obj.main_category.name if obj.main_category else "None"
+
+    @admin.display(description="Sub category name")
+    def sub_category_name(self, obj):
+        return obj.sub_category.name if obj.sub_category else "None"
+
+    @admin.display(description="Closet item name")
+    def closet_item_name(self, obj):
+        return obj.name
