@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from packing.models import PackingTemplate, PackingTemplateItem, TripType
+from packing.models import PackingTemplate, PackingTemplateItem
 from closet.models import ItemCategory, ItemCategoryType
 from django.db import transaction
 from django.db.models import Sum
@@ -31,7 +31,9 @@ class PackingTemplateItemCreateSerializer(serializers.ModelSerializer):
 
 class PackingTemplateCreateSerializer(serializers.ModelSerializer):
     items = PackingTemplateItemCreateSerializer(many=True)
-    trip_type_name = serializers.CharField(source='trip_type.name', read_only=True)
+    trip_type_name = serializers.CharField(
+        source='trip_type.name', read_only=True
+    )
     total_items = serializers.SerializerMethodField()
 
     class Meta:
@@ -59,10 +61,10 @@ class PackingTemplateCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
-        
+
         with transaction.atomic():
             template = PackingTemplate.objects.create(**validated_data)
-            
+
             for item_data in items_data:
                 main_cat = item_data.get('main_category')
                 main_cat_name = item_data.get('main_category_name')
@@ -75,7 +77,7 @@ class PackingTemplateCreateSerializer(serializers.ModelSerializer):
                         name=main_cat_name,
                         defaults={'code': main_cat_name[:5].upper()}
                     )
-                
+
                 # Handle Sub Category (ItemCategory)
                 if main_cat and not sub_cat and sub_cat_name:
                     sub_cat, _ = ItemCategory.objects.get_or_create(
@@ -94,5 +96,4 @@ class PackingTemplateCreateSerializer(serializers.ModelSerializer):
                     note=item_data.get('note'),
                     sort_order=item_data.get('sort_order', 0)
                 )
-                
             return template
