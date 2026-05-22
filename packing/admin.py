@@ -17,12 +17,12 @@ from packing.models import (
 )
 
 
-@admin.register(TripType)
-class TripTypeAdmin(ModelAdmin):
-    list_display = ('name', 'code', 'created_at')
-    search_fields = ('name', 'code')
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(TripType)
+# class TripTypeAdmin(ModelAdmin):
+#     list_display = ('name', 'code', 'created_at')
+#     search_fields = ('name', 'code')
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)
 
 
 class PackingTemplateItemInline(TabularInline):
@@ -53,13 +53,13 @@ class PackingTemplateCategoryInline(TabularInline):
     show_count = True
 
 
-@admin.register(PackingTemplateCategory)
-class PackingTemplateCategoryAdmin(ModelAdmin):
-    list_display = ('name', 'template', 'sort_order')
-    list_filter = ('template',)
-    search_fields = ('name', 'template__title')
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(PackingTemplateCategory)
+# class PackingTemplateCategoryAdmin(ModelAdmin):
+#     list_display = ('name', 'template', 'sort_order')
+#     list_filter = ('template',)
+#     search_fields = ('name', 'template__title')
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)
 
 
 class UploadAIView(UnfoldModelAdminViewMixin, TemplateView):
@@ -199,7 +199,6 @@ class PackingTemplateAdmin(ModelAdmin):
         if request.method == "POST" and request.POST.get("_save_custom") == "1":
             import json
             from django.db import transaction
-            
             try:
                 with transaction.atomic():
                     payload = json.loads(request.POST.get("payload"))
@@ -374,46 +373,46 @@ class PackingTemplateAdmin(ModelAdmin):
         }
 
 
-@admin.register(PackingTemplateItem)
-class PackingTemplateItemAdmin(ModelAdmin):
-    list_display = (
-        'template',
-        'category',
-        'brand_category',
-        'title',
-        'quantity',
-        'is_required',
-        'show_shop_url',
-        'sort_order'
-    )
-    list_filter = (
-        'template',
-        'brand_category',
-        'is_required',
-        'show_shop_url'
-    )
-    search_fields = (
-        'template__title', 'title', 'note',
-        'brand_category__name'
-    )
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(PackingTemplateItem)
+# class PackingTemplateItemAdmin(ModelAdmin):
+#     list_display = (
+#         'template',
+#         'category',
+#         'brand_category',
+#         'title',
+#         'quantity',
+#         'is_required',
+#         'show_shop_url',
+#         'sort_order'
+#     )
+#     list_filter = (
+#         'template',
+#         'brand_category',
+#         'is_required',
+#         'show_shop_url'
+#     )
+#     search_fields = (
+#         'template__title', 'title', 'note',
+#         'brand_category__name'
+#     )
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)
 
-    # Display configuration
-    list_per_page = 10000
-    list_max_show_all = 10000
-    list_fullwidth = False
+#     # Display configuration
+#     list_per_page = 10000
+#     list_max_show_all = 10000
+#     list_fullwidth = False
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "category":
-            import re
-            match = re.search(r'packingtemplateitem/([^/]+)/change', request.path)
-            if match:
-                item_id = match.group(1)
-                item = self.model.objects.filter(id=item_id).first()
-                if item:
-                    kwargs["queryset"] = PackingTemplateCategory.objects.filter(template=item.template)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+#     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+#         if db_field.name == "category":
+#             import re
+#             match = re.search(r'packingtemplateitem/([^/]+)/change', request.path)
+#             if match:
+#                 item_id = match.group(1)
+#                 item = self.model.objects.filter(id=item_id).first()
+#                 if item:
+#                     kwargs["queryset"] = PackingTemplateCategory.objects.filter(template=item.template)
+#         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class TripPackingItemInline(TabularInline):
@@ -516,13 +515,13 @@ class TripPackingItemSelectionAdmin(ModelAdmin):
     exclude = ('deleted_at',)
 
 
-@admin.register(TripEvent)
-class TripEventAdmin(ModelAdmin):
-    list_display = (
-        'title',
-        'trip',
-        'event_type',
-        'date'
-    )
-    readonly_fields = ('created_at', 'updated_at')
-    exclude = ('deleted_at',)
+# @admin.register(TripEvent)
+# class TripEventAdmin(ModelAdmin):
+#     list_display = (
+#         'title',
+#         'trip',
+#         'event_type',
+#         'date'
+#     )
+#     readonly_fields = ('created_at', 'updated_at')
+#     exclude = ('deleted_at',)

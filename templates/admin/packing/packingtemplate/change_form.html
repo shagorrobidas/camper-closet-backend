@@ -260,18 +260,7 @@
             x-init="init()"
             class="saas-bg font-inter min-h-screen p-6 md:p-8 -m-6 md:-m-8 text-slate-700 dark:text-slate-350 relative z-20 transition-colors duration-200"
         >
-            <!-- Hidden django submit form to execute custom atomic database saves -->
-            <form id="custom-save-form" method="POST" action="" class="hidden">
-                {% csrf_token %}
-                <input type="hidden" name="_save_custom" value="1">
-                <input type="hidden" name="camp_name" :value="campName">
-                <input type="hidden" name="season" :value="selectedSeason">
-                <input type="hidden" name="trip_type_id" :value="selectedTripType">
-                <input type="hidden" name="is_system" :value="isSystem ? '1' : '0'">
-                <input type="hidden" name="sort_order" :value="sortOrder">
-                <input type="hidden" name="description" :value="description">
-                <input type="hidden" name="payload" :value="JSON.stringify({categories: categories, items: items})">
-            </form>
+            <!-- Removed hidden nested form to avoid HTML stripping. Inputs will be appended dynamically via JS -->
 
             <div class="max-w-[1600px] mx-auto">
                 
@@ -295,11 +284,19 @@
                             <button 
                                 type="button" 
                                 @click="submitForm()" 
-                                class="h-10 px-5 bg-[#0B1528] dark:bg-indigo-600 hover:bg-[#162540] dark:hover:bg-indigo-500 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow transition duration-200 flex items-center gap-2"
+                                class="relative h-10 px-6 bg-blue-600 hover:bg-blue-700 text-sm font-semibold rounded-xl text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-300 flex items-center gap-2 overflow-hidden group"
                             >
-                                <span class="material-symbols-outlined text-sm font-bold">check</span>
-                                <span>Update Changes</span>
+                                <!-- <span class="material-symbols-outlined text-lg font-bold group-hover:scale-110 transition-transform duration-200">
+                                    check
+                                </span> -->
+                                <span class="font-poppins tracking-wide">
+                                    save changes
+                                </span>
                             </button>
+                            <a href="javascript:history.back()" class="relative h-10 px-6 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-sm font-semibold rounded-xl text-slate-700 shadow-sm transition-all duration-300 flex items-center gap-2 hover:border-slate-300">
+                                <span class="material-symbols-outlined text-lg font-light">arrow_back</span>
+                                <span class="font-poppins tracking-wide">Go Back</span>
+                            </a>
                         </div>
                     </div>
 
@@ -796,7 +793,33 @@
                     },
 
                     submitForm() {
-                        document.getElementById('custom-save-form').submit();
+                        // Find the main Django admin form (Unfold/Django wraps the content block in a form)
+                        const mainForm = document.getElementById('packingtemplate_form') || document.forms[0];
+                        
+                        // Helper to add or update hidden inputs
+                        const addHiddenInput = (name, value) => {
+                            let input = mainForm.querySelector(`input[name="${name}"]`);
+                            if (!input) {
+                                input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = name;
+                                mainForm.appendChild(input);
+                            }
+                            input.value = value;
+                        };
+                        
+                        // Append our custom data
+                        addHiddenInput('_save_custom', '1');
+                        addHiddenInput('camp_name', this.campName);
+                        addHiddenInput('season', this.selectedSeason);
+                        addHiddenInput('trip_type_id', this.selectedTripType);
+                        addHiddenInput('is_system', this.isSystem ? '1' : '0');
+                        addHiddenInput('sort_order', this.sortOrder);
+                        addHiddenInput('description', this.description);
+                        addHiddenInput('payload', JSON.stringify({categories: this.categories, items: this.items}));
+                        
+                        // Submit the main form
+                        mainForm.submit();
                     }
                 };
             }
@@ -838,3 +861,8 @@
         </div>
     </div>
 {% endblock %}
+
+{% block footer %}
+    <!-- Hide default submit buttons to prevent saving without custom JS payload -->
+{% endblock %}
+
