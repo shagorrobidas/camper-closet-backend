@@ -99,7 +99,6 @@ class ClosetItem(BaseModel):
     )
 
     class Meta:
-        unique_together = ("user", "name")
         indexes = [
             models.Index(fields=["user"]),
             models.Index(fields=["sub_category"]),

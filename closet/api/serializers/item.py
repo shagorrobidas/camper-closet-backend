@@ -50,15 +50,6 @@ class ClosetItemSerializer(serializers.ModelSerializer):
         if sub_category and not main_category:
             attrs['main_category'] = sub_category.type
 
-        # 2. Enforce unique user + name constraint
-        name = attrs.get('name')
-        if name:
-            query = ClosetItem.objects.filter(user=user, name=name)
-            if self.instance:
-                query = query.exclude(pk=self.instance.pk)
-            if query.exists():
-                raise serializers.ValidationError({
-                    "name": "You already have an item with this name."
-                })
+
 
         return attrs
