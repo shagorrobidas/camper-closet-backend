@@ -89,6 +89,7 @@ class PackingTemplate(BaseModel):
         ('None', 'None'),
     ]
     title = models.CharField(
+        "Camp name",
         max_length=255
     )
 
@@ -96,7 +97,8 @@ class PackingTemplate(BaseModel):
         TripType,
         on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
+        verbose_name="Camp Type"
     )
 
     season = models.CharField(
@@ -113,6 +115,7 @@ class PackingTemplate(BaseModel):
     )
 
     image = models.ImageField(
+        verbose_name="Image",
         upload_to="packing_templates/",
         blank=True,
         null=True
@@ -128,6 +131,10 @@ class PackingTemplate(BaseModel):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = "Camp"
+        verbose_name_plural = "Camps"
 
 
 class PackingTemplateCategory(BaseModel):

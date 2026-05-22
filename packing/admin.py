@@ -209,8 +209,20 @@ class PackingTemplateAdmin(ModelAdmin):
                     sort_order = int(request.POST.get("sort_order", 0))
                     description = request.POST.get("description")
                     
-                    template = self.get_object(request, object_id)
-                    if template:
+                    template = self.get_object(request, object_id) if object_id else None
+                    is_new = False
+                    if not template:
+                        is_new = True
+                        template = PackingTemplate.objects.create(
+                            title=camp_name,
+                            season=season,
+                            trip_type=TripType.objects.filter(id=trip_type_id).first() if trip_type_id else None,
+                            is_system=is_system,
+                            sort_order=sort_order,
+                            description=description,
+                            is_active=True
+                        )
+                    else:
                         template.title = camp_name
                         template.season = season
                         
@@ -224,98 +236,106 @@ class PackingTemplateAdmin(ModelAdmin):
                         template.description = description
                         template.save()
 
-                        # Track existing categories and items to delete ones that are removed
-                        existing_categories = {str(c.id): c for c in template.categories.all()}
-                        existing_items = {str(i.id): i for i in template.items.all()}
+                    # Track existing categories and items to delete ones that are removed
+                    existing_categories = {str(c.id): c for c in template.categories.all()} if not is_new else {}
+                    existing_items = {str(i.id): i for i in template.items.all()} if not is_new else {}
 
-                        kept_category_ids = set()
-                        kept_item_ids = set()
+                    kept_category_ids = set()
+                    kept_item_ids = set()
 
-                        # Save Categories
-                        category_id_mapping = {} # Map UI temp IDs to real database UUIDs
-                        for cat_idx, cat_data in enumerate(payload.get("categories", [])):
-                            cat_id = cat_data.get("id")
-                            cat_name = cat_data.get("name")
-                            cat_sort = cat_data.get("sort_order", cat_idx)
+                    # Save Categories
+                    category_id_mapping = {} # Map UI temp IDs to real database UUIDs
+                    for cat_idx, cat_data in enumerate(payload.get("categories", [])):
+                        cat_id = cat_data.get("id")
+                        cat_name = cat_data.get("name")
+                        cat_sort = cat_data.get("sort_order", cat_idx)
 
-                            if cat_id in existing_categories:
-                                category = existing_categories[cat_id]
-                                category.name = cat_name
-                                category.sort_order = cat_sort
-                                category.save()
-                                kept_category_ids.add(cat_id)
-                                category_id_mapping[cat_id] = category
-                            else:
-                                category = PackingTemplateCategory.objects.create(
-                                    template=template,
-                                    name=cat_name,
-                                    sort_order=cat_sort
-                                )
-                                category_id_mapping[cat_id] = category
-                                kept_category_ids.add(str(category.id))
+                        if cat_id in existing_categories:
+                            category = existing_categories[cat_id]
+                            category.name = cat_name
+                            category.sort_order = cat_sort
+                            category.save()
+                            kept_category_ids.add(cat_id)
+                            category_id_mapping[cat_id] = category
+                        else:
+                            category = PackingTemplateCategory.objects.create(
+                                template=template,
+                                name=cat_name,
+                                sort_order=cat_sort
+                            )
+                            category_id_mapping[cat_id] = category
+                            kept_category_ids.add(str(category.id))
 
-                        # Save Items
-                        for item_idx, item_data in enumerate(payload.get("items", [])):
-                            item_id = item_data.get("id")
-                            cat_temp_id = item_data.get("category_id")
-                            brand_category_id = item_data.get("brand_category_id")
-                            title = item_data.get("title")
-                            quantity = int(item_data.get("quantity", 0))
-                            is_required = item_data.get("is_required", True)
-                            show_shop_url = item_data.get("show_shop_url", False)
-                            
-                            # Store note, sentences, and url in the note field as a JSON string
-                            note_payload = {
-                                "note": item_data.get("note", ""),
-                                "sentences": item_data.get("sentences", ""),
-                                "url": item_data.get("url", "")
-                            }
-                            note_str = json.dumps(note_payload)
+                    # Save Items
+                    for item_idx, item_data in enumerate(payload.get("items", [])):
+                        item_id = item_data.get("id")
+                        cat_temp_id = item_data.get("category_id")
+                        brand_category_id = item_data.get("brand_category_id")
+                        title = item_data.get("title")
+                        quantity = int(item_data.get("quantity", 0))
+                        is_required = item_data.get("is_required", True)
+                        show_shop_url = item_data.get("show_shop_url", False)
+                        
+                        # Store note, sentences, and url in the note field as a JSON string
+                        note_payload = {
+                            "note": item_data.get("note", ""),
+                            "sentences": item_data.get("sentences", ""),
+                            "url": item_data.get("url", "")
+                        }
+                        note_str = json.dumps(note_payload)
 
-                            # Get the saved category object
-                            category_obj = category_id_mapping.get(cat_temp_id)
+                        # Get the saved category object
+                        category_obj = category_id_mapping.get(cat_temp_id)
 
-                            from dashboard.models import BrandCategory
-                            brand_cat_obj = BrandCategory.objects.filter(id=brand_category_id).first() if brand_category_id else None
+                        from dashboard.models import BrandCategory
+                        brand_cat_obj = BrandCategory.objects.filter(id=brand_category_id).first() if brand_category_id else None
 
-                            if item_id in existing_items:
-                                item = existing_items[item_id]
-                                item.category = category_obj
-                                item.brand_category = brand_cat_obj
-                                item.title = title
-                                item.quantity = quantity
-                                item.is_required = is_required
-                                item.show_shop_url = show_shop_url
-                                item.note = note_str
-                                item.sort_order = item_idx
-                                item.save()
-                                kept_item_ids.add(item_id)
-                            else:
-                                item = PackingTemplateItem.objects.create(
-                                    template=template,
-                                    category=category_obj,
-                                    brand_category=brand_cat_obj,
-                                    title=title,
-                                    quantity=quantity,
-                                    is_required=is_required,
-                                    show_shop_url=show_shop_url,
-                                    note=note_str,
-                                    sort_order=item_idx
-                                )
-                                kept_item_ids.add(str(item.id))
+                        if item_id in existing_items:
+                            item = existing_items[item_id]
+                            item.category = category_obj
+                            item.brand_category = brand_cat_obj
+                            item.title = title
+                            item.quantity = quantity
+                            item.is_required = is_required
+                            item.show_shop_url = show_shop_url
+                            item.note = note_str
+                            item.sort_order = item_idx
+                            item.save()
+                            kept_item_ids.add(item_id)
+                        else:
+                            item = PackingTemplateItem.objects.create(
+                                template=template,
+                                category=category_obj,
+                                brand_category=brand_cat_obj,
+                                title=title,
+                                quantity=quantity,
+                                is_required=is_required,
+                                show_shop_url=show_shop_url,
+                                note=note_str,
+                                sort_order=item_idx
+                            )
+                            kept_item_ids.add(str(item.id))
 
-                        # Delete categories and items that were removed in the UI
-                        for cat_id, cat_obj in existing_categories.items():
-                            if cat_id not in kept_category_ids:
-                                cat_obj.delete()
+                    # Delete categories and items that were removed in the UI
+                    for cat_id, cat_obj in existing_categories.items():
+                        if cat_id not in kept_category_ids:
+                            cat_obj.delete()
 
-                        for item_id, item_obj in existing_items.items():
-                            if item_id not in kept_item_ids:
-                                item_obj.delete()
+                    for item_id, item_obj in existing_items.items():
+                        if item_id not in kept_item_ids:
+                            item_obj.delete()
 
-                        messages.success(request, f"Successfully updated camp packing list details for: '{template.title}'!")
+                    messages.success(
+                        request, 
+                        f"Successfully {'created' if is_new else 'updated'} camp packing list details for: '{template.title}'!"
+                    )
                     
-                    return HttpResponseRedirect(request.path)
+                    if is_new:
+                        from django.urls import reverse
+                        redirect_url = reverse("admin:packing_packingtemplate_change", args=[template.id])
+                        return HttpResponseRedirect(redirect_url)
+                    else:
+                        return HttpResponseRedirect(request.path)
 
             except Exception as e:
                 import logging

@@ -253,14 +253,13 @@
 {% endblock %}
 
 {% block content %}
-    {% if original %}
-        <!-- Modern SaaS Admin Dashboard Wrapper -->
-        <div 
-            x-data="campDashboard()" 
-            x-init="init()"
-            class="saas-bg font-inter min-h-screen p-6 md:p-8 -m-6 md:-m-8 text-slate-700 dark:text-slate-350 relative z-20 transition-colors duration-200"
-        >
-            <!-- Removed hidden nested form to avoid HTML stripping. Inputs will be appended dynamically via JS -->
+    <!-- Modern SaaS Admin Dashboard Wrapper -->
+    <div 
+        x-data="campDashboard()" 
+        x-init="init()"
+        class="saas-bg font-inter min-h-screen p-6 md:p-8 -m-6 md:-m-8 text-slate-700 dark:text-slate-350 relative z-20 transition-colors duration-200"
+    >
+        <!-- Removed hidden nested form to avoid HTML stripping. Inputs will be appended dynamically via JS -->
 
             <div class="max-w-[1600px] mx-auto">
                 
@@ -290,7 +289,7 @@
                                     check
                                 </span> -->
                                 <span class="font-poppins tracking-wide">
-                                    save changes
+                                    {% if original %}save changes{% else %}create camp{% endif %}
                                 </span>
                             </button>
                             <a href="javascript:history.back()" class="relative h-10 px-6 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-sm font-semibold rounded-xl text-slate-700 shadow-sm transition-all duration-300 flex items-center gap-2 hover:border-slate-300">
@@ -376,7 +375,6 @@
 
                     <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
 
-                    {% comment %}
                     <!-- 3. DYNAMIC CATEGORIES TABULAR PANEL -->
                     <div class="space-y-4 pt-2">
                         <div class="flex items-center justify-between">
@@ -457,7 +455,6 @@
                     </div>
 
                     <div class="border-t border-slate-100 dark:border-slate-800 my-2"></div>
-                    {% endcomment %}
 
                     <!-- 4. DYNAMIC ITEMS TABULAR PANEL -->
                     <div class="space-y-4 pt-2">
@@ -476,13 +473,18 @@
                                     <span class="text-slate-400 uppercase font-bold text-[9px] tracking-wider">Active Filter:</span>
                                     <select 
                                         x-model="activeCategoryId" 
+                                        x-init="
+                                            const updateFilter = () => {
+                                                const currentVal = activeCategoryId;
+                                                $el.innerHTML = '<option value=\'all\'>All Categories</option><option value=\'uncategorized\'>Uncategorized</option>' + 
+                                                    categories.map(c => `<option value=\'${c.id}\'>${c.name.toUpperCase()}</option>`).join('');
+                                                $el.value = currentVal;
+                                            };
+                                            $watch('categories', updateFilter);
+                                            updateFilter();
+                                        "
                                         class="bg-transparent border-0 p-0 text-slate-800 dark:text-slate-200 font-semibold focus:ring-0 cursor-pointer"
                                     >
-                                        <option value="all">All Categories</option>
-                                        <option value="uncategorized">Uncategorized</option>
-                                        <template x-for="cat in categories" :key="cat.id">
-                                            <option :value="cat.id" x-text="cat.name"></option>
-                                        </template>
                                     </select>
                                 </div>
 
@@ -517,20 +519,22 @@
                                 <tbody class="divide-y divide-slate-50 dark:divide-slate-800/40 text-xs">
                                     <template x-for="(item, index) in filteredItems()" :key="item.id">
                                         <tr class="hover:saas-bg/40 hover:bg-slate-50/40 dark:hover:bg-slate-950/40 transition duration-100">
-                                            <!-- Category Select Dropdown (Avoid Alpine race condition via static render fallback) -->
+                                            <!-- Category Select Dropdown -->
                                             <td class="py-2.5 px-2">
                                                 <select 
                                                     x-model="item.category_id" 
+                                                    x-init="
+                                                        const updateItemOptions = () => {
+                                                            const currentVal = item.category_id;
+                                                            $el.innerHTML = '<option value=\'\'>UNCATEGORIZED</option>' + 
+                                                                categories.map(c => `<option value=\'${c.id}\'>${c.name.toUpperCase()}</option>`).join('');
+                                                            $el.value = currentVal;
+                                                        };
+                                                        $watch('categories', updateItemOptions);
+                                                        updateItemOptions();
+                                                    "
                                                     class="w-full h-8 px-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-slate-800 dark:focus:border-indigo-500 rounded-lg text-xs font-medium transition duration-150 text-slate-800 dark:text-slate-200"
                                                 >
-                                                    <option value="">UNCATEGORIZED</option>
-                                                    {% for category in original.categories.all %}
-                                                        <option value="{{ category.id }}">{{ category.name }}</option>
-                                                    {% endfor %}
-                                                    <!-- Dynamic rendering fallback for newly added unsaved categories -->
-                                                    <template x-for="cat in categories.filter(c => c.id.startsWith('temp_'))" :key="cat.id">
-                                                        <option :value="cat.id" x-text="cat.name"></option>
-                                                    </template>
                                                 </select>
                                             </td>
 
@@ -698,6 +702,7 @@
                             return {
                                 id: item.id,
                                 category_id: item.category_id || "",
+                                filter_category_id: item.category_id || "",
                                 brand_category_id: item.brand_category_id || "",
                                 title: item.title || "",
                                 quantity: item.quantity || 0,
@@ -707,6 +712,12 @@
                                 sentences: sentencesText,
                                 url: urlText
                             };
+                        });
+
+                        this.$watch('activeCategoryId', (newVal) => {
+                            this.items.forEach(item => {
+                                item.filter_category_id = item.category_id;
+                            });
                         });
                     },
 
@@ -719,13 +730,13 @@
                         return cat ? cat.name : 'Unknown';
                     },
 
-                    filteredItems() {
+                     filteredItems() {
                         return this.items.filter(item => {
                             if (this.activeCategoryId !== 'all') {
                                 if (this.activeCategoryId === 'uncategorized') {
-                                    if (item.category_id !== '') return false;
+                                    if ((item.filter_category_id || '') !== '') return false;
                                 } else {
-                                    if (item.category_id !== this.activeCategoryId) return false;
+                                    if (item.filter_category_id !== this.activeCategoryId) return false;
                                 }
                             }
                             if (this.searchQuery.trim() !== '') {
@@ -754,6 +765,7 @@
                         this.items.forEach(item => {
                             if (item.category_id === id) {
                                 item.category_id = '';
+                                item.filter_category_id = '';
                             }
                         });
                         if (this.activeCategoryId === id) {
@@ -772,6 +784,7 @@
                         this.items.push({
                             id: tempId,
                             category_id: defaultCatId,
+                            filter_category_id: defaultCatId,
                             brand_category_id: '',
                             title: '',
                             quantity: 1,
@@ -824,11 +837,10 @@
                 };
             }
         </script>
-    {% endif %}
+        </div>
 
-    <!-- ACCORDION WRAPPER: Native Django Unfold editors reserved for developers -->
-    <div x-data="{ open: false }" class="font-inter mt-12 mb-8 max-w-[1600px] mx-auto relative z-10">
-        {% if original %}
+        <!-- ACCORDION WRAPPER: Native Django Unfold editors reserved for developers -->
+        <div x-data="{ open: false }" class="font-inter mt-12 mb-8 max-w-[1600px] mx-auto relative z-10">
             <button 
                 type="button"
                 @click="open = !open" 
@@ -848,18 +860,17 @@
                     keyboard_arrow_down
                 </span>
             </button>
-        {% endif %}
 
-        <div 
-            x-show="open" 
-            x-transition:enter="transition ease-out duration-200 transform"
-            x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
-            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-            class="developer-structural-view mt-4 p-6 rounded-2xl shadow-sm"
-        >
-            {{ block.super }}
+            <div 
+                x-show="open" 
+                x-transition:enter="transition ease-out duration-200 transform"
+                x-transition:enter-start="opacity-0 -translate-y-2 scale-98"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                class="developer-structural-view mt-4 p-6 rounded-2xl shadow-sm"
+            >
+                {{ block.super }}
+            </div>
         </div>
-    </div>
 {% endblock %}
 
 {% block footer %}
