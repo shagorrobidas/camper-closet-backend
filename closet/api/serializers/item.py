@@ -42,14 +42,9 @@ class ClosetItemSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        user = self.context['request'].user
-        
         # 1. Auto-pick main_category from sub_category
         sub_category = attrs.get('sub_category')
         main_category = attrs.get('main_category')
         if sub_category and not main_category:
             attrs['main_category'] = sub_category.type
-
-
-
         return attrs
