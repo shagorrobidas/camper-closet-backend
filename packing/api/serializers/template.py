@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from packing.models import PackingTemplate, PackingTemplateItem, PackingTemplateCategory
+from packing.models import (
+    PackingTemplate,
+    PackingTemplateItem,
+    PackingTemplateCategory
+)
 from django.db.models import Sum
 
 
@@ -94,4 +98,6 @@ class PackingTemplateDetailSerializer(PackingTemplateSerializer):
     items = PackingTemplateItemSerializer(many=True, read_only=True)
 
     class Meta(PackingTemplateSerializer.Meta):
-        fields = PackingTemplateSerializer.Meta.fields + ['categories', 'items']
+        fields = PackingTemplateSerializer.Meta.fields + [
+            'categories', 'items'
+        ]
