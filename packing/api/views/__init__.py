@@ -28,6 +28,10 @@ from .packing import (
     TripEventCreateView,
     TripEventDeleteView,
 )
+from .template_category import (
+    PackingTemplateCategoryListView,
+    PackingTemplateCategoryDetailView,
+)
 
 
 __all__ = [
@@ -54,4 +58,6 @@ __all__ = [
     'UpcomingTripEventListView',
     'ActiveIncompleteTripPackingItemListView',
     'PackingTemplateCreateAPIView',
+    'PackingTemplateCategoryListView',
+    'PackingTemplateCategoryDetailView',
 ]
