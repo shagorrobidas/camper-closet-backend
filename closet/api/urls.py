@@ -10,6 +10,8 @@ from closet.api.views import (
     ClosetItemDeleteView,
     ClosetItemToggleFavoriteView,
     ScanItemView,
+    ClosetCategoryApiView,
+    ClosetSubCategoryApiView,
 )
 
 urlpatterns = [
@@ -63,4 +65,38 @@ urlpatterns = [
         ScanItemView.as_view(),
         name='closet_items_scan'
     ),
+
+    # Main category APIs (ItemCategoryType)
+    path(
+        'closet-category/',
+        ClosetCategoryApiView.as_view(),
+        name='closet_category_list_create'
+    ),
+    path(
+        'closet-category/<uuid:pk>/',
+        ClosetCategoryApiView.as_view(),
+        name='closet_category_detail'
+    ),
+
+    # Subcategory APIs (ItemCategory)
+    path(
+        'closet-sub-category/',
+        ClosetSubCategoryApiView.as_view(),
+        name='closet_subcategory_list_create'
+    ),
+    path(
+        'closet-sub-category/<uuid:pk>/',
+        ClosetSubCategoryApiView.as_view(),
+        name='closet_subcategory_detail'
+    ),
+    # path(
+    #     'closet-subcetagary/',
+    #     ClosetSubCategoryApiView.as_view(),
+    #     name='closet_subcategory_list_create_alt'
+    # ),
+    # path(
+    #     'closet-subcetagary/<uuid:pk>/',
+    #     ClosetSubCategoryApiView.as_view(),
+    #     name='closet_subcategory_detail_alt'
+    # ),
 ]
