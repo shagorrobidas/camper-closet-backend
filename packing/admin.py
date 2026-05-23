@@ -461,7 +461,8 @@ class TripEventInline(TabularInline):
 @admin.register(Trip)
 class TripAdmin(ModelAdmin):
     list_display = (
-        'user',
+        'parent_account',
+        'camper',
         'camp_name',
         'camp_type',
         'camp_status',
@@ -474,18 +475,28 @@ class TripAdmin(ModelAdmin):
         'is_template_applied',
         'start_date'
     )
-    search_fields = ('name', 'location', 'user__email')
+    search_fields = ('name', 'location', 'user__email', 'user__parent__email')
     inlines = [TripPackingItemInline, TripEventInline]
 
-    @display(description="Camp Name", ordering="name")
+    @display(description="Parent Account", ordering="user__parent__email")
+    def parent_account(self, obj):
+        if obj.user.parent:
+            return f"{obj.user.parent.full_name} ({obj.user.parent.email})"
+        return f"{obj.user.full_name} ({obj.user.email})"
+
+    @display(description="Camper", ordering="user__full_name")
+    def camper(self, obj):
+        return obj.user.full_name
+
+    @display(description="Camp Name", ordering="template__title")
     def camp_name(self, obj):
-        return obj.name
+        return obj.template.title if obj.template else obj.name
 
-    @display(description="Camp Type", ordering="name")
+    @display(description="Camp Type", ordering="trip_type__name")
     def camp_type(self, obj):
-        return obj.trip_type.name
+        return obj.trip_type.name if obj.trip_type else "-"
 
-    @display(description="Camp Status", ordering="name")
+    @display(description="Camp Status", ordering="status")
     def camp_status(self, obj):
         return obj.status
     
