@@ -4,8 +4,24 @@ from django.conf import settings
 
 
 class ItemCategoryType(BaseModel):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=5, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='category_types',
+        null=True,
+        blank=True
+    )
+    name = models.CharField(
+        max_length=100
+    )
+    code = models.CharField(
+        max_length=5, 
+        null=True, 
+        blank=True
+    )
+
+    class Meta:
+        unique_together = ("user", "name")
 
     def __str__(self):
         return self.name
