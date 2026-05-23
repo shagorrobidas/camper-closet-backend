@@ -2,6 +2,8 @@ from django.urls import path
 from packing.api.views import (
     PackingTemplateListView,
     PackingTemplateDetailView,
+    PackingTemplateCategoryListView,
+    PackingTemplateCategoryDetailView,
     TripListView,
     TripDetailView,
     TripCreateView,
@@ -41,6 +43,16 @@ urlpatterns = [
         'templates/<uuid:pk>/',
         PackingTemplateDetailView.as_view(),
         name='packing-template-detail'
+    ),
+    path(
+        'templates/categories/',
+        PackingTemplateCategoryListView.as_view(),
+        name='packing-template-category-list'
+    ),
+    path(
+        'templates/categories/<uuid:pk>/',
+        PackingTemplateCategoryDetailView.as_view(),
+        name='packing-template-category-detail'
     ),
 
     # Trips
