@@ -15,6 +15,7 @@ from packing.models import (
     PackingTemplate,
     TripPackingItem,
     PackingTemplateItem,
+    PackingTemplateCategory,
     TripEvent,
     TripType
 )
