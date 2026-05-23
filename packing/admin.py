@@ -17,12 +17,12 @@ from packing.models import (
 )
 
 
-# @admin.register(TripType)
-# class TripTypeAdmin(ModelAdmin):
-#     list_display = ('name', 'code', 'created_at')
-#     search_fields = ('name', 'code')
-#     readonly_fields = ('created_at', 'updated_at')
-#     exclude = ('deleted_at',)
+@admin.register(TripType)
+class CampTypeAdmin(ModelAdmin):
+    list_display = ('name', 'code', 'created_at')
+    search_fields = ('name', 'code')
+    readonly_fields = ('created_at', 'updated_at')
+    exclude = ('deleted_at',)
 
 
 class PackingTemplateItemInline(TabularInline):
@@ -356,8 +356,6 @@ class PackingTemplateAdmin(ModelAdmin):
         from dashboard.models import BrandCategory
         extra_context["brand_categories"] = BrandCategory.objects.all()
         return super().changeform_view(request, object_id, form_url, extra_context)
-
-
 
     @display(
         description="Season",
