@@ -456,21 +456,35 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
                 # Auto-generate trip events
                 _create_trip_events(trip)
 
-                # 3. Create PackingTemplateItems
-                cat_types = ItemCategoryType.objects.all()
+                # 3. Create PackingTemplateCategory, PackingTemplateItem, and TripPackingItem for each category type
+                from django.db.models import Q
+                cat_types = ItemCategoryType.objects.filter(
+                    Q(user=user) | Q(user__isnull=True)
+                )
                 for cat_type in cat_types:
-                    PackingTemplateItem.objects.create(
+                    # Create template category
+                    template_cat = PackingTemplateCategory.objects.create(
                         template=template,
-                        title=trip.name,
+                        name=cat_type.name,
+                        sort_order=0
+                    )
+
+                    # Create template item under the template category
+                    t_item = PackingTemplateItem.objects.create(
+                        template=template,
+                        category=template_cat,
+                        title=cat_type.name,
                         is_required=False,
                         quantity=0
                     )
 
-                    # 4. Create TripPackingItems
+                    # Create trip packing item linked to the category
                     TripPackingItem.objects.create(
                         trip=trip,
                         main_category=cat_type,
-                        title=trip.name,
+                        template_item=t_item,
+                        category=template_cat,
+                        title=cat_type.name,
                         status='active',
                         is_required=False,
                         is_packed=False,
