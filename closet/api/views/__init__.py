@@ -14,6 +14,10 @@ from .item import (
     ClosetItemToggleFavoriteView,
 )
 from .scanning_item import ScanItemView
+from .cetagory import (
+    ClosetCategoryApiView,
+    ClosetSubCategoryApiView,
+)
 
 
 __all__ = [
@@ -27,4 +31,6 @@ __all__ = [
     'ClosetItemDeleteView',
     'ClosetItemToggleFavoriteView',
     'ScanItemView',
+    'ClosetCategoryApiView',
+    'ClosetSubCategoryApiView',
 ]
