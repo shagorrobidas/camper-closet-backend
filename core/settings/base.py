@@ -236,6 +236,7 @@ UNFOLD = {
     "STYLES": [
         lambda request: "css/custom_admin.css",
     ],
+    "DASHBOARD_CALLBACK": "dashboard.views.dashboard_callback",
 }
 
 # File Upload Settings
