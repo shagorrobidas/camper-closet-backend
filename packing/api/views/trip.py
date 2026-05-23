@@ -411,6 +411,21 @@ class MenualTripCreateView(ProfileAccessMixin, CreateAPIView):
             data = request.data.copy()
             data['user'] = user.id
 
+            # Fallback for trip_type if the provided ID is missing, invalid, or does not exist
+            trip_type_id = data.get('trip_type')
+            trip_type_exists = False
+            if trip_type_id:
+                try:
+                    trip_type_exists = TripType.objects.filter(id=trip_type_id).exists()
+                except Exception:
+                    pass
+
+            if not trip_type_exists:
+                fallback_type = TripType.objects.first()
+                if not fallback_type:
+                    fallback_type = TripType.objects.create(name='Camping', code='CAMP')
+                data['trip_type'] = str(fallback_type.id)
+
             serializer = self.get_serializer(data=data)
             if not serializer.is_valid():
                 print("Serializer errors in MenualTripCreateView:")
