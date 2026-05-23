@@ -1,0 +1,40 @@
+{% extends 'admin/index.html' %}
+{% load i18n %}
+{% load unfold %}
+
+{% block content %}
+    <div class="mb-8">
+        {% component "unfold/components/flex.html" with class="gap-4 flex-col md:flex-row" %}
+            
+            {% component "unfold/components/card.html" with class="flex-1 p-6" %}
+                {% component "unfold/components/text.html" with class="text-sm font-semibold uppercase text-zinc-500 dark:text-zinc-400" %}
+                    Total Users
+                {% endcomponent %}
+                {% component "unfold/components/title.html" with class="text-3xl font-extrabold mt-2 text-zinc-900 dark:text-white" %}
+                    {{ total_users }}
+                {% endcomponent %}
+            {% endcomponent %}
+
+            {% component "unfold/components/card.html" with class="flex-1 p-6" %}
+                {% component "unfold/components/text.html" with class="text-sm font-semibold uppercase text-zinc-500 dark:text-zinc-400" %}
+                    Total Camps
+                {% endcomponent %}
+                {% component "unfold/components/title.html" with class="text-3xl font-extrabold mt-2 text-zinc-900 dark:text-white" %}
+                    {{ total_camps }}
+                {% endcomponent %}
+            {% endcomponent %}
+
+            {% component "unfold/components/card.html" with class="flex-1 p-6" %}
+                {% component "unfold/components/text.html" with class="text-sm font-semibold uppercase text-zinc-500 dark:text-zinc-400" %}
+                    Total Campers
+                {% endcomponent %}
+                {% component "unfold/components/title.html" with class="text-3xl font-extrabold mt-2 text-zinc-900 dark:text-white" %}
+                    {{ total_campers }}
+                {% endcomponent %}
+            {% endcomponent %}
+
+        {% endcomponent %}
+    </div>
+
+    {{ block.super }}
+{% endblock %}
